@@ -42,3 +42,11 @@ cmake-build-*/
 *.so
 *.a
 .DS_Store
+# Secrets / SSH keys (never commit these)
+.ssh/
+*.pem
+*.key
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
