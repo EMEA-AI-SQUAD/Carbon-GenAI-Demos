@@ -1,0 +1,13 @@
+{
+  "shell_port": 60077,
+  "iopub_port": 48569,
+  "stdin_port": 46991,
+  "control_port": 37265,
+  "hb_port": 54249,
+  "ip": "127.0.0.1",
+  "key": "fb5aa26d-49c1f9005a94e6894720349e",
+  "transport": "tcp",
+  "signature_scheme": "hmac-sha256",
+  "kernel_name": "python3",
+  "jupyter_session": "/home/cecuser/carbon-tutorial-nextjs/entity_extraction.ipynb"
+}

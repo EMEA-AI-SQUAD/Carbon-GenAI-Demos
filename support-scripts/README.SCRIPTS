@@ -1,0 +1,9 @@
+
+Scripts in this directory are intended to provide short cuts for performing
+a few common tasks that people have asked support for help with in the past.
+
+In most cases the name is sufficient to describe what the script will do.
+Some of them may perform some extra checks or require manual confirmation
+before they will do anything.
+
+You should run them as root, or use sudo to run them as root.

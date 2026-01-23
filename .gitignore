@@ -1,0 +1,44 @@
+# Node / Next.js
+node_modules/
+.next/
+.cache/
+
+# Yarn Berry cache
+.yarn/cache/
+.yarn/unplugged/
+.yarn/install-state.gz
+
+# Python
+__pycache__/
+*.pyc
+.llama.cpp.venv/
+.venv/
+
+# Pip cache
+.cache/pip/
+
+# CMake build directories
+build/
+cmake-build/
+*.o
+
+# General
+.DS_Store
+node_modules/
+.next/
+.cache/
+.yarn/
+.yarn/cache/
+.yarn/unplugged/
+.yarn/install-state.gz
+__pycache__/
+*.pyc
+.venv/
+.llama.cpp.venv/
+.cache/pip/
+build/
+cmake-build-*/
+*.o
+*.so
+*.a
+.DS_Store

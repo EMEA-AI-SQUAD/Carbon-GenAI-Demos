@@ -1,0 +1,13 @@
+{
+  "shell_port": 39839,
+  "iopub_port": 38997,
+  "stdin_port": 49307,
+  "control_port": 50949,
+  "hb_port": 41883,
+  "ip": "127.0.0.1",
+  "key": "d186c2db-afd8d00f3f7e39655979e2a4",
+  "transport": "tcp",
+  "signature_scheme": "hmac-sha256",
+  "kernel_name": "python3",
+  "jupyter_session": "/home/cecuser/carbon-tutorial-nextjs/Console 3"
+}
