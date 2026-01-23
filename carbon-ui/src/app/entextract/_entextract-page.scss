@@ -1,0 +1,135 @@
+@use '@carbon/react/scss/spacing' as *;
+@use '@carbon/react/scss/type' as *;
+@use '@carbon/react/scss/breakpoint' as *;
+@use '@carbon/react/scss/theme' as *;
+@use './mixins.scss' as *;
+@use './overrides.scss';
+
+html {
+  background-color: $layer-01;
+}
+
+.landing-page__banner {
+  padding-top: $spacing-05;
+  padding-bottom: $spacing-07 * 4;
+  padding-left: $spacing-06;
+}
+
+.landing-page__heading {
+  @include type-style('productive-heading-05');
+}
+
+.landing-page__r2 {
+  margin-top: rem(-40px);
+}
+
+.landing-page__illo {
+  max-width: 100%;
+  float: inline-end;
+  height: auto;
+}
+
+
+/* Scope all overrides to your tabs content area */
+.tabs-group-content {
+  // Keep your existing top/left padding, but remove bottom:
+  padding: $spacing-10 0 0 $spacing-06; // already has 0 bottom
+  // In case the Carbon panel/subgrid adds its own bottom padding, force it off:
+  padding-bottom: 0;
+}
+
+/* Remove the bottom margin on the *last* grid row only */
+.tabs-group-content :where(.cds--row:last-child, .cds--subgrid-row:last-child) {
+  margin-bottom: 0;
+}
+
+/* Some versions name rows differently; this is a safe catch-all */
+.tabs-group-content :where([class*="--row"]:last-child) {
+  margin-bottom: 0;
+}
+
+/* If you’re using the Subgrid API and it adds block-end padding, neutralize it */
+.tabs-group-content.cds--subgrid {
+  padding-block-end: 0; // logical 'bottom' padding
+}
+
+/* Make entity rows a bit tighter */
+.entity-row {
+  margin-bottom: $spacing-01; /* default is spacing-05; this tightens it */
+  padding-left: $spacing-06
+}
+
+.entity__tab-content {
+  margin-bottom: 0
+}
+
+.landing-page__subheading {
+  @include type-style('productive-heading-03');
+
+  font-weight: 600;
+}
+
+.landing-page__p {
+  @include type-style('productive-heading-03');
+  margin-top: $spacing-06;
+  margin-bottom: 0;
+
+  @include breakpoint-between((320px + 1), md) {
+    max-width: 75%;
+  }
+}
+
+.tabs-group {
+  background-color: $layer-01;
+  padding: 0 0;
+  margin-bottom: 0;
+}
+
+.landing-page__r3 {
+  padding-top: $spacing-08;
+  padding-bottom: $spacing-08;
+  padding-left: $spacing-06;
+}
+
+.landing-page__label {
+  @include type-style('heading-01');
+
+  @include breakpoint-down(md) {
+    padding-bottom: 1.5rem;
+  }
+}
+
+.landing-page__title {
+  padding-bottom: 0.5rem;
+}
+
+.landing-page__banner,
+.landing-page__r2,
+.landing-page__r3 {
+  margin-left: -20px;
+  margin-right: -20px;
+
+  @include breakpoint-down(md) {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+@media (max-width: 672px) {
+  .landing-page__illo {
+    width: 528px;
+    width: 100%;
+    height: auto;
+    float: inline-start;
+  }
+}
+
+@media (max-width: 320px) {
+  .landing-page__illo {
+    display: none;
+  }
+
+  .landing-page__banner {
+    padding-bottom: $spacing-05 * 4;
+  }
+}

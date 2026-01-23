@@ -1,0 +1,286 @@
+'use client';
+import EntExtractTable from './EntExtractTable';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  Button,
+  Tabs,
+  Tab,
+  TabList,
+  TabPanels,
+  TabPanel,
+  Link,
+  Grid,
+  Column,
+  TextArea,
+} from '@carbon/react';
+import Image from 'next/image';
+import React, { useEffect, useState } from 'react';
+import OpenAI from 'openai';
+
+var defaults = { 
+	free_form_text: "The name of our next book is The Hunger Games. Now, some of you might have read this book earlier, but in my personal opinion, reading it again won't hurt, right? It gets even more interesting when we read it a second time. So, the author of this book is Suzanne Collins, who wrote many books in the past, but this particular book for her has got a rating of 4.33/5, which I think is a pretty good number considering what we just saw for The Book Thief. Anyways, this book is a work of fiction, written in English and falls in the Post Apocalyptic genre. This book has 374 pages. It was published on the 10th of October, 2005. This book is priced at 5 dollars and 9 cents. If anyone is interested in this book, you can approach Mr Hofstadter after this workshop, he will be glad to sell you this book for only 3 dollars. Dont miss out this chance to grab such a memorable book.",
+	label1: "Title",
+	definition1: "This is the title of the book.",
+	
+
+function MultiText({ defaults }) {
+  // `defaults` is an object like:
+  // { summary: '...', notes: '...', excerpt: '...' }
+
+  const [values, setValues] = useState(defaults);
+
+  // Keep state in sync if the parent changes `defaults`
+  useEffect(() => {
+    setValues(defaults);
+  }, [defaults]);
+
+  // Single change handler for all fields
+  const handleChange = (name) => (e) => {
+    const next = e.target.value;
+    setValues((prev) => ({ ...prev, [name]: next }));
+  };
+
+
+export default function EntityExtractionPage() {
+let slot_id = -1;
+
+const API_URL = 'http://p1270-pvm1.p1270.cecc.ihost.com:3001';
+
+const openai_client = new OpenAI({
+    baseURL: API_URL,  // Fixed: removed quotes, changed to baseURL
+    apiKey: 'sk-no-key-required',
+    dangerouslyAllowBrowser: true
+});
+
+var text_about_book = "The name of our next book is The Hunger Games. Now, some of you might have read this book earlier, but in my personal opinion, reading it again won't hurt, right? It gets even more interesting when we read it a second time. So, the author of this book is Suzanne Collins, who wrote many books in the past, but this particular book for her has got a rating of 4.33/5, which I think is a pretty good number considering what we just saw for The Book Thief. Anyways, this book is a work of fiction, written in English and falls in the Post Apocalyptic genre. This book has 374 pages. It was published on the 10th of October, 2005. This book is priced at 5 dollars and 9 cents. If anyone is interested in this book, you can approach Mr Hofstadter after this workshop, he will be glad to sell you this book for only 3 dollars. Dont miss out this chance to grab such a memorable book."
+console.log(text_about_book)
+
+async function completion() {
+  console.log("Calling LLM...");
+  console.log("API URL:", API_URL)
+  try {
+    const result = await openai_client.chat.completions.create({
+      model: 'gpt-3.5-turbo',  // llama.cpp ignores this but needs it
+      messages: [
+        { role: 'system', content: 'You are a coding assistant that talks like a pirate' },
+        { role: 'user', content: 'Are semicolons optional in JavaScript?' }
+      ],
+      stream: true,
+    });
+
+    for await (const chunk of result) {
+      const content = chunk.choices[0]?.delta?.content;
+      if (content) {
+        console.log(content);
+      }
+    }
+  } catch (error) {
+    console.error('Error calling LLM:', error);
+  }
+}
+
+  return (
+    <Grid className="landing-page" fullWidth>
+      <Column lg={16} md={8} sm={4} className="landing-page__banner">
+	<Breadcrumb noTrailingSlash aria-label="Page navigation">
+    	  <BreadcrumbItem>
+      	    <a href="/">Return to main page</a>
+    	  </BreadcrumbItem>
+  	</Breadcrumb>
+	<h1 className="landing-page__heading">Demonstrate using GenAI to extract entities with IBM Power</h1>
+      </Column>
+      <Column lg={16} md={8} sm={4} className="landing-page__r2">
+  	<Tabs defaultSelectedIndex={0}>
+	<TabList className="tabs-group" aria-label="Tab navigation">
+      	  <Tab>Book Review</Tab>
+      	  <Tab>IT Opps Email</Tab>
+          <Tab>Quote Email</Tab>
+    	</TabList>
+	<TabPanels>
+      	  <TabPanel>
+            <Grid className="tabs-group-content">
+              <Column md={4} lg={7} sm={4} className="landing-page__tab-content">
+                <h3 className="landing-page__subheading">Extract key points from unscructured text</h3>
+                  <p className="landing-page__p">
+		    In this version of the Entity Extraction demo, we will use the LLM 
+		    running in this IBM Power Virtual Server to extract details about 
+		    a book from the unstuctured text below. You can alter the text to 
+		    test getting results from different inputs. This demo come from an 
+		    example from the Granite Cafe, which you can see more about by
+		    following the link below.
+            	  </p>
+                <Link href="https://github.com/ibm-granite-community/granite-snack-cookbook/blob/main/recipes/Entity-Extraction/entity_extraction.ipynb">
+                  Entity Extraction from text using Granite
+                </Link>
+              </Column>
+              <Column md={4} lg={{ span: 8, offset: 7 }} sm={4}>
+                <Image
+    		  className="landing-page__illo"
+    		  src="https://assets.ibm.com/is/image/ibm/thinkstudio?$original$"
+    		  alt="People Studying Books"
+		  width={500}
+		  height={208}
+  		/>
+	      </Column>
+	      <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
+	        <TextArea
+    	          className="text-area-class"
+                  id="text-input-1"
+                  invalidText="Error message goes here"
+                  labelText="Text we want to extract details from. You can alter the text as you like."
+                  defaultValue={text_about_book}
+                  size="lg"
+                  cols={128}
+                  rows={8}
+                  warnText="Warning message that is really long can wrap to more lines but should not be excessively long."
+	        />
+	      </Column>
+              <Column md={3} lg={3} sm={3} className="landing-page__tab-content">
+		  <TextArea
+                  className="text-area-class"
+                  id="label-input-1"
+                  invalidText="Error message goes here"
+                  labelText="Labels for details want to extract"
+                  defaultValue="Title"
+                  size="sm"
+                  cols={8}
+                  rows={1}
+                  warnText="Warning message that is really long can wrap to more lines but should not be excessively long."
+                />
+                <TextArea
+                  className="text-area-class"
+                  id="label-input-2"
+                  invalidText="Error message goes here"
+                  defaultValue="Author"
+                  size="sm"
+                  cols={8}
+                  rows={1}
+                  warnText="Warning message that is really long can wrap to more lines but should not be excessively long."
+                />
+                <TextArea
+                  className="text-area-class"
+                  id="label-input-3"
+                  invalidText="Error message goes here"
+                  defaultValue="Price"
+                  size="sm"
+                  cols={8}
+                  rows={1}
+                  warnText="Warning message that is really long can wrap to more lines but should not be excessively long."
+                />
+		<TextArea
+                  className="text-area-class"
+                  id="label-input-4"
+                  invalidText="Error message goes here"
+                  defaultValue="Rating"
+                  size="sm"
+                  cols={8}
+                  rows={1}
+                  warnText="Warning message that is really long can wrap to more lines but should not be excessively long."
+                />
+                <TextArea
+                  className="text-area-class"
+                  helperText="Change default label as desired"
+                  id="label-input-5"
+                  invalidText="Error message goes here"
+                  defaultValue=""
+                  size="sm"
+                  cols={8}
+                  rows={1}
+                  warnText="Warning message that is really long can wrap to more lines but should not be excessively long."
+                />
+		</Column>
+		<Column md={4} lg={8} sm={2}>
+                <TextArea
+                  className="text-area-class"
+                  id="definition-input-1"
+                  invalidText="Error message goes here"
+                  labelText="Definition for details want to extract"
+                  defaultValue="This is the title of the book."
+                  size="md"
+                  cols={64}
+                  rows={1}
+                  warnText="Warning message that is really long can wrap to more lines but should not be excessively long."
+                />
+                <TextArea
+                  className="text-area-class"
+                  id="definition-input-2"
+                  invalidText="Error message goes here"
+                  defaultValue="This is author of the book. The one who wrote this book."
+                  size="md"
+                  cols={64}
+                  rows={1}
+                  warnText="Warning message that is really long can wrap to more lines but should not be excessively long."
+                />
+                <TextArea
+                  className="text-area-class"
+                  id="definition-input-3"
+                  invalidText="Error message goes here"
+                  defaultValue="This is the price of the book."
+                  size="md"
+                  cols={64}
+                  rows={1}
+                  warnText="Warning message that is really long can wrap to more lines but should not be excessively long."
+                />
+                <TextArea
+                  className="text-area-class"
+                  id="definition-input-4"
+                  invalidText="Error message goes here"
+                  defaultValue="This is the rating given for this particular book."
+                  size="md"
+                  cols={64}
+                  rows={1}
+                  warnText="Warning message that is really long can wrap to more lines but should not be excessively long."
+                />
+                <TextArea
+                  className="text-area-class"
+                  helperText="Change default definition as desired"
+                  id="label-input-5"
+                  invalidText="Error message goes here"
+                  defaultValue=""
+                  size="md"
+                  cols={64}
+                  rows={1}
+                  warnText="Warning message that is really long can wrap to more lines but should not be excessively long."
+                />
+	      </Column>
+	      <Column md={4} lg={7} sm={4} className="landing-page__tab-content">
+
+		<Button className="send-to-llm-class" onClick={()=>completion()}>Send Prompt to LLM</Button>
+	      </Column>
+
+            </Grid>
+          </TabPanel>
+	  <TabPanel>
+            <Grid className="tabs-group-content">
+              <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
+                <p className="landing-page__p">
+		  Your data can remain safe and secure inside IBM Power, without needing
+		  to leave your control. IBM Power also has orders of magnitude fewer
+		  security vulnerabilities in the virtualisation that is in the heart of
+		  every IBM Power server, lowering the surface area that can be attacked
+		  by bad actors.
+                </p>
+              </Column>
+            </Grid>
+          </TabPanel>
+          <TabPanel>
+            <Grid className="tabs-group-content">
+              <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
+                <p className="landing-page__p">
+		  These demos use the Granite 4.0 model, running in this IBM Power virtual
+		  server, which was downloaded from Huggingface. You can easily swap this
+		  model for others, such as Mystral or the Llama models from Meta. You can 
+		  therefore be free to pick which every model best suits your use case, and
+	 	  use different models in different virtual servers. You are not restricted
+		  to the resources in GPUs, or to the model served by a given provider.
+                </p>
+              </Column>
+            </Grid>
+          </TabPanel>
+       </TabPanels>
+     </Tabs>
+   </Column>
+</Grid>
+);
+}

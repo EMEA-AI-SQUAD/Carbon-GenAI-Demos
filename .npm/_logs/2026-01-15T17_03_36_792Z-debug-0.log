@@ -1,0 +1,29 @@
+0 verbose cli /usr/bin/node-22 /usr/bin/npm
+1 info using npm@10.9.3
+2 info using node@v22.19.0
+3 silly config load:file:/usr/lib/node_modules_22/npm/npmrc
+4 silly config load:file:/home/cecuser/carbon-tutorial-nextjs/.npmrc
+5 silly config load:file:/home/cecuser/.npmrc
+6 silly config load:file:/etc/npmrc
+7 verbose title npm init
+8 verbose argv "init" "--yes"
+9 verbose logfile logs-max:10 dir:/home/cecuser/.npm/_logs/2026-01-15T17_03_36_792Z-
+10 verbose logfile /home/cecuser/.npm/_logs/2026-01-15T17_03_36_792Z-debug-0.log
+11 silly logfile start cleaning logs, removing 6 files
+12 silly logfile done cleaning log files
+13 silly package data {
+13 silly package data   name: 'llama-proxy',
+13 silly package data   version: '1.0.0',
+13 silly package data   description: '',
+13 silly package data   main: 'index.js',
+13 silly package data   scripts: { test: 'echo "Error: no test specified" && exit 1' },
+13 silly package data   keywords: [],
+13 silly package data   author: '',
+13 silly package data   license: 'ISC'
+13 silly package data }
+14 verbose cwd /home/cecuser/carbon-tutorial-nextjs/src/llama-proxy
+15 verbose os Linux 6.12.0-124.8.1.el10_1.ppc64le
+16 verbose node v22.19.0
+17 verbose npm  v10.9.3
+18 verbose exit 0
+19 info ok

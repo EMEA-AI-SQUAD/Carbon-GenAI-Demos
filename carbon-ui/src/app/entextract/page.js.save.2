@@ -1,0 +1,211 @@
+'use client';
+import EntExtractTable from './EntExtractTable';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  Button,
+  Tabs,
+  Tab,
+  TabList,
+  TabPanels,
+  TabPanel,
+  Link,
+  Grid,
+  Column,
+  TextArea,
+} from '@carbon/react';
+import Image from 'next/image';
+import React, { useEffect, useState } from 'react';
+import OpenAI from 'openai';
+
+const DEFAULTS = {
+        free_form_text: `The name of our next book is The Hunger Games. Now, some of you might have read this book earlier, but in
+my personal opinion, reading it again won't hurt, right? It gets even more interesting when we read it a second time.
+So, the author of this book is Suzanne Collins, who wrote many books in the past, but this particular book for her
+has got a rating of 4.33/5, which I think is a pretty good number considering what we just saw for The Book Thief.
+Anyways, this book is a work of fiction, written in English and falls in the Post Apocalyptic genre. This book has 374 pages.
+It was published on the 10th of October, 2005. This book is priced at 5 dollars and 9 cents. If anyone is interested in this book,
+you can approach Mr Hofstadter after this workshop, he will be glad to sell you this book for only 3 dollars.
+Dont miss out this chance to grab such a memorable book.`,
+        entities: [
+          { label: "Title",    definition: "This is the title of the book." },
+          { label: "Author",   definition: "This is author of the book. The one who wrote this book." },
+          { label: "Price",    definition: "This is the price of the book." },
+          { label: "Rating",   definition: "This is the rating given for this particular book." },
+          { label: "",         definition: "" }
+        ]
+};
+
+export default function EntityExtractionPage() {
+  const [values, setValues] = useState(() => DEFAULTS);
+
+  const onFreeFormChange = (e) =>
+    setValues((prev) => ({ ...prev, free_form_text: e.target.value }));
+
+  const onEntityChange = (index, key) => (e) => {
+    const next = e.target.value;
+    setValues((prev) => {
+      const entities = [...prev.entities];
+      entities[index] = { ...entities[index], [key]: next };
+      return { ...prev, entities };
+    });
+  };
+
+
+let slot_id = -1;
+
+const API_URL = 'http://p1270-pvm1.p1270.cecc.ihost.com:3001';
+
+const openai_client = new OpenAI({
+    baseURL: API_URL,  // Fixed: removed quotes, changed to baseURL
+    apiKey: 'sk-no-key-required',
+    dangerouslyAllowBrowser: true
+});
+
+async function completion() {
+  console.log("Calling LLM...");
+  console.log("API URL:", API_URL)
+  try {
+    const result = await openai_client.chat.completions.create({
+      model: 'gpt-3.5-turbo',  // llama.cpp ignores this but needs it
+      messages: [
+        { role: 'system', content: 'You are a coding assistant that talks like a pirate' },
+        { role: 'user', content: 'Are semicolons optional in JavaScript?' }
+      ],
+      stream: true,
+    });
+
+    for await (const chunk of result) {
+      const content = chunk.choices[0]?.delta?.content;
+      if (content) {
+        console.log(content);
+      }
+    }
+  } catch (error) {
+    console.error('Error calling LLM:', error);
+  }
+}
+
+  return (
+    <Grid className="landing-page" fullWidth>
+      <Column lg={16} md={8} sm={4} className="landing-page__banner">
+	<Breadcrumb noTrailingSlash aria-label="Page navigation">
+    	  <BreadcrumbItem>
+      	    <a href="/">Return to main page</a>
+    	  </BreadcrumbItem>
+  	</Breadcrumb>
+	<h1 className="landing-page__heading">Demonstrate using GenAI to extract entities with IBM Power</h1>
+      </Column>
+      <Column lg={16} md={8} sm={4} className="landing-page__r2">
+  	<Tabs defaultSelectedIndex={0}>
+	<TabList className="tabs-group" aria-label="Tab navigation">
+      	  <Tab>Book Review</Tab>
+      	  <Tab>IT Opps Email</Tab>
+          <Tab>Quote Email</Tab>
+    	</TabList>
+	<TabPanels>
+      	  <TabPanel>
+            <Grid className="tabs-group-content">
+              <Column md={4} lg={7} sm={4} className="landing-page__tab-content">
+                <h3 className="landing-page__subheading">Extract key points from unscructured text</h3>
+                  <p className="landing-page__p">
+		    In this version of the Entity Extraction demo, we will use the LLM 
+		    running in this IBM Power Virtual Server to extract details about 
+		    a book from the unstuctured text below. You can alter the text to 
+		    test getting results from different inputs. This demo come from an 
+		    example from the Granite Cafe, which you can see more about by
+		    following the link below.
+            	  </p>
+                <Link href="https://github.com/ibm-granite-community/granite-snack-cookbook/blob/main/recipes/Entity-Extraction/entity_extraction.ipynb">
+                  Entity Extraction from text using Granite
+                </Link>
+              </Column>
+              <Column md={4} lg={{ span: 8, offset: 7 }} sm={4}>
+                <Image
+    		  className="landing-page__illo"
+    		  src="https://assets.ibm.com/is/image/ibm/thinkstudio?$original$"
+    		  alt="People Studying Books"
+		  width={500}
+		  height={208}
+  		/>
+	      </Column>
+
+    <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
+      <TextArea
+	className="text-area-class"
+        id="free-form-text"
+        labelText="Text we want to extract details from. You can alter the text as you like."
+        value={values.free_form_text ?? ""}
+        onChange={onFreeFormChange}
+        size="lg"
+        cols={128}
+        rows={8}
+      />
+    </Column>
+      
+
+{/* Entities, two columns per row */}
+  {(values.entities ?? []).map((f, i) => (
+	<Grid key={i}>
+      {/* Label column */}
+        <TextArea
+          id={`label-${i}`}
+          labelText={`Label ${i + 1}`}
+          value={f.label ?? ''}
+          onChange={onEntityChange(i, 'label')}
+          size="sm"
+          rows={1}
+        />
+
+      {/* Definition column */}
+        <TextArea
+          id={`definition-${i}`}
+          labelText={`Definition ${i + 1}`}
+          value={f.definition ?? ''}
+          onChange={onEntityChange(i, 'definition')}
+          size="lg"
+          rows={1}
+        />
+	</Grid>
+  ))}
+
+	      <Column md={4} lg={7} sm={4} className="landing-page__tab-content">
+
+		<Button className="send-to-llm-class" onClick={()=>completion()}>Send Prompt to LLM</Button>
+	      </Column>
+
+            </Grid>
+          </TabPanel>
+	  <TabPanel>
+            <Grid className="tabs-group-content">
+              <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
+                <p className="landing-page__p">
+		  Your data can remain safe and secure inside IBM Power, without needing
+		  to leave your control. IBM Power also has orders of magnitude fewer
+		  security vulnerabilities in the virtualisation that is in the heart of
+		  every IBM Power server, lowering the surface area that can be attacked
+		  by bad actors.
+                </p>
+              </Column>
+            </Grid>
+          </TabPanel>
+          <TabPanel>
+            <Grid className="tabs-group-content">
+              <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
+                <p className="landing-page__p">
+		  These demos use the Granite 4.0 model, running in this IBM Power virtual
+		  server, which was downloaded from Huggingface. You can easily swap this
+		  model for others, such as Mystral or the Llama models from Meta. You can 
+		  therefore be free to pick which every model best suits your use case, and
+	 	  use different models in different virtual servers. You are not restricted
+		  to the resources in GPUs, or to the model served by a given provider.
+                </p>
+              </Column>
+            </Grid>
+          </TabPanel>
+       </TabPanels>
+     </Tabs>
+   </Column>
+</Grid>
+);
+}
