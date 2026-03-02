@@ -1,9 +1,9 @@
 @use '@carbon/react';
 @use '@carbon/react/scss/breakpoint' as *;
-@use '@/components/TutorialHeader/tutorial-header';
-@use '@/app/home/landing-page';
-@use '@/app/entextract/entextract-page';
-@use '@/app/carbon/carbon-page';
+@use '../components/TutorialHeader/tutorial-header';
+@use '../app/home/landing-page';
+@use '../app/entextract/entextract-page';
+@use '../app/carbon/carbon-page';
 
 
 /// Remove overrides once Carbon bugs are fixed upstream.
