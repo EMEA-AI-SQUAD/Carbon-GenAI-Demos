@@ -9,6 +9,7 @@
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PID_FILE="${SCRIPT_DIR}/carbon-dev-server.pid"
+PROXY_PID_FILE="${SCRIPT_DIR}/proxy-server.pid"
 LLM_PID_FILE="${SCRIPT_DIR}/llama-server.pid"
 
 # Color codes
@@ -81,6 +82,13 @@ web_result=$?
 
 echo ""
 
+# Stop proxy server
+echo -e "${BOLD}Proxy Server${NC}"
+stop_server "$PROXY_PID_FILE" "Proxy Server"
+proxy_result=$?
+
+echo ""
+
 # Stop LLM server
 echo -e "${BOLD}LLM Server${NC}"
 stop_server "$LLM_PID_FILE" "LLM Server"
@@ -90,7 +98,7 @@ echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 # Exit with appropriate code
-if [ $web_result -eq 0 ] || [ $llm_result -eq 0 ]; then
+if [ $web_result -eq 0 ] || [ $proxy_result -eq 0 ] || [ $llm_result -eq 0 ]; then
     echo -e "${GREEN}✓${NC} At least one server was stopped"
     exit 0
 else

@@ -16,6 +16,7 @@ set -o pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOG_FILE="${SCRIPT_DIR}/carbon-deployment-$(date +%Y%m%d-%H%M%S).log"
 PID_FILE="${SCRIPT_DIR}/carbon-dev-server.pid"
+PROXY_PID_FILE="${SCRIPT_DIR}/proxy-server.pid"
 LLM_PID_FILE="${SCRIPT_DIR}/llama-server.pid"
 VENV_NAME="carbon.venv"
 LLM_VENV_NAME="llama.cpp.venv"
@@ -40,7 +41,7 @@ NC='\033[0m' # No Color
 
 # Step tracking
 CURRENT_STEP=0
-TOTAL_STEPS=11
+TOTAL_STEPS=13
 
 # ============================================================================
 # LOGGING FUNCTIONS
@@ -160,6 +161,16 @@ cleanup_on_error() {
             print_info "Stopped dev server (PID: $pid)"
         fi
         rm -f "$PID_FILE"
+    fi
+    
+    # Stop proxy server if running
+    if [ -f "$PROXY_PID_FILE" ]; then
+        local pid=$(cat "$PROXY_PID_FILE")
+        if kill -0 "$pid" 2>/dev/null; then
+            kill "$pid" 2>/dev/null
+            print_info "Stopped proxy server (PID: $pid)"
+        fi
+        rm -f "$PROXY_PID_FILE"
     fi
     
     # Stop LLM server if running
@@ -391,9 +402,122 @@ build_application() {
         print_error "Failed to build application"
         cleanup_on_error
     fi
+
+# Phase 7: Configure Proxy and Web App
+configure_proxy() {
+    print_step "🔧 Configuring proxy and web application..."
+    
+    # Get the fully qualified hostname
+    local fqdn=$(hostname -f)
+    if [ -z "$fqdn" ]; then
+        print_warning "Could not get FQDN, using hostname"
+        fqdn=$(hostname)
+    fi
+    print_info "Server FQDN: $fqdn"
+    
+    # 1. Update proxy server configuration
+    local proxy_file="${SCRIPT_DIR}/${REPO_DIR}/${APP_DIR}/src/llama-proxy/server_final.js"
+    
+    if [ ! -f "$proxy_file" ]; then
+        print_error "Proxy configuration file not found: $proxy_file"
+        cleanup_on_error
+    fi
+    
+    # Backup proxy file
+    if [ ! -f "${proxy_file}.backup" ]; then
+        cp "$proxy_file" "${proxy_file}.backup"
+        print_info "Created backup: ${proxy_file}.backup"
+    fi
+    
+    print_info "Updating proxy server configuration..."
+    # Replace hardcoded hostname in proxy (port 3000)
+    sed -i "s|http://[^:]*:3000|http://${fqdn}:3000|g" "$proxy_file"
+    
+    if [ $? -eq 0 ]; then
+        print_success "Proxy server configuration updated"
+        if grep -q "http://${fqdn}:3000" "$proxy_file"; then
+            print_success "Hostname verified in proxy config"
+        fi
+    else
+        print_error "Failed to update proxy configuration"
+        cleanup_on_error
+    fi
+    
+    # 2. Update web application page
+    local page_file="${SCRIPT_DIR}/${REPO_DIR}/${APP_DIR}/src/app/entextract/page.js"
+    
+    if [ ! -f "$page_file" ]; then
+        print_error "Web page file not found: $page_file"
+        cleanup_on_error
+    fi
+    
+    # Backup page file
+    if [ ! -f "${page_file}.backup" ]; then
+        cp "$page_file" "${page_file}.backup"
+        print_info "Created backup: ${page_file}.backup"
+    fi
+    
+    print_info "Updating web application API URL..."
+    # Replace hardcoded hostname in page.js (port 3001 - proxy port)
+    sed -i "s|http://[^:]*:3001|http://${fqdn}:3001|g" "$page_file"
+    
+    if [ $? -eq 0 ]; then
+        print_success "Web application API URL updated"
+        if grep -q "http://${fqdn}:3001" "$page_file"; then
+            print_success "Hostname verified in web app"
+        fi
+    else
+        print_error "Failed to update web application"
+        cleanup_on_error
+    fi
+    
+    print_success "All hostname configurations updated successfully"
 }
 
-# Phase 7: Start Dev Server
+}
+
+
+# Phase 8: Start Proxy Server
+start_proxy_server() {
+    print_step "🔌 Starting proxy server..."
+    
+    # Navigate to proxy directory
+    local proxy_dir="${SCRIPT_DIR}/${REPO_DIR}/${APP_DIR}/src/llama-proxy"
+    cd "$proxy_dir" || {
+        print_error "Failed to navigate to proxy directory"
+        cleanup_on_error
+    }
+    print_info "Working directory: $(pwd)"
+    
+    # Check if server_final.js exists
+    if [ ! -f "server_final.js" ]; then
+        print_error "Proxy server file not found: server_final.js"
+        cleanup_on_error
+    fi
+    
+    # Start proxy server in background
+    log_message "INFO" "Starting proxy server with: nohup node server_final.js"
+    nohup node server_final.js >> "$LOG_FILE" 2>&1 &
+    local proxy_pid=$!
+    
+    # Save PID
+    local proxy_pid_file="${SCRIPT_DIR}/proxy-server.pid"
+    echo "$proxy_pid" > "$proxy_pid_file"
+    print_success "Proxy server started (PID: $proxy_pid)"
+    
+    # Wait a moment and verify it's still running
+    sleep 3
+    if kill -0 "$proxy_pid" 2>/dev/null; then
+        print_success "Proxy server is running on port 3001"
+        log_message "INFO" "Proxy server verified running with PID: $proxy_pid"
+    else
+        print_error "Proxy server failed to start"
+        log_message "ERROR" "Proxy server process died immediately"
+        cleanup_on_error
+    fi
+}
+
+# Phase 8: Start Dev Server
 start_dev_server() {
     print_step "🚀 Starting development server..."
     
@@ -424,7 +548,7 @@ start_dev_server() {
     fi
 }
 
-# Phase 8: Setup LLM Environment
+# Phase 9: Setup LLM Environment
 setup_llm_env() {
     print_step "🤖 Setting up LLM environment..."
     
@@ -471,7 +595,7 @@ setup_llm_env() {
     fi
 }
 
-# Phase 9: Clone and Build llama.cpp
+# Phase 10: Clone and Build llama.cpp
 build_llama_cpp() {
     print_step "🔨 Building llama.cpp..."
     
@@ -541,7 +665,7 @@ build_llama_cpp() {
     fi
 }
 
-# Phase 10: Download LLM Model
+# Phase 11: Download LLM Model
 download_model() {
     print_step "📥 Downloading LLM model..."
     
@@ -572,7 +696,7 @@ download_model() {
     fi
 }
 
-# Phase 11: Start LLM Server
+# Phase 12: Start LLM Server
 start_llm_server() {
     print_step "🚀 Starting LLM server..."
     
@@ -616,16 +740,18 @@ print_summary() {
     echo -e "${BOLD}📁 Installation Directory:${NC} ${SCRIPT_DIR}/${REPO_DIR}"
     echo -e "${BOLD}🐍 Web App Virtual Env:${NC} ${SCRIPT_DIR}/${VENV_NAME}"
     echo -e "${BOLD}🤖 LLM Virtual Env:${NC} ${SCRIPT_DIR}/${LLM_VENV_NAME}"
-    echo -e "${BOLD}🌐 Web Dev Server:${NC} http://localhost:3000 (check logs for actual port)"
-    echo -e "${BOLD}🤖 LLM Server:${NC} http://localhost:8080 (default llama.cpp port)"
+    echo -e "${BOLD}🌐 Web Dev Server:${NC} http://$(hostname -f):3000"
+    echo -e "${BOLD}🔌 Proxy Server:${NC} http://$(hostname -f):3001"
+    echo -e "${BOLD}🤖 LLM Server:${NC} http://localhost:8080"
     echo -e "${BOLD}📋 Log File:${NC} $LOG_FILE"
     echo -e "${BOLD}⏱️  Total Time:${NC} $elapsed"
     echo ""
     echo -e "${BOLD}🛑 To stop servers:${NC}"
-    echo "   ./stop-server.sh  # Stops both web and LLM servers"
+    echo "   ./stop-server.sh  # Stops all servers"
     echo "   OR manually:"
-    echo "   kill \$(cat $PID_FILE)      # Web server"
-    echo "   kill \$(cat $LLM_PID_FILE)  # LLM server"
+    echo "   kill \$(cat $PID_FILE)        # Web server"
+    echo "   kill \$(cat $PROXY_PID_FILE)  # Proxy server"
+    echo "   kill \$(cat $LLM_PID_FILE)    # LLM server"
     echo ""
     echo -e "${BOLD}🔄 To check server status:${NC}"
     echo "   ./check-status.sh"
@@ -633,6 +759,9 @@ print_summary() {
     echo -e "${BOLD}📖 For more information:${NC}"
     echo "   cat README.md"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+    echo -e "${BLUE}Deployment automation created with Bob (Roo-Cline AI Assistant)${NC}"
+    echo -e "${BLUE}https://github.com/RooVetGit/Roo-Cline${NC}"
     
     log_message "INFO" "Deployment completed successfully in $elapsed"
 }
@@ -645,6 +774,7 @@ main() {
     # Print banner
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo -e "${BOLD}${CYAN}Carbon GenAI Demo - Automated Deployment${NC}"
+    echo -e "${BLUE}Created with Bob (Roo-Cline AI Assistant)${NC}"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo ""
     
@@ -660,6 +790,8 @@ main() {
     clone_repository
     install_node_dependencies
     build_application
+    configure_proxy
+    start_proxy_server
     start_dev_server
     setup_llm_env
     build_llama_cpp
@@ -679,5 +811,8 @@ trap cleanup_on_error ERR
 main
 
 exit 0
+
+# Deployment automation created with assistance from Bob (Roo-Cline AI Assistant)
+# https://github.com/RooVetGit/Roo-Cline
 
 # Made with Bob
