@@ -85,39 +85,64 @@ The script will:
 The deployment follows these phases:
 
 ```
-[1/7] 🔍 Pre-flight Checks
-      ├─ Verify RHEL OS
-      ├─ Check PPC64LE architecture
-      ├─ Validate sudo access
-      ├─ Test internet connectivity
-      └─ Check disk space
+[1/13] 🔍 Pre-flight Checks
+       ├─ Verify RHEL OS
+       ├─ Check PPC64LE architecture
+       ├─ Validate sudo access
+       ├─ Test internet connectivity
+       └─ Check disk space
 
-[2/7] 📦 System Update
-      └─ Update all system packages
+[2/13] 📦 System Update
+       └─ Update all system packages
 
-[3/7] 🔧 Install Dependencies
-      ├─ Python 3.12 + pip + dev tools
-      ├─ Git
-      ├─ GCC/G++
-      └─ Node.js
+[3/13] 🔧 Install Dependencies
+       ├─ Python 3.12 + pip + dev tools
+       ├─ Git, GCC/G++, Node.js
+       ├─ CMake, Make, Ninja
+       └─ Build tools for llama.cpp
 
-[4/7] 🐍 Python Environment
-      ├─ Create virtual environment
-      ├─ Activate environment
-      └─ Upgrade pip
+[4/13] 🐍 Web App Python Environment
+       ├─ Create virtual environment
+       ├─ Activate environment
+       └─ Upgrade pip
 
-[5/7] 📥 Clone Repository
-      └─ Clone Carbon-GenAI-Demos from GitHub
+[5/13] 📥 Clone Repository
+       └─ Clone Carbon-GenAI-Demos from GitHub
 
-[6/7] 📦 Node Dependencies
-      ├─ Install Yarn globally
-      ├─ Install project dependencies
-      ├─ Add Carbon React packages
-      └─ Install additional npm packages
+[6/13] 📦 Node Dependencies
+       ├─ Install Yarn globally
+       ├─ Install project dependencies
+       ├─ Add Carbon React packages
+       └─ Install additional npm packages
 
-[7/7] 🏗️  Build & Start
-      ├─ Build application
-      └─ Start dev server (background)
+[7/13] 🏗️  Build Application
+       └─ Build web application with Yarn
+
+[8/13] 🔧 Configure Proxy & Web App
+       ├─ Detect server FQDN
+       ├─ Update proxy configuration
+       ├─ Update web app API URLs
+       └─ Create configuration backups
+
+[9/13] 🔌 Start Proxy Server
+       └─ Start proxy on port 3001 (background)
+
+[10/13] 🚀 Start Web Dev Server
+        └─ Start web app on port 3000 (background)
+
+[11/13] 🤖 Setup LLM Environment
+        ├─ Create LLM virtual environment
+        ├─ Install PyTorch & OpenBLAS
+        └─ Configure for PPC64LE
+
+[12/13] 🔨 Build llama.cpp
+        ├─ Clone llama.cpp repository
+        ├─ Configure with OpenBLAS
+        └─ Build llama-server binary
+
+[13/13] 📥 Download Model & Start LLM
+        ├─ Download Granite 4.0 Micro model
+        └─ Start LLM server on port 8080 (background)
 ```
 
 ## File Structure
@@ -127,15 +152,26 @@ After deployment, your directory will contain:
 ```
 .
 ├── deploy-carbon-genai.sh          # Main deployment script
-├── stop-server.sh                  # Stop dev server
+├── stop-server.sh                  # Stop all servers
 ├── check-status.sh                 # Check deployment status
 ├── README.md                       # This file
 ├── deployment-plan.md              # Detailed implementation plan
-├── carbon.venv/                    # Python virtual environment
+├── git-commit.ps1                  # PowerShell Git helper
+├── carbon.venv/                    # Web app Python virtual environment
+├── llama.cpp.venv/                 # LLM Python virtual environment
 ├── Carbon-GenAI-Demos/             # Cloned repository
 │   └── carbon-ui/                  # Application directory
+│       └── src/
+│           ├── llama-proxy/        # Proxy server (configured)
+│           │   └── server_final.js.backup
+│           └── app/entextract/
+│               └── page.js.backup  # Web app (configured)
+├── llama.cpp/                      # llama.cpp installation
+│   └── build/bin/llama-server      # LLM server binary
 ├── carbon-deployment-*.log         # Deployment log files
-└── carbon-dev-server.pid           # Dev server process ID
+├── carbon-dev-server.pid           # Web server process ID
+├── proxy-server.pid                # Proxy server process ID
+└── llama-server.pid                # LLM server process ID
 ```
 
 ## Logging
@@ -170,22 +206,33 @@ tail -f carbon-deployment-*.log
 ```
 
 Shows:
-- Python virtual environment status
+- Web app and LLM Python virtual environments
 - Repository and application status
-- Dev server status (running/stopped)
+- All server statuses (web, proxy, LLM)
+- Resource usage (CPU/memory)
+- Listening ports
 - System dependencies
 - Log files information
 
-### Stop Development Server
+### Stop All Servers
 ```bash
 ./stop-server.sh
 ```
 
-Gracefully stops the dev server and cleans up PID file.
+Gracefully stops all three servers:
+- Web development server (port 3000)
+- Proxy server (port 3001)
+- LLM server (port 8080)
 
 ### Manual Server Stop
 ```bash
-kill $(cat carbon-dev-server.pid)
+# Stop individual servers
+kill $(cat carbon-dev-server.pid)  # Web server
+kill $(cat proxy-server.pid)       # Proxy server
+kill $(cat llama-server.pid)        # LLM server
+
+# Or stop all at once
+kill $(cat *.pid)
 ```
 
 ### View Server Logs
@@ -197,11 +244,26 @@ tail -f carbon-deployment-*.log
 tail -f carbon-deployment-20260303-162800.log
 ```
 
-### Restart Server Manually
+### Restart Servers Manually
+
+**Web Dev Server:**
 ```bash
 cd Carbon-GenAI-Demos/carbon-ui
 source ../../carbon.venv/bin/activate
 yarn dev
+```
+
+**Proxy Server:**
+```bash
+cd Carbon-GenAI-Demos/carbon-ui/src/llama-proxy
+node server_final.js
+```
+
+**LLM Server:**
+```bash
+cd llama.cpp
+source ../llama.cpp.venv/bin/activate
+./build/bin/llama-server -m /tmp/models/granite-4.0-micro-Q4_K_M.gguf --host 0.0.0.0
 ```
 
 ## Troubleshooting
@@ -373,22 +435,49 @@ yarn dev
 After successful deployment, the application will be available at:
 
 ```
-http://localhost:3000
+Web Application: http://<your-server-fqdn>:3000
+Proxy Server:    http://<your-server-fqdn>:3001
+LLM API:         http://localhost:8080
 ```
 
-**Note**: The actual port may vary. Check the deployment logs or run `./check-status.sh` to see the listening port.
+**Note**:
+- The script automatically configures the correct hostname (FQDN)
+- Access the web app from your browser using the server's FQDN
+- The proxy forwards requests from the web app to the LLM server
+- The LLM server is only accessible locally for security
+
+### Testing the Deployment
+
+```bash
+# Check web app
+curl http://<your-server-fqdn>:3000
+
+# Check proxy server
+curl http://<your-server-fqdn>:3001/health
+
+# Check LLM server
+curl http://localhost:8080/health
+```
 
 ## Cleanup
 
 To completely remove the deployment:
 
 ```bash
-# Stop the server
+# Stop all servers
 ./stop-server.sh
 
 # Remove all files
-rm -rf carbon.venv Carbon-GenAI-Demos carbon-deployment-*.log carbon-dev-server.pid
+rm -rf carbon.venv llama.cpp.venv Carbon-GenAI-Demos llama.cpp \
+       carbon-deployment-*.log *.pid /tmp/models
 ```
+
+**Note**: This will remove:
+- Both Python virtual environments
+- Cloned repositories
+- Built binaries
+- Downloaded models
+- All log files and PID files
 
 ## Support
 
@@ -405,8 +494,24 @@ This deployment script is provided as-is. The Carbon GenAI Demo application has 
 
 ## Version History
 
+- **v2.0.0** (2026-03-03): Complete automation with LLM and proxy
+  - Added LLM server integration (llama.cpp + Granite model)
+  - Added proxy server automation
+  - Automatic hostname configuration (FQDN detection)
+  - 13-step fully automated deployment
+  - Three background servers (web, proxy, LLM)
+  - Enhanced monitoring and management scripts
+
 - **v1.0.0** (2026-03-03): Initial release
-  - Automated deployment for RHEL/PPC64LE
+  - Automated web app deployment for RHEL/PPC64LE
   - Dual logging system
   - Helper scripts for management
   - Comprehensive error handling
+## Credits
+
+This deployment automation was created with assistance from **Bob** (Roo-Cline AI Assistant).
+
+- **Roo-Cline**: https://github.com/RooVetGit/Roo-Cline
+- **AI Assistant**: Bob - Expert software engineer specializing in automation and deployment
+
+---

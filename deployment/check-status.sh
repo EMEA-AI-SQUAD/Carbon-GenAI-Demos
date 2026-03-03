@@ -9,6 +9,7 @@
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PID_FILE="${SCRIPT_DIR}/carbon-dev-server.pid"
+PROXY_PID_FILE="${SCRIPT_DIR}/proxy-server.pid"
 LLM_PID_FILE="${SCRIPT_DIR}/llama-server.pid"
 VENV_NAME="carbon.venv"
 LLM_VENV_NAME="llama.cpp.venv"
@@ -247,6 +248,7 @@ echo -e "${BOLD}Commands:${NC}"
 echo "  Start deployment:  ./deploy-carbon-genai.sh"
 echo "  Stop servers:      ./stop-server.sh"
 echo "  View logs:         tail -f carbon-deployment-*.log"
+echo "  Test Proxy API:    curl http://localhost:3001/health"
 echo "  Test LLM API:      curl http://localhost:8080/health"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
