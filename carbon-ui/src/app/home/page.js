@@ -22,7 +22,7 @@ return (
       <a href="/">Getting started</a>
     </BreadcrumbItem>
   </Breadcrumb>
-  <h1 className="landing-page__heading">Testing!!! Demonstrate GenAI adding value with IBM Power</h1>
+  <h1 className="landing-page__heading">Demonstrate GenAI adding value with IBM Power</h1>
 </Column>
 <Column lg={16} md={8} sm={4} className="landing-page__r2">
   <Tabs defaultSelectedIndex={0}>
@@ -35,9 +35,8 @@ return (
       <TabPanel>
         <Grid className="tabs-group-content">
           <Column md={4} lg={7} sm={4} className="landing-page__tab-content">
-            <h3 className="landing-page__subheading">Testing!!! GenAI on IBM Power</h3>
+            <h3 className="landing-page__subheading">GenAI on IBM Power</h3>
             <p className="landing-page__p">
-		Testing!!!!
 		GenAI, running in IBM Power, can deliver business benefit without
 		needing to use expensive and energy hungry GPUs. You can derive
 		business benefit by using Open Source GenAI that are augmented
