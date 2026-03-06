@@ -39,12 +39,50 @@ The script will automatically install:
 
 ## Quick Start
 
-### 1. Download the Deployment Package
+### 1. Get Scripts on Your Server
 
+**Method 1: Download Directly from GitHub (RECOMMENDED - No Git Required!)**
+
+SSH into your clean server and run:
 ```bash
-# If you have the scripts in a directory, navigate to it
-cd /path/to/deployment-scripts
+# Create deployment directory
+mkdir -p ~/deployment
+cd ~/deployment
+
+# Download the main deployment script
+curl -O https://raw.githubusercontent.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos/main/deployment/deploy-carbon-genai.sh
+
+# Download helper scripts
+curl -O https://raw.githubusercontent.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos/main/deployment/stop-server.sh
+curl -O https://raw.githubusercontent.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos/main/deployment/check-status.sh
+
+# Download README (optional but recommended)
+curl -O https://raw.githubusercontent.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos/main/deployment/README.md
 ```
+
+**Method 2: Using wget (if curl is not available):**
+```bash
+mkdir -p ~/deployment
+cd ~/deployment
+wget https://raw.githubusercontent.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos/main/deployment/deploy-carbon-genai.sh
+wget https://raw.githubusercontent.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos/main/deployment/stop-server.sh
+wget https://raw.githubusercontent.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos/main/deployment/check-status.sh
+wget https://raw.githubusercontent.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos/main/deployment/README.md
+```
+
+**Method 3: Using SCP from your local machine:**
+```powershell
+# From Windows PowerShell
+scp -r "C:\Users\YOUR-USERNAME\Desktop\Carbon-GenAI-Demos\Carbon-GenAI-Demos\deployment" username@your-server-ip:/home/username/
+```
+
+**Method 4: If Git is already installed:**
+```bash
+git clone https://github.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos
+cd Carbon-GenAI-Demos/deployment
+```
+
+**Note**: The deployment script will install Git automatically during the process, so you don't need it pre-installed!
 
 ### 2. Make Scripts Executable
 
