@@ -133,3 +133,14 @@ html {
     padding-bottom: $spacing-05 * 4;
   }
 }
+
+
+// Pulse animation for loading pictogram
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

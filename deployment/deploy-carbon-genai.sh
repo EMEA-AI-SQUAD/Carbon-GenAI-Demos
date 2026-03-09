@@ -375,6 +375,7 @@ install_node_dependencies() {
     run_command "yarn add sass@1.63.6" "Sass added"
     run_command "yarn add typescript" "TypeScript added"
     run_command "yarn add @carbon/icons-react" "Carbon Icons added"
+    run_command "yarn add @carbon/pictograms-react" "Carbon Pictograms added"
     
     # Install npm packages
     print_info "Installing additional npm packages..."

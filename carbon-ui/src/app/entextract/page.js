@@ -23,7 +23,10 @@ import {
   TableCell,
   DataTableSkeleton,
   InlineNotification,
+  AILabel,
+  AILabelContent,
 } from '@carbon/react';
+import { DataBase, MachineLearningModel } from '@carbon/pictograms-react';
 import Image from 'next/image';
 import React, { useMemo, useState } from 'react';
 import { DEFAULTS } from "./defaults";
@@ -106,7 +109,7 @@ async function completion() {
     setExtractedRows(rows);
   } catch (err) {
     console.error(err);
-    setErrorMsg(e?.message || 'Failed to contact the LLM.');
+    setErrorMsg(err?.message || 'Failed to contact the LLM.');
   } finally {
     setIsLoading(false);
   }
@@ -133,7 +136,7 @@ async function completion() {
       	  <TabPanel>
             <Grid className="tabs-group-content">
               <Column md={4} lg={7} sm={4} className="entity__tab-content">
-                <h3 className="landing-page__subheading">Extract key points from unscructured text</h3>
+                <h3 className="landing-page__subheading">Extract key points from unstructured text</h3>
                   <p className="landing-page__p">
 		    In this version of the Entity Extraction demo, we will use the LLM 
 		    running in this IBM Power Virtual Server to extract details about 
@@ -215,13 +218,48 @@ async function completion() {
     </Button>
   </Column>
 
+{/* Error Display */}
+{errorMsg && (
+  <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
+    <InlineNotification
+      kind="error"
+      title="Error"
+      subtitle={errorMsg}
+      onCloseButtonClick={() => setErrorMsg('')}
+      lowContrast
+    />
+  </Column>
+)}
+
 {/* Results */}
 <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
 
-{/* 1) Skeleton while loading */}
+{/* 1) Loading state with pictogram */}
   {isLoading ? (
-<DataTableSkeleton
-        // You can optionally pass headers (for column titles), Carbon supports both signatures.
+    <>
+      <div style={{
+        textAlign: 'center',
+        padding: '2rem',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '1rem'
+      }}>
+        <MachineLearningModel
+          style={{
+            fill: 'var(--cds-icon-primary)',
+            animation: 'pulse 2s ease-in-out infinite'
+          }}
+        />
+        <InlineNotification
+          kind="info"
+          title="Processing"
+          subtitle="Granite 4.0 is analyzing your text..."
+          hideCloseButton
+          lowContrast
+        />
+      </div>
+      <DataTableSkeleton
         headers={[
           { key: 'label', header: 'Entity' },
           { key: 'value', header: 'Value' },
@@ -231,11 +269,28 @@ async function completion() {
         rowCount={Math.max(3, values.entities.filter(e => (e.label || '').trim()).length)}
         columnCount={2}
       />
+    </>
   ) : extractedRows.length === 0 ? (
-    // Empty state
-    <p>
-      No results yet. Edit the text and entities, then click <em>Send Prompt to LLM</em>.
-    </p>
+    // Empty state with pictogram
+    <div style={{
+      textAlign: 'center',
+      padding: '3rem 1rem',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: '1rem'
+    }}>
+      <DataBase style={{ fill: 'var(--cds-icon-secondary)' }} />
+      <h4 style={{ margin: 0 }}>No entities extracted yet</h4>
+      <p style={{
+        color: 'var(--cds-text-secondary)',
+        maxWidth: '400px',
+        margin: 0
+      }}>
+        Edit the text and entity definitions above, then click
+        <strong> Send Prompt to LLM</strong> to extract structured data.
+      </p>
+    </div>
   ) : (
 
         <DataTable
@@ -249,7 +304,22 @@ async function completion() {
           useStaticWidth
         >
           {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
-            <TableContainer>
+            <TableContainer
+              title={
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span>Extracted Entities</span>
+                  <AILabel size="sm">
+                    <AILabelContent>
+                      <div>
+                        <p className="secondary">AI Generated</p>
+                        <p className="secondary">Content extracted by Granite 4.0 LLM</p>
+                      </div>
+                    </AILabelContent>
+                  </AILabel>
+                </div>
+              }
+              description="Entities extracted from your text using AI"
+            >
               <Table stickyHeader {...getTableProps()}>
                 <TableHead>
                   <TableRow>
