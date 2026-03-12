@@ -359,6 +359,7 @@ async function completion() {
 	             <Column md={4} lg={16} sm={4} className="entity__tab-content">
 	               <h3 className="landing-page__subheading">Multilingual Entity Extraction with Priority Assessment</h3>
 	               <p className="landing-page__p">
+	                 {/* eslint-disable-next-line react/no-unescaped-entities */}
 	                 This demo showcases Granite 4.0's ability to understand different languages and assess true priority.
 	                 Toggle between an emotional Italian email (low priority) and a professional French email (critical safety issue).
 	                 The AI extracts entities and translates them to English while correctly assessing business impact.
