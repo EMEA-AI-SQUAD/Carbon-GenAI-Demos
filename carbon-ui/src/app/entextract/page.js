@@ -30,7 +30,7 @@ import {
   Loading,
 } from '@carbon/react';
 import Image from 'next/image';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { DEFAULTS } from "./defaults";
 import { buildMessages } from "./messages";
 import { getExpectedKeys, parseModelJson, reconcileOutput, buildKeyLabelMap } from "./postprocess";
@@ -55,9 +55,37 @@ export default function EntityExtractionPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [extractedRows, setExtractedRows] = useState([]); // [{ id, label, value }]
+  const [activeTab, setActiveTab] = useState(0);
   
   // IT Ops email selection state
   const [selectedScenario, setSelectedScenario] = useState('italian_emotional'); // 'italian_emotional' or 'french_professional'
+
+  // Initialize scenarios when tab changes
+  useEffect(() => {
+    if (activeTab === 1) {
+      // IT Ops tab - load Italian scenario
+      const scenario = IT_OPS_SCENARIOS.italian_emotional;
+      setValues({
+        free_form_text: scenario.email,
+        entities: scenario.entities
+      });
+      setExtractedRows([]);
+      setErrorMsg('');
+    } else if (activeTab === 2) {
+      // Logistics tab - load German scenario
+      setValues({
+        free_form_text: LOGISTICS_QUOTE_SCENARIO.email,
+        entities: LOGISTICS_QUOTE_SCENARIO.entities
+      });
+      setExtractedRows([]);
+      setErrorMsg('');
+    } else if (activeTab === 0) {
+      // Book Review tab - load defaults
+      setValues(DEFAULTS);
+      setExtractedRows([]);
+      setErrorMsg('');
+    }
+  }, [activeTab]);
 
   const onFreeFormChange = (e) =>
     setValues((prev) => ({ ...prev, free_form_text: e.target.value }));
@@ -133,8 +161,8 @@ async function completion() {
 	<h1 className="landing-page__heading">Demonstrate using GenAI to extract entities with IBM Power</h1>
       </Column>
       <Column lg={16} md={8} sm={4} className="landing-page__r2">
-  	<Tabs defaultSelectedIndex={0}>
-	<TabList className="tabs-group" aria-label="Tab navigation">
+   <Tabs defaultSelectedIndex={0} onChange={({ selectedIndex }) => setActiveTab(selectedIndex)}>
+ <TabList className="tabs-group" aria-label="Tab navigation">
       	  <Tab>Book Review</Tab>
       	  <Tab>IT Opps Email</Tab>
           <Tab>Quote Email</Tab>
@@ -371,8 +399,8 @@ async function completion() {
 	               <Toggle
 	                 id="scenario-toggle"
 	                 labelText="Select Email Scenario"
-	                 labelA="🇮🇹 Italian (Emotional - Low Priority)"
-	                 labelB="🇫🇷 French (Professional - Critical)"
+	                 labelA="🇮🇹 Italian Email"
+	                 labelB="🇫🇷 French Email"
 	                 toggled={selectedScenario === 'french_professional'}
 	                 onToggle={(checked) => {
 	                   const newScenario = checked ? 'french_professional' : 'italian_emotional';
