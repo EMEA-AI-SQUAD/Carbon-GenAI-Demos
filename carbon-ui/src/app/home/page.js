@@ -11,7 +11,6 @@ import {
   Grid,
   Column,
 } from '@carbon/react';
-import { CloudDataOps, Security, Enterprise } from '@carbon/pictograms-react';
 import Image from 'next/image';
 
 export default function LandingPage() {
@@ -98,7 +97,7 @@ return (
       sm={4}
       className="landing-page__title"
       style={{ textAlign: 'center' }}>
-      <CloudDataOps style={{ marginBottom: '1rem', fill: 'var(--cds-icon-primary)' }} />
+      <h4>💾 Data Locality</h4>
       <div>Run GenAI Models where your data lives</div>
     </Column>
     <Column
@@ -107,7 +106,7 @@ return (
       sm={4}
       className="landing-page__title"
       style={{ textAlign: 'center' }}>
-      <Security style={{ marginBottom: '1rem', fill: 'var(--cds-icon-primary)' }} />
+      <h4>🔒 Security</h4>
       <div>Ensure data sovereignty</div>
     </Column>
     <Column
@@ -116,7 +115,7 @@ return (
       sm={4}
       className="landing-page__title"
       style={{ textAlign: 'center' }}>
-      <Enterprise style={{ marginBottom: '1rem', fill: 'var(--cds-icon-primary)' }} />
+      <h4>⚡ Reliability</h4>
       <div>Legendary reliability</div>
     </Column>
   </Grid>

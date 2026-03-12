@@ -27,8 +27,8 @@ import {
   AILabelContent,
   Toggle,
   Tile,
+  Loading,
 } from '@carbon/react';
-import { DataBase, MachineLearningModel } from '@carbon/pictograms-react';
 import Image from 'next/image';
 import React, { useMemo, useState } from 'react';
 import { DEFAULTS } from "./defaults";
@@ -252,12 +252,7 @@ async function completion() {
         alignItems: 'center',
         gap: '1rem'
       }}>
-        <MachineLearningModel
-          style={{
-            fill: 'var(--cds-icon-primary)',
-            animation: 'pulse 2s ease-in-out infinite'
-          }}
-        />
+        <Loading description="Processing" withOverlay={false} />
         <InlineNotification
           kind="info"
           title="Processing"
@@ -287,7 +282,6 @@ async function completion() {
       alignItems: 'center',
       gap: '1rem'
     }}>
-      <DataBase style={{ fill: 'var(--cds-icon-secondary)' }} />
       <h4 style={{ margin: 0 }}>No entities extracted yet</h4>
       <p style={{
         color: 'var(--cds-text-secondary)',
@@ -562,12 +556,7 @@ async function completion() {
 	                       alignItems: 'center',
 	                       gap: '1rem'
 	                     }}>
-	                       <MachineLearningModel
-	                         style={{
-	                           fill: 'var(--cds-icon-primary)',
-	                           animation: 'pulse 2s ease-in-out infinite'
-	                         }}
-	                       />
+	                       <Loading description="Processing" withOverlay={false} />
 	                       <InlineNotification
 	                         kind="info"
 	                         title="Processing"
@@ -596,7 +585,6 @@ async function completion() {
 	                     alignItems: 'center',
 	                     gap: '1rem'
 	                   }}>
-	                     <DataBase style={{ fill: 'var(--cds-icon-secondary)' }} />
 	                     <h4 style={{ margin: 0 }}>No entities extracted yet</h4>
 	                     <p style={{
 	                       color: 'var(--cds-text-secondary)',
@@ -780,12 +768,7 @@ async function completion() {
                       alignItems: 'center',
                       gap: '1rem'
                     }}>
-                      <MachineLearningModel
-                        style={{
-                          fill: 'var(--cds-icon-primary)',
-                          animation: 'pulse 2s ease-in-out infinite'
-                        }}
-                      />
+                      <Loading description="Processing" withOverlay={false} />
                       <InlineNotification
                         kind="info"
                         title="Processing"
@@ -814,7 +797,6 @@ async function completion() {
                     alignItems: 'center',
                     gap: '1rem'
                   }}>
-                    <DataBase style={{ fill: 'var(--cds-icon-secondary)' }} />
                     <h4 style={{ margin: 0 }}>No entities extracted yet</h4>
                     <p style={{
                       color: 'var(--cds-text-secondary)',
