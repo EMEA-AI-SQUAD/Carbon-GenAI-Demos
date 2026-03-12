@@ -216,36 +216,34 @@ async function completion() {
   </Column>
 </Grid>
 
-{/* Entities, two columns per row */}
-<Grid className="entity-grid" fullWidth>
-  {(values.entities ?? []).map((f, i) => (
-    <React.Fragment key={i}>
-      {/* Label column - takes 1/4 of the row */}
-      <Column sm={4} md={2} lg={4}>
-        <TextArea
-          id={`label-${i}`}
-          labelText={`Label ${i + 1}`}
-          value={f.label ?? ''}
-          onChange={onEntityChange(i, 'label')}
-          size="sm"
-          rows={1}
-        />
-      </Column>
+{/* Entities - each entity pair in its own row */}
+{(values.entities ?? []).map((f, i) => (
+  <Grid key={i} className="entity-row" fullWidth>
+    {/* Label column */}
+    <Column sm={4} md={2} lg={4}>
+      <TextArea
+        id={`label-${i}`}
+        labelText={`Label ${i + 1}`}
+        value={f.label ?? ''}
+        onChange={onEntityChange(i, 'label')}
+        size="sm"
+        rows={1}
+      />
+    </Column>
 
-      {/* Definition column - takes 3/4 of the row */}
-      <Column sm={4} md={6} lg={12}>
-        <TextArea
-          id={`definition-${i}`}
-          labelText={`Definition ${i + 1}`}
-          value={f.definition ?? ''}
-          onChange={onEntityChange(i, 'definition')}
-          size="sm"
-          rows={1}
-        />
-      </Column>
-    </React.Fragment>
-  ))}
-</Grid>
+    {/* Definition column */}
+    <Column sm={4} md={6} lg={12}>
+      <TextArea
+        id={`definition-${i}`}
+        labelText={`Definition ${i + 1}`}
+        value={f.definition ?? ''}
+        onChange={onEntityChange(i, 'definition')}
+        size="sm"
+        rows={1}
+      />
+    </Column>
+  </Grid>
+))}
 
 <Grid className="tabs-group-content">
   <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
