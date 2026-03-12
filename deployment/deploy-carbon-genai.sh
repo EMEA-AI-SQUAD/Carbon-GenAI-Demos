@@ -253,10 +253,31 @@ preflight_checks() {
 # Phase 1: System Update
 update_system() {
     print_step "📦 Updating system packages..."
+    print_info "This may take several minutes. Progress indicators will show activity..."
     
-    if run_command "sudo dnf -y update" "System packages updated"; then
+    # Start a background spinner to show progress
+    (
+        local spin='-\|/'
+        local i=0
+        while kill -0 $$ 2>/dev/null; do
+            i=$(( (i+1) %4 ))
+            printf "\r${BLUE}⏳${NC} Updating packages... ${spin:$i:1} "
+            sleep 0.5
+        done
+    ) &
+    local spinner_pid=$!
+    
+    # Run the update
+    if sudo dnf -y update >> "$LOG_FILE" 2>&1; then
+        kill $spinner_pid 2>/dev/null
+        wait $spinner_pid 2>/dev/null
+        printf "\r"
+        print_success "System packages updated"
         return 0
     else
+        kill $spinner_pid 2>/dev/null
+        wait $spinner_pid 2>/dev/null
+        printf "\r"
         print_error "Failed to update system packages"
         cleanup_on_error
     fi
