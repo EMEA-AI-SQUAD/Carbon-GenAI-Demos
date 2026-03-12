@@ -527,31 +527,33 @@ async function completion() {
 	               </p>
 	             </Column>
 
-	             {/* Entities, two columns per row */}
-	             {(values.entities ?? []).map((f, i) => (
-	               <Grid key={i} className="entity-row">
-	                 <Column sm={2} md={4} lg={4}>
-	                   <TextArea
-	                     id={`it-ops-label-${i}`}
-	                     labelText={`Label ${i + 1}`}
-	                     value={f.label ?? ''}
-	                     onChange={onEntityChange(i, 'label')}
-	                     size="sm"
-	                     rows={1}
-	                   />
-	                 </Column>
-	                 <Column sm={2} md={4} lg={12}>
-	                   <TextArea
-	                     id={`it-ops-definition-${i}`}
-	                     labelText={`Definition ${i + 1}`}
-	                     value={f.definition ?? ''}
-	                     onChange={onEntityChange(i, 'definition')}
-	                     size="sm"
-	                     rows={1}
-	                   />
-	                 </Column>
-	               </Grid>
-	             ))}
+	             {/* Entities - use single Grid with all entity pairs */}
+	             <Grid className="entity-grid">
+	               {(values.entities ?? []).map((f, i) => (
+	                 <React.Fragment key={i}>
+	                   <Column sm={4} md={4} lg={4} className="entity-label-col">
+	                     <TextArea
+	                       id={`it-ops-label-${i}`}
+	                       labelText={`Label ${i + 1}`}
+	                       value={f.label ?? ''}
+	                       onChange={onEntityChange(i, 'label')}
+	                       size="sm"
+	                       rows={1}
+	                     />
+	                   </Column>
+	                   <Column sm={4} md={4} lg={12} className="entity-def-col">
+	                     <TextArea
+	                       id={`it-ops-definition-${i}`}
+	                       labelText={`Definition ${i + 1}`}
+	                       value={f.definition ?? ''}
+	                       onChange={onEntityChange(i, 'definition')}
+	                       size="sm"
+	                       rows={1}
+	                     />
+	                   </Column>
+	                 </React.Fragment>
+	               ))}
+	             </Grid>
 
 	             {/* Submit button and results - reuse the same pattern from Book Review tab */}
 	             <Grid className="tabs-group-content">
