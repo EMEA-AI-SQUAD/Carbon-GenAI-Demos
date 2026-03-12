@@ -216,12 +216,12 @@ async function completion() {
   </Column>
 </Grid>
 
-{/* Entities - each entity pair in its own row */}
-<div style={{ width: '100%' }}>
+{/* Entities - use single Grid with all entity pairs */}
+<Grid className="entity-grid">
   {(values.entities ?? []).map((f, i) => (
-    <Grid key={i} className="entity-row" style={{ width: '100%', marginBottom: '1rem' }}>
-      {/* Label column - 1/4 width on all screens */}
-      <Column sm={4} md={4} lg={4}>
+    <React.Fragment key={i}>
+      {/* Label column */}
+      <Column sm={4} md={4} lg={4} className="entity-label-col">
         <TextArea
           id={`label-${i}`}
           labelText={`Label ${i + 1}`}
@@ -232,8 +232,8 @@ async function completion() {
         />
       </Column>
 
-      {/* Definition column - 3/4 width on all screens */}
-      <Column sm={4} md={4} lg={12}>
+      {/* Definition column */}
+      <Column sm={4} md={4} lg={12} className="entity-def-col">
         <TextArea
           id={`definition-${i}`}
           labelText={`Definition ${i + 1}`}
@@ -243,9 +243,9 @@ async function completion() {
           rows={1}
         />
       </Column>
-    </Grid>
+    </React.Fragment>
   ))}
-</div>
+</Grid>
 
 <Grid className="tabs-group-content">
   <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
