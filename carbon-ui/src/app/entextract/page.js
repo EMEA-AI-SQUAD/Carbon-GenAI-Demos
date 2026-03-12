@@ -742,31 +742,33 @@ async function completion() {
               </Column>
             </Grid>
 
-            {/* Entities */}
-            {(LOGISTICS_QUOTE_SCENARIO.entities ?? []).map((f, i) => (
-              <Grid key={i} className="entity-row">
-                <Column sm={2} md={4} lg={4}>
-                  <TextArea
-                    id={`logistics-label-${i}`}
-                    labelText={`Label ${i + 1}`}
-                    value={f.label ?? ''}
-                    onChange={onEntityChange(i, 'label')}
-                    size="sm"
-                    rows={1}
-                  />
-                </Column>
-                <Column sm={2} md={4} lg={12}>
-                  <TextArea
-                    id={`logistics-definition-${i}`}
-                    labelText={`Definition ${i + 1}`}
-                    value={f.definition ?? ''}
-                    onChange={onEntityChange(i, 'definition')}
-                    size="sm"
-                    rows={1}
-                  />
-                </Column>
-              </Grid>
-            ))}
+            {/* Entities - use single Grid with all entity pairs */}
+            <Grid className="entity-grid">
+              {(LOGISTICS_QUOTE_SCENARIO.entities ?? []).map((f, i) => (
+                <React.Fragment key={i}>
+                  <Column sm={4} md={4} lg={4} className="entity-label-col">
+                    <TextArea
+                      id={`logistics-label-${i}`}
+                      labelText={`Label ${i + 1}`}
+                      value={f.label ?? ''}
+                      onChange={onEntityChange(i, 'label')}
+                      size="sm"
+                      rows={1}
+                    />
+                  </Column>
+                  <Column sm={4} md={4} lg={12} className="entity-def-col">
+                    <TextArea
+                      id={`logistics-definition-${i}`}
+                      labelText={`Definition ${i + 1}`}
+                      value={f.definition ?? ''}
+                      onChange={onEntityChange(i, 'definition')}
+                      size="sm"
+                      rows={1}
+                    />
+                  </Column>
+                </React.Fragment>
+              ))}
+            </Grid>
 
             <Grid className="tabs-group-content">
               <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
