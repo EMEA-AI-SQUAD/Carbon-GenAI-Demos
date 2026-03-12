@@ -392,11 +392,11 @@ install_node_dependencies() {
     
     # Add specific Carbon packages
     print_info "Installing Carbon packages..."
-    run_command "yarn add @carbon/react@1.33.0" "Carbon React added"
+    run_command "yarn add @carbon/react@latest" "Carbon React added"
     run_command "yarn add sass@1.63.6" "Sass added"
     run_command "yarn add typescript" "TypeScript added"
-    run_command "yarn add @carbon/icons-react" "Carbon Icons added"
-    run_command "yarn add @carbon/pictograms-react" "Carbon Pictograms added"
+    run_command "yarn add @carbon/icons-react@latest" "Carbon Icons added"
+    run_command "yarn add @carbon/pictograms-react@latest" "Carbon Pictograms added"
     
     # Install npm packages
     print_info "Installing additional npm packages..."
