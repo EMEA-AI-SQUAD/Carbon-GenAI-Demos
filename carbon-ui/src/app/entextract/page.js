@@ -217,11 +217,11 @@ async function completion() {
 </Grid>
 
 {/* Entities, two columns per row */}
+<Grid className="entity-grid">
   {(values.entities ?? []).map((f, i) => (
-	<Grid key={i} className="entity-row">
-
+    <React.Fragment key={i}>
       {/* Label column */}
-<Column sm={2} md={4} lg={4}>
+      <Column sm={4} md={4} lg={4}>
         <TextArea
           id={`label-${i}`}
           labelText={`Label ${i + 1}`}
@@ -230,10 +230,10 @@ async function completion() {
           size="sm"
           rows={1}
         />
-</Column>
+      </Column>
 
       {/* Definition column */}
-<Column sm={2} md={4} lg={12}>
+      <Column sm={4} md={4} lg={12}>
         <TextArea
           id={`definition-${i}`}
           labelText={`Definition ${i + 1}`}
@@ -242,9 +242,10 @@ async function completion() {
           size="sm"
           rows={1}
         />
-</Column>
-	</Grid>
+      </Column>
+    </React.Fragment>
   ))}
+</Grid>
 
 <Grid className="tabs-group-content">
   <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
