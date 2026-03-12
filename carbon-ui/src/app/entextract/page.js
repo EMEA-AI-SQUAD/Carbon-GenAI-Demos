@@ -218,9 +218,9 @@ async function completion() {
 
 {/* Entities - each entity pair in its own row */}
 {(values.entities ?? []).map((f, i) => (
-  <Grid key={i} className="entity-row" fullWidth>
-    {/* Label column */}
-    <Column sm={4} md={2} lg={4}>
+  <Grid key={i} className="entity-row">
+    {/* Label column - 1/4 width on all screens */}
+    <Column sm={4} md={4} lg={4}>
       <TextArea
         id={`label-${i}`}
         labelText={`Label ${i + 1}`}
@@ -231,8 +231,8 @@ async function completion() {
       />
     </Column>
 
-    {/* Definition column */}
-    <Column sm={4} md={6} lg={12}>
+    {/* Definition column - 3/4 width on all screens */}
+    <Column sm={4} md={4} lg={12}>
       <TextArea
         id={`definition-${i}`}
         labelText={`Definition ${i + 1}`}
