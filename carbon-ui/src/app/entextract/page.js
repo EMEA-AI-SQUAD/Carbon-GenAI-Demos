@@ -217,33 +217,35 @@ async function completion() {
 </Grid>
 
 {/* Entities - each entity pair in its own row */}
-{(values.entities ?? []).map((f, i) => (
-  <Grid key={i} className="entity-row">
-    {/* Label column - 1/4 width on all screens */}
-    <Column sm={4} md={4} lg={4}>
-      <TextArea
-        id={`label-${i}`}
-        labelText={`Label ${i + 1}`}
-        value={f.label ?? ''}
-        onChange={onEntityChange(i, 'label')}
-        size="sm"
-        rows={1}
-      />
-    </Column>
+<div style={{ width: '100%' }}>
+  {(values.entities ?? []).map((f, i) => (
+    <Grid key={i} className="entity-row" style={{ width: '100%', marginBottom: '1rem' }}>
+      {/* Label column - 1/4 width on all screens */}
+      <Column sm={4} md={4} lg={4}>
+        <TextArea
+          id={`label-${i}`}
+          labelText={`Label ${i + 1}`}
+          value={f.label ?? ''}
+          onChange={onEntityChange(i, 'label')}
+          size="sm"
+          rows={1}
+        />
+      </Column>
 
-    {/* Definition column - 3/4 width on all screens */}
-    <Column sm={4} md={4} lg={12}>
-      <TextArea
-        id={`definition-${i}`}
-        labelText={`Definition ${i + 1}`}
-        value={f.definition ?? ''}
-        onChange={onEntityChange(i, 'definition')}
-        size="sm"
-        rows={1}
-      />
-    </Column>
-  </Grid>
-))}
+      {/* Definition column - 3/4 width on all screens */}
+      <Column sm={4} md={4} lg={12}>
+        <TextArea
+          id={`definition-${i}`}
+          labelText={`Definition ${i + 1}`}
+          value={f.definition ?? ''}
+          onChange={onEntityChange(i, 'definition')}
+          size="sm"
+          rows={1}
+        />
+      </Column>
+    </Grid>
+  ))}
+</div>
 
 <Grid className="tabs-group-content">
   <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
