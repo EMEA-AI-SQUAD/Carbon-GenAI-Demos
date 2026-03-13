@@ -164,7 +164,7 @@ export default function EntityExtractionPage() {
         <Tabs defaultSelectedIndex={0} onChange={({ selectedIndex }) => setActiveTab(selectedIndex)}>
           <TabList className="tabs-group" aria-label="Tab navigation">
             <Tab>Book Review</Tab>
-            <Tab>IT Opps Email</Tab>
+            <Tab>IT Ops Email</Tab>
             <Tab>Quote Email</Tab>
           </TabList>
           <TabPanels>
@@ -173,10 +173,10 @@ export default function EntityExtractionPage() {
                 <Column md={4} lg={7} sm={4} className="entity__tab-content">
                   <h3 className="landing-page__subheading">Extract key points from unstructured text</h3>
                   <p className="landing-page__p">
-                    In this version of the Entity Extraction demo, we will use the LLM 
-                    running in this IBM Power Virtual Server to extract details about 
-                    a book from the unstuctured text below. You can alter the text to 
-                    test getting results from different inputs. This demo come from an 
+                    In this version of the Entity Extraction demo, we will use the LLM
+                    running in this IBM Power Virtual Server to extract details about
+                    a book from the unstructured text below. You can alter the text to
+                    test getting results from different inputs. This demo comes from an
                     example from the Granite Cafe, which you can see more about by
                     following the link below.
                   </p>
@@ -211,7 +211,7 @@ export default function EntityExtractionPage() {
                 <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
                   <p className="landing-page__p">
                     Below are the labels and definitions that define the entities we shall extract from the text.
-                    Again, you can feel free to change these are you like, to extract other details if desired.
+                    Again, you can feel free to change these as you like, to extract other details if desired.
                   </p>
                 </Column>
               </Grid>
