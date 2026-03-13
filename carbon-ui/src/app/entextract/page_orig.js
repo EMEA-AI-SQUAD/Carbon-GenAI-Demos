@@ -526,7 +526,6 @@ async function completion() {
 	                 Entities to extract (in English):
 	               </p>
 	             </Column>
-               </Grid>
 
 	             {/* Entities - use single Grid with all entity pairs */}
 	             <Grid className="entity-grid">
@@ -686,7 +685,7 @@ async function completion() {
 	                 )}
 	               </Column>
 	             </Grid>
-
+	           </Grid>
 	         </TabPanel>
           <TabPanel>
             <Grid className="tabs-group-content">
