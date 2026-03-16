@@ -129,6 +129,20 @@ Extract and redact personal information from customer support tickets
   - Compliant long-term storage
 - **Built by**: Bob with team requirements
 
+#### 🛂 **Tab 2: Passport Verification - ID Document OCR**
+Automated identity verification from passport/ID document scans
+- **Use Case**: Pre-meeting visitor verification, KYC compliance, facility access control
+- **Scenario**: UK Passport (Mr. Bean - sample document for demonstration)
+- **Features**:
+  - Display passport image with OCR-extracted text
+  - Parse unstructured OCR output into structured identity data
+  - Extract 11 identity fields: document type, passport number, name, DOB, nationality, sex, birthplace, issue/expiry dates, issuing authority
+  - Machine Readable Zone (MRZ) data extraction
+  - Side-by-side display: Identity data table + redacted OCR text
+  - Automated visitor registration workflow
+- **Built by**: Bob with team requirements
+- **Innovation**: Shows complete ID verification pipeline - image → OCR text → structured data → compliance records
+
 #### 📄 **Tab 3: Document Discovery - Elinar GDPR Solution**
 Unstructured data discovery for GDPR compliance audits
 - **Use Case**: Legacy document scanning before system migration or data retention review
