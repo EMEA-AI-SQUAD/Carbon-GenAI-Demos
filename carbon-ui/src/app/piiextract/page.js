@@ -119,16 +119,50 @@ export default function PIIExtractionPage() {
           <Column md={4} lg={7} sm={4} className="entity__tab-content">
             <h3 className="landing-page__subheading">Privacy Compliance: Extract PII from Customer Support Tickets</h3>
             <p className="landing-page__p">
-              This demo addresses a critical compliance challenge: A customer submits a complaint ticket
-              via email that needs to be routed to an L1 support agent who doesn't need to view PII
-              information to address the problem.
+              This demo showcases how Granite 4.0 running on IBM Power solves a critical compliance
+              challenge in customer support operations.
             </p>
-            <p className="landing-page__p">
-              The ticket must also be stored long-term for historical analysis, but cannot contain any
-              PII information in accordance with GDPR, CCPA, and other compliance standards. Granite 4.0
-              running on IBM Power can automatically identify and extract sensitive personal information
-              including names, contact details, financial data, and location information.
-            </p>
+          </Column>
+          
+          {/* Use Case Scenario Box */}
+          <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
+            <div style={{
+              background: 'var(--cds-layer-02)',
+              padding: '1.5rem',
+              borderLeft: '4px solid var(--cds-border-interactive)',
+              marginTop: '1rem',
+              marginBottom: '1rem'
+            }}>
+              <h4 style={{ marginTop: 0, marginBottom: '1rem', fontSize: '1.125rem' }}>
+                📋 Use Case Scenario
+              </h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <span style={{ fontWeight: 600, minWidth: '40px' }}>1.</span>
+                  <span>A customer sends a complaint ticket via an email channel containing sensitive personal information.</span>
+                </div>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <span style={{ fontWeight: 600, minWidth: '40px' }}>2.</span>
+                  <span>The ticket needs to be routed to an L1 support agent, who <strong>doesn't need to view PII information</strong> to address the technical problem.</span>
+                </div>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <span style={{ fontWeight: 600, minWidth: '40px' }}>3.</span>
+                  <span>The ticket must be stored long-term for historical analysis, but <strong>cannot contain any PII information</strong> in accordance with GDPR, CCPA, and other compliance standards.</span>
+                </div>
+                <div style={{
+                  marginTop: '0.5rem',
+                  paddingTop: '0.75rem',
+                  borderTop: '1px solid var(--cds-border-subtle)',
+                  fontStyle: 'italic',
+                  color: 'var(--cds-text-secondary)'
+                }}>
+                  <strong>Solution:</strong> Granite 4.0 automatically identifies and extracts all PII, enabling redaction for L1 agents and compliant long-term storage.
+                </div>
+              </div>
+            </div>
+          </Column>
+          
+          <Column md={4} lg={7} sm={4} className="entity__tab-content">
           </Column>
           <Column md={4} lg={{ span: 8, offset: 7 }} sm={4}>
             <Image
