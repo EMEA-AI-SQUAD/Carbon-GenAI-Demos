@@ -111,9 +111,13 @@ export default function PIIExtractionPage() {
       let redacted = values.free_form_text;
       rows.forEach(row => {
         if (row.value && row.value !== "Data not available") {
-          // Replace each PII value with [REDACTED]
-          const regex = new RegExp(row.value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-          redacted = redacted.replace(regex, '[REDACTED]');
+          // Split comma-separated values and redact each individually
+          const values = row.value.split(',').map(v => v.trim()).filter(v => v);
+          values.forEach(val => {
+            // Replace each PII value with [REDACTED]
+            const regex = new RegExp(val.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+            redacted = redacted.replace(regex, '[REDACTED]');
+          });
         }
       });
       setRedactedText(redacted);
