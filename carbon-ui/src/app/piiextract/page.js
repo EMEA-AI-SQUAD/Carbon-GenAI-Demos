@@ -332,8 +332,8 @@ export default function PIIExtractionPage() {
             </Column>
           ) : (
             <>
-              {/* PII Table - Left side */}
-              <Column sm={4} md={4} lg={8} className="landing-page__tab-content">
+              {/* PII Table - Left side (1/4 of page) */}
+              <Column sm={4} md={2} lg={4} className="landing-page__tab-content">
                 <DataTable
                   rows={extractedRows}
                   headers={[
@@ -391,9 +391,9 @@ export default function PIIExtractionPage() {
                 </DataTable>
               </Column>
 
-              {/* Redacted Text - Right side */}
+              {/* Redacted Text - Right side (3/4 of page) */}
               {redactedText && (
-                <Column sm={4} md={4} lg={8} className="landing-page__tab-content">
+                <Column sm={4} md={6} lg={12} className="landing-page__tab-content">
                   <Tile style={{ padding: '1.5rem', height: '100%' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                       <h4 style={{ margin: 0, fontSize: '1rem' }}>Redacted Text</h4>
