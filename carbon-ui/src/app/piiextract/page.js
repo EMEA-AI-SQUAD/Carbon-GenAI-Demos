@@ -580,16 +580,25 @@ export default function PIIExtractionPage() {
 
                 {/* Performance Notice */}
                 <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
-                  <InlineNotification
-                    kind="warning"
-                    title="Demo Environment Performance"
-                    subtitle=""
-                    hideCloseButton
-                    lowContrast
-                    style={{ marginTop: '1rem' }}
-                  >
-                    <div style={{ marginTop: '0.5rem', lineHeight: '1.6' }}>
-                      <p style={{ margin: '0 0 0.5rem 0' }}>
+                  <div style={{
+                    background: '#fff1e6',
+                    border: '1px solid #f1c21b',
+                    borderLeft: '4px solid #f1c21b',
+                    padding: '1rem 1.5rem',
+                    borderRadius: '4px',
+                    marginTop: '1rem'
+                  }}>
+                    <h4 style={{
+                      marginTop: 0,
+                      marginBottom: '0.75rem',
+                      fontSize: '0.875rem',
+                      fontWeight: 600,
+                      color: '#161616'
+                    }}>
+                      ⚠️ Demo Environment Performance
+                    </h4>
+                    <div style={{ lineHeight: '1.6', fontSize: '0.875rem', color: '#525252' }}>
+                      <p style={{ margin: '0 0 0.75rem 0' }}>
                         <strong>Note:</strong> Vision processing in this demo environment may take 4-5 minutes on first load,
                         then 20-30 seconds when cached. Performance is not optimal due to demo infrastructure constraints.
                       </p>
@@ -605,7 +614,7 @@ export default function PIIExtractionPage() {
                         </Link>
                       </p>
                     </div>
-                  </InlineNotification>
+                  </div>
                 </Column>
               </Grid>
 
