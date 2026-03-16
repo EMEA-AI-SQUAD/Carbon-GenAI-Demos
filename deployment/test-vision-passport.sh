@@ -52,7 +52,7 @@ PAYLOAD=$(cat <<EOF
       },
       {
         "type": "text",
-        "text": "Extract all text visible in this passport image. List each field and its value."
+        "text": "Read this passport and extract the following information in a structured format:\n- Passport Number\n- Surname\n- Given Names\n- Nationality\n- Date of Birth\n- Sex\n- Place of Birth\n- Date of Issue\n- Date of Expiry\n- Issuing Authority\n\nProvide only the extracted data, not a description of the image."
       }
     ]
   }],
