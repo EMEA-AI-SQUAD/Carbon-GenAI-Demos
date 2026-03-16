@@ -5,6 +5,7 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 const app = express();
 const PORT = 3001;
 const LLAMA_URL = 'http://localhost:8080';
+const VISION_URL = 'http://localhost:8082';
 
 /**
  * CORS must be first
@@ -29,7 +30,39 @@ app.use((req, res, next) => {
 });
 
 /**
- * Transparent proxy to llama.cpp
+ * Vision endpoint - routes to Granite Vision on port 8082
+ */
+app.use(
+  '/vision',
+  createProxyMiddleware({
+    target: VISION_URL,
+    changeOrigin: true,
+    pathRewrite: {
+      '^/vision': '', // Remove /vision prefix when forwarding
+    },
+    logLevel: 'debug',
+
+    onProxyReq(proxyReq, req) {
+      console.log(`→ Proxying VISION ${req.method} ${req.url} → ${VISION_URL}${req.url.replace('/vision', '')}`);
+    },
+
+    onProxyRes(proxyRes, req) {
+      console.log(`← Vision Response ${proxyRes.statusCode} for ${req.method} ${req.url}`);
+    },
+
+    onError(err, req, res) {
+      console.error('✗ VISION PROXY ERROR ✗');
+      console.error(err.message);
+      res.status(502).json({
+        error: 'Vision proxy error',
+        message: err.message,
+      });
+    },
+  })
+);
+
+/**
+ * Default proxy to llama.cpp text model
  */
 app.use(
   '/',
@@ -59,7 +92,8 @@ app.use(
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`✓ CORS Proxy running on http://localhost:${PORT}`);
-  console.log(`→ Forwarding to llama.cpp at ${LLAMA_URL}`);
+  console.log(`→ Text model: ${LLAMA_URL}`);
+  console.log(`→ Vision model: ${VISION_URL} (via /vision route)`);
   console.log(`→ Accepting requests from http://p1270-pvm1.p1270.cecc.ihost.com:3000`);
 });
 

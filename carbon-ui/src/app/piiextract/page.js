@@ -29,16 +29,24 @@ import {
   Tag,
 } from '@carbon/react';
 import Image from 'next/image';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { DEFAULTS, PASSPORT_VERIFICATION, DOCUMENT_SCAN } from "./defaults";
 import { buildMessages } from "./messages";
 import { getExpectedKeys, parseModelJson, reconcileOutput, buildKeyLabelMap } from "./postprocess";
+import { prewarmVisionCache } from "./vision-extraction";
 import OpenAI from 'openai';
 
 const API_URL = 'http://localhost:3001/v1';
+const VISION_API_URL = 'http://localhost:3001/vision/v1';
 
 const openai_client = new OpenAI({
   baseURL: API_URL,
+  apiKey: 'sk-no-key-required',
+  dangerouslyAllowBrowser: true,
+});
+
+const vision_client = new OpenAI({
+  baseURL: VISION_API_URL,
   apiKey: 'sk-no-key-required',
   dangerouslyAllowBrowser: true,
 });
@@ -52,6 +60,39 @@ export default function PIIExtractionPage() {
   const [extractedRows, setExtractedRows] = useState([]); // [{ id, label, value }]
   const [redactedText, setRedactedText] = useState('');
   const [activeTab, setActiveTab] = useState(0);
+  
+  // Vision-specific state
+  const [visionLoading, setVisionLoading] = useState(false);
+  const [visionCached, setVisionCached] = useState(false);
+  const [visionError, setVisionError] = useState('');
+
+  // Pre-warm vision cache when Tab 2 is selected
+  useEffect(() => {
+    if (activeTab === 1 && !visionCached && !visionLoading) {
+      console.log('Tab 2 selected - pre-warming vision cache...');
+      setVisionLoading(true);
+      setVisionError('');
+      
+      prewarmVisionCache(
+        '/images/mr-bean-passport.jpg',
+        PASSPORT_VERIFICATION.entities,
+        vision_client
+      )
+        .then((result) => {
+          console.log('Vision cache pre-warmed successfully');
+          setVisionCached(true);
+          // Optionally auto-populate results
+          setExtractedRows(result.rows);
+        })
+        .catch((error) => {
+          console.error('Vision pre-warming failed:', error);
+          setVisionError(error.message || 'Failed to process passport image');
+        })
+        .finally(() => {
+          setVisionLoading(false);
+        });
+    }
+  }, [activeTab, visionCached, visionLoading]);
 
   const onFreeFormChange = (e) =>
     setValues((prev) => ({ ...prev, free_form_text: e.target.value }));
@@ -147,11 +188,13 @@ export default function PIIExtractionPage() {
           setExtractedRows([]);
           setRedactedText('');
           setErrorMsg('');
+          setVisionError('');
           // Load appropriate defaults
           if (selectedIndex === 0) {
             setValues(DEFAULTS);
           } else if (selectedIndex === 1) {
             setValues(PASSPORT_VERIFICATION);
+            // Vision pre-warming will trigger via useEffect
           } else if (selectedIndex === 2) {
             setValues(DOCUMENT_SCAN);
           }
@@ -455,10 +498,11 @@ export default function PIIExtractionPage() {
             <TabPanel>
               <Grid className="tabs-group-content">
                 <Column md={4} lg={7} sm={4} className="entity__tab-content">
-                  <h3 className="landing-page__subheading">ID Document Verification - Passport OCR</h3>
+                  <h3 className="landing-page__subheading">ID Document Verification - Vision AI</h3>
                   <p className="landing-page__p">
-                    This demo shows automated extraction of personal information from identity documents
-                    for visitor registration, KYC compliance, and pre-meeting verification.
+                    This demo uses <strong>Granite Vision 3.3 2B</strong> to read passport images directly,
+                    extracting personal information for visitor registration, KYC compliance, and pre-meeting verification.
+                    No OCR pre-processing required - true multimodal AI!
                   </p>
                 </Column>
                 <Column md={4} lg={{ span: 8, offset: 7 }} sm={4}>
@@ -509,87 +553,49 @@ export default function PIIExtractionPage() {
                         fontStyle: 'italic',
                         color: 'var(--cds-text-secondary)'
                       }}>
-                        <strong>Solution:</strong> Granite 4.0 extracts structured PII from OCR text, automating visitor registration and KYC verification.
+                        <strong>Solution:</strong> Granite Vision 3.3 2B reads passport images directly, extracting structured identity data without OCR pre-processing.
                       </div>
                     </div>
                   </div>
                 </Column>
 
                 <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
-                  <p className="landing-page__p">
-                    Below is the OCR-extracted text from the passport image. The AI will parse this unstructured
-                    text and extract structured identity information for verification and record-keeping.
-                  </p>
-                  <TextArea
-                    className="text-area-class"
-                    id="free-form-text"
-                    value={values.free_form_text ?? ""}
-                    onChange={onFreeFormChange}
-                    size="lg"
-                    rows={12}
-                  />
+                  <div style={{
+                    background: 'var(--cds-layer-02)',
+                    padding: '1.5rem',
+                    borderRadius: '4px',
+                    marginTop: '1rem'
+                  }}>
+                    <h4 style={{ marginTop: 0, marginBottom: '1rem', fontSize: '1rem' }}>
+                      🤖 Automatic Vision Processing
+                    </h4>
+                    <p style={{ margin: 0, color: 'var(--cds-text-secondary)', lineHeight: '1.6' }}>
+                      When you navigate to this tab, Granite Vision 3.3 2B automatically begins processing
+                      the passport image above. The vision model reads the document directly and extracts
+                      structured identity data - no manual input or OCR pre-processing required.
+                      Results appear below once processing completes.
+                    </p>
+                  </div>
                 </Column>
-                <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
-                  <p className="landing-page__p">
-                    Define the identity fields to extract from the passport OCR text. These will be used
-                    for visitor registration, security clearance, and compliance documentation.
-                  </p>
-                </Column>
-              </Grid>
-
-              {/* Entities - use single Grid with all entity pairs */}
-              <Grid className="entity-grid">
-                {(values.entities ?? []).map((f, i) => (
-                  <React.Fragment key={i}>
-                    {/* Label column */}
-                    <Column sm={4} md={4} lg={4} className="entity-label-col">
-                      <TextArea
-                        id={`label-${i}`}
-                        labelText={`Label ${i + 1}`}
-                        value={f.label ?? ''}
-                        onChange={onEntityChange(i, 'label')}
-                        size="sm"
-                        rows={Math.max(1, Math.ceil((f.label?.length || 0) / 30))}
-                      />
-                    </Column>
-
-                    {/* Definition column */}
-                    <Column sm={4} md={4} lg={12} className="entity-def-col">
-                      <TextArea
-                        id={`definition-${i}`}
-                        labelText={`Definition ${i + 1}`}
-                        value={f.definition ?? ''}
-                        onChange={onEntityChange(i, 'definition')}
-                        size="sm"
-                        rows={Math.max(1, Math.ceil((f.definition?.length || 0) / 80))}
-                      />
-                    </Column>
-                  </React.Fragment>
-                ))}
               </Grid>
 
               <Grid className="tabs-group-content">
-                <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
-                  <Button className="send-to-llm-class" onClick={()=>completion()} disabled={isLoading}>
-                    {isLoading ? 'Extracting Identity Data…' : 'Extract Passport Information'}
-                  </Button>
-                </Column>
 
-                {/* Error Display */}
-                {errorMsg && (
+                {/* Vision Error Display */}
+                {visionError && (
                   <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
                     <InlineNotification
                       kind="error"
-                      title="Error"
-                      subtitle={errorMsg}
-                      onCloseButtonClick={() => setErrorMsg('')}
+                      title="Vision Processing Error"
+                      subtitle={visionError}
+                      onCloseButtonClick={() => setVisionError('')}
                       lowContrast
                     />
                   </Column>
                 )}
 
                 {/* Results */}
-                {isLoading ? (
+                {visionLoading ? (
                   <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
                     <div style={{
                       textAlign: 'center',
@@ -602,8 +608,8 @@ export default function PIIExtractionPage() {
                       <Loading description="Processing" withOverlay={false} />
                       <InlineNotification
                         kind="info"
-                        title="Processing Passport"
-                        subtitle="Granite 4.0 is extracting identity information from OCR text..."
+                        title="Processing Passport Image"
+                        subtitle="Granite Vision 3.3 2B is reading the passport directly... This may take 4-5 minutes on first load, then 20-30 seconds when cached."
                         hideCloseButton
                         lowContrast
                       />
@@ -629,14 +635,17 @@ export default function PIIExtractionPage() {
                       alignItems: 'center',
                       gap: '1rem'
                     }}>
-                      <h4 style={{ margin: 0 }}>No data extracted yet</h4>
+                      <h4 style={{ margin: 0 }}>
+                        {visionCached ? '✓ Vision Processing Complete' : 'Vision Processing Starting...'}
+                      </h4>
                       <p style={{
                         color: 'var(--cds-text-secondary)',
-                        maxWidth: '400px',
+                        maxWidth: '500px',
                         margin: 0
                       }}>
-                        Review the OCR text above, then click
-                        <strong> Extract Passport Information</strong> to parse identity data.
+                        {visionCached
+                          ? 'Granite Vision has processed the passport image. Results will appear above once extraction completes.'
+                          : 'Granite Vision 3.3 2B is analyzing the passport image directly. This demo uses true multimodal AI - no OCR pre-processing required!'}
                       </p>
                     </div>
                   </Column>
