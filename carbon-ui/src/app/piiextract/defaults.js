@@ -13,4 +13,45 @@ export const DEFAULTS = {
   ]
 };
 
+// Tab 3: Unstructured Data Discovery - Document Scan (Elinar-inspired)
+export const DOCUMENT_SCAN = {
+  free_form_text: `PROJECT STATUS UPDATE - Q1 2024
+
+Project Phoenix Migration - Internal Memo
+
+Date: 15 January 2024
+From: IT Operations Team
+Subject: Legacy System Data Audit Progress
+
+Team Update:
+Our data migration project is progressing well. Lead developer Anna Kowalski (anna.kowalski@techcorp.eu, +48 22 123 4567) has completed the initial database schema review. The technical architecture team, headed by Marcus Weber, identified 847 legacy files requiring assessment.
+
+Key Findings:
+- Customer database contains approximately 125,000 records
+- Employee records system holds data from 2015-present
+- Marketing automation platform includes email campaigns sent to 89,000 subscribers
+
+Action Items:
+1. Anna to coordinate with Data Protection Officer by 25 January
+2. Marcus Weber (m.weber@techcorp.eu) to prepare compliance documentation
+3. Schedule review meeting for 1 February 2024 at Berlin office
+
+Technical Notes:
+The Phoenix system architecture uses PostgreSQL 14.2 with Redis caching layer. Migration scripts are stored in repository phoenix-migration-2024. Initial testing shows 99.7% data integrity across test environments.
+
+Contact: For questions, reach Anna Kowalski at extension 4567 or Marcus at +49 30 987 6543.
+
+End of memo.`,
+  entities: [
+    { label: "Person Name", definition: "Full names of individuals mentioned in the document" },
+    { label: "Email Address", definition: "Email addresses of employees or contacts" },
+    { label: "Phone Number", definition: "Phone numbers including country codes and extensions" },
+    { label: "Job Title/Role", definition: "Professional roles or positions mentioned" },
+    { label: "Office Location", definition: "Physical office or workplace locations" },
+    { label: "Date", definition: "Specific dates mentioned in the document" },
+    { label: "Record Count", definition: "Numbers indicating quantities of personal data records (e.g., '125,000 records', '89,000 subscribers')" },
+    { label: "", definition: "" } // optional spare row for the UI
+  ]
+};
+
 // Made with Bob
