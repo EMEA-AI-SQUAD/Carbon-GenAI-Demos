@@ -79,7 +79,8 @@ fi
     --mmproj "${VISION_MODEL_DIR}/${MMPROJ_FILE}" \
     --host 0.0.0.0 \
     --port ${VISION_PORT} \
-    -c 4096 \
+    -c 8192 \
+    -ngl 0 \
     --log-disable \
     2>&1 | tee -a ../deployment/granite-vision-server.log
 
