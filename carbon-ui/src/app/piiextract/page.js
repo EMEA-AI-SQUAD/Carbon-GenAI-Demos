@@ -3,6 +3,11 @@ import {
   Breadcrumb,
   BreadcrumbItem,
   Button,
+  Tabs,
+  Tab,
+  TabList,
+  TabPanels,
+  TabPanel,
   Link,
   Grid,
   Column,
@@ -45,6 +50,7 @@ export default function PIIExtractionPage() {
   const [errorMsg, setErrorMsg] = useState('');
   const [extractedRows, setExtractedRows] = useState([]); // [{ id, label, value }]
   const [redactedText, setRedactedText] = useState('');
+  const [activeTab, setActiveTab] = useState(0);
 
   const onFreeFormChange = (e) =>
     setValues((prev) => ({ ...prev, free_form_text: e.target.value }));
@@ -130,31 +136,39 @@ export default function PIIExtractionPage() {
         <h1 className="landing-page__heading">PII Extraction for Privacy Compliance with IBM Power</h1>
       </Column>
       <Column lg={16} md={8} sm={4} className="landing-page__r2">
-        <Grid className="tabs-group-content">
-          <Column md={4} lg={7} sm={4} className="entity__tab-content">
-            <h3 className="landing-page__subheading">Privacy Compliance: Extract PII from Customer Support Tickets</h3>
-            <p className="landing-page__p">
-              This demo showcases how Granite 4.0 running on IBM Power solves a critical compliance
-              challenge in customer support operations.
-            </p>
-          </Column>
-          <Column md={4} lg={{ span: 8, offset: 7 }} sm={4}>
-            <Image
-              className="landing-page__illo"
-              src="/images/pii-protection.jpg"
-              alt="PII Protection and Data Security"
-              width={500}
-              height={350}
-            />
-            <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-              <Link href="https://www.ibm.com/think/topics/pii" target="_blank" rel="noopener noreferrer">
-                Learn more about Personally Identifiable Information (PII) →
-              </Link>
-            </div>
-          </Column>
+        <Tabs defaultSelectedIndex={0} onChange={({ selectedIndex }) => setActiveTab(selectedIndex)}>
+          <TabList className="tabs-group" aria-label="Tab navigation">
+            <Tab>Fraud Complaint</Tab>
+            <Tab>Demo 2 (Coming Soon)</Tab>
+            <Tab>Demo 3 (Coming Soon)</Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel>
+              <Grid className="tabs-group-content">
+                <Column md={4} lg={7} sm={4} className="entity__tab-content">
+                  <h3 className="landing-page__subheading">Privacy Compliance: Extract PII from Customer Support Tickets</h3>
+                  <p className="landing-page__p">
+                    This demo showcases how Granite 4.0 running on IBM Power solves a critical compliance
+                    challenge in customer support operations.
+                  </p>
+                </Column>
+                <Column md={4} lg={{ span: 8, offset: 7 }} sm={4}>
+                  <Image
+                    className="landing-page__illo"
+                    src="/images/pii-protection.jpg"
+                    alt="PII Protection and Data Security"
+                    width={500}
+                    height={350}
+                  />
+                  <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+                    <Link href="https://www.ibm.com/think/topics/pii" target="_blank" rel="noopener noreferrer">
+                      Learn more about Personally Identifiable Information (PII) →
+                    </Link>
+                  </div>
+                </Column>
 
-          {/* Use Case Scenario Box */}
-          <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
+                {/* Use Case Scenario Box */}
+                <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
             <div style={{
               background: 'var(--cds-layer-02)',
               padding: '1.5rem',
@@ -264,41 +278,39 @@ export default function PIIExtractionPage() {
             </Column>
           )}
 
-          {/* Results */}
-          <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
-            {/* Loading state */}
-            {isLoading ? (
-              <>
-                <div style={{
-                  textAlign: 'center',
-                  padding: '2rem',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '1rem'
-                }}>
-                  <Loading description="Processing" withOverlay={false} />
-                  <InlineNotification
-                    kind="info"
-                    title="Processing"
-                    subtitle="Granite 4.0 is identifying and extracting PII for compliance..."
-                    hideCloseButton
-                    lowContrast
-                  />
-                </div>
-                <DataTableSkeleton
-                  headers={[
-                    { key: 'label', header: 'Field' },
-                    { key: 'value', header: 'Extracted Value' },
-                  ]}
-                  showHeader
-                  showToolbar
-                  rowCount={Math.max(3, values.entities.filter(e => (e.label || '').trim()).length)}
-                  columnCount={2}
+          {/* Results - Table on left, Redacted text on right */}
+          {isLoading ? (
+            <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
+              <div style={{
+                textAlign: 'center',
+                padding: '2rem',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '1rem'
+              }}>
+                <Loading description="Processing" withOverlay={false} />
+                <InlineNotification
+                  kind="info"
+                  title="Processing"
+                  subtitle="Granite 4.0 is identifying and extracting PII for compliance..."
+                  hideCloseButton
+                  lowContrast
                 />
-              </>
-            ) : extractedRows.length === 0 ? (
-              // Empty state
+              </div>
+              <DataTableSkeleton
+                headers={[
+                  { key: 'label', header: 'Field' },
+                  { key: 'value', header: 'Extracted Value' },
+                ]}
+                showHeader
+                showToolbar
+                rowCount={Math.max(3, values.entities.filter(e => (e.label || '').trim()).length)}
+                columnCount={2}
+              />
+            </Column>
+          ) : extractedRows.length === 0 ? (
+            <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
               <div style={{
                 textAlign: 'center',
                 padding: '3rem 1rem',
@@ -317,102 +329,132 @@ export default function PIIExtractionPage() {
                   <strong> Extract PII for Compliance</strong> to identify sensitive information.
                 </p>
               </div>
-            ) : (
-              <DataTable
-                rows={extractedRows}
-                headers={[
-                  { key: 'label', header: 'Field' },
-                  { key: 'value', header: 'Extracted Value' },
-                ]}
-                isSortable
-                size="sm"
-                useStaticWidth
-              >
-                {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
-                  <TableContainer
-                    title={
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <span>Extracted PII - Compliance Report</span>
-                        <AILabel size="sm">
-                          <AILabelContent>
-                            <div>
-                              <p className="secondary">AI Generated</p>
-                              <p className="secondary">PII identified by Granite 4.0 LLM</p>
-                            </div>
-                          </AILabelContent>
-                        </AILabel>
-                      </div>
-                    }
-                    description="Sensitive personal information extracted for redaction and compliance storage"
-                  >
-                    <Table stickyHeader {...getTableProps()}>
-                      <TableHead>
-                        <TableRow>
-                          {headers.map((header) => (
-                            <TableHeader
-                              key={header.key}
-                              {...getHeaderProps({ header })}
-                            >
-                              {header.header}
-                            </TableHeader>
-                          ))}
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {rows.map((row) => (
-                          <TableRow key={row.id} {...getRowProps({ row })}>
-                            {row.cells.map((cell) => (
-                              <TableCell key={cell.id} style={{ whiteSpace: 'pre-wrap' }}>
-                                {cell.value}
-                              </TableCell>
+            </Column>
+          ) : (
+            <>
+              {/* PII Table - Left side */}
+              <Column sm={4} md={4} lg={8} className="landing-page__tab-content">
+                <DataTable
+                  rows={extractedRows}
+                  headers={[
+                    { key: 'label', header: 'Field' },
+                    { key: 'value', header: 'Extracted Value' },
+                  ]}
+                  isSortable
+                  size="sm"
+                  useStaticWidth
+                >
+                  {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
+                    <TableContainer
+                      title={
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <span>Extracted PII</span>
+                          <AILabel size="sm">
+                            <AILabelContent>
+                              <div>
+                                <p className="secondary">AI Generated</p>
+                                <p className="secondary">PII identified by Granite 4.0</p>
+                              </div>
+                            </AILabelContent>
+                          </AILabel>
+                        </div>
+                      }
+                      description="Sensitive information extracted for redaction"
+                    >
+                      <Table stickyHeader {...getTableProps()}>
+                        <TableHead>
+                          <TableRow>
+                            {headers.map((header) => (
+                              <TableHeader
+                                key={header.key}
+                                {...getHeaderProps({ header })}
+                              >
+                                {header.header}
+                              </TableHeader>
                             ))}
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                )}
-              </DataTable>
-            )}
-          </Column>
+                        </TableHead>
+                        <TableBody>
+                          {rows.map((row) => (
+                            <TableRow key={row.id} {...getRowProps({ row })}>
+                              {row.cells.map((cell) => (
+                                <TableCell key={cell.id} style={{ whiteSpace: 'pre-wrap' }}>
+                                  {cell.value}
+                                </TableCell>
+                              ))}
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  )}
+                </DataTable>
+              </Column>
 
-          {/* Redacted Text Display */}
-          {redactedText && (
-            <Column sm={4} md={8} lg={16} className="landing-page__tab-content" style={{ marginTop: '2rem' }}>
-              <Tile style={{ padding: '1.5rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-                  <h4 style={{ margin: 0 }}>Redacted Text - Ready for L1 Agent & Long-term Storage</h4>
-                  <AILabel size="sm">
-                    <AILabelContent>
-                      <div>
-                        <p className="secondary">AI Generated</p>
-                        <p className="secondary">PII redacted by Granite 4.0</p>
-                      </div>
-                    </AILabelContent>
-                  </AILabel>
-                </div>
-                <p style={{
-                  fontSize: '0.875rem',
-                  color: 'var(--cds-text-secondary)',
-                  marginBottom: '1rem'
-                }}>
-                  This version has all PII replaced with [REDACTED] and is safe for L1 agents to view and for long-term compliance storage.
-                </p>
-                <div style={{
-                  background: 'var(--cds-layer-01)',
-                  padding: '1rem',
-                  borderRadius: '4px',
-                  fontFamily: 'monospace',
-                  fontSize: '0.875rem',
-                  whiteSpace: 'pre-wrap',
-                  lineHeight: '1.6'
-                }}>
-                  {redactedText}
-                </div>
-              </Tile>
-            </Column>
+              {/* Redacted Text - Right side */}
+              {redactedText && (
+                <Column sm={4} md={4} lg={8} className="landing-page__tab-content">
+                  <Tile style={{ padding: '1.5rem', height: '100%' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                      <h4 style={{ margin: 0, fontSize: '1rem' }}>Redacted Text</h4>
+                      <AILabel size="sm">
+                        <AILabelContent>
+                          <div>
+                            <p className="secondary">AI Generated</p>
+                            <p className="secondary">PII redacted by Granite 4.0</p>
+                          </div>
+                        </AILabelContent>
+                      </AILabel>
+                    </div>
+                    <p style={{
+                      fontSize: '0.75rem',
+                      color: 'var(--cds-text-secondary)',
+                      marginBottom: '1rem'
+                    }}>
+                      Safe for L1 agents & long-term storage
+                    </p>
+                    <div style={{
+                      background: 'var(--cds-layer-01)',
+                      padding: '1rem',
+                      borderRadius: '4px',
+                      fontFamily: 'monospace',
+                      fontSize: '0.75rem',
+                      whiteSpace: 'pre-wrap',
+                      lineHeight: '1.6',
+                      maxHeight: '500px',
+                      overflow: 'auto'
+                    }}>
+                      {redactedText}
+                    </div>
+                  </Tile>
+                </Column>
+              )}
+            </>
           )}
-        </Grid>
+              </Grid>
+            </TabPanel>
+            <TabPanel>
+              <Grid className="tabs-group-content">
+                <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
+                  <h3 className="landing-page__subheading">Demo 2 - Coming Soon</h3>
+                  <p className="landing-page__p">
+                    Additional PII extraction demo will be added here.
+                  </p>
+                </Column>
+              </Grid>
+            </TabPanel>
+            <TabPanel>
+              <Grid className="tabs-group-content">
+                <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
+                  <h3 className="landing-page__subheading">Demo 3 - Coming Soon</h3>
+                  <p className="landing-page__p">
+                    Additional PII extraction demo will be added here.
+                  </p>
+                </Column>
+              </Grid>
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
       </Column>
     </Grid>
   );
