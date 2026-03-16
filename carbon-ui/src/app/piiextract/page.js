@@ -8,7 +8,6 @@ import {
   TabList,
   TabPanels,
   TabPanel,
-  Link,
   Grid,
   Column,
   TextArea,
@@ -605,13 +604,14 @@ export default function PIIExtractionPage() {
                       <p style={{ margin: 0 }}>
                         Production deployments on IBM Power with proper NUMA configuration achieve significantly faster inference.
                         Learn more about{' '}
-                        <Link
+                        <a
                           href="https://community.ibm.com/community/user/blogs/sebastian-lehrig/2024/03/26/sizing-for-ai"
                           target="_blank"
                           rel="noopener noreferrer"
+                          style={{ color: '#0f62fe', textDecoration: 'underline' }}
                         >
                           optimal AI workload sizing on IBM Power →
-                        </Link>
+                        </a>
                       </p>
                     </div>
                   </div>
