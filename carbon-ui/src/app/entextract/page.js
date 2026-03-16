@@ -228,7 +228,7 @@ export default function EntityExtractionPage() {
                         value={f.label ?? ''}
                         onChange={onEntityChange(i, 'label')}
                         size="sm"
-                        rows={1}
+                        rows={Math.max(1, Math.ceil((f.label?.length || 0) / 30))}
                       />
                     </Column>
 
@@ -240,7 +240,7 @@ export default function EntityExtractionPage() {
                         value={f.definition ?? ''}
                         onChange={onEntityChange(i, 'definition')}
                         size="sm"
-                        rows={1}
+                        rows={Math.max(1, Math.ceil((f.definition?.length || 0) / 80))}
                       />
                     </Column>
                   </React.Fragment>
@@ -536,7 +536,7 @@ export default function EntityExtractionPage() {
                         value={f.label ?? ''}
                         onChange={onEntityChange(i, 'label')}
                         size="sm"
-                        rows={1}
+                        rows={Math.max(1, Math.ceil((f.label?.length || 0) / 30))}
                       />
                     </Column>
                     <Column sm={4} md={4} lg={12} className="entity-def-col">
@@ -546,7 +546,7 @@ export default function EntityExtractionPage() {
                         value={f.definition ?? ''}
                         onChange={onEntityChange(i, 'definition')}
                         size="sm"
-                        rows={1}
+                        rows={Math.max(1, Math.ceil((f.definition?.length || 0) / 80))}
                       />
                     </Column>
                   </React.Fragment>
@@ -699,9 +699,6 @@ export default function EntityExtractionPage() {
                     configuration, and compute the total load height - demonstrating reasoning beyond
                     simple extraction.
                   </p>
-                  <Link href="https://www.ibm.com/downloads/documents/us-en/1443d5dc5ecf4367" target="_blank" rel="noopener noreferrer">
-                    Read the Hans Geis IBM Case Study →
-                  </Link>
                 </Column>
                 <Column md={4} lg={{span: 8, offset: 7}} sm={4}>
                   <Image
@@ -711,6 +708,9 @@ export default function EntityExtractionPage() {
                     width={500}
                     height={280}
                   />
+                  <Link href="https://www.ibm.com/downloads/documents/us-en/1443d5dc5ecf4367" target="_blank" rel="noopener noreferrer">
+                    Read the Hans Geis IBM Case Study →
+                  </Link>
                 </Column>
 
                 <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
@@ -750,7 +750,7 @@ export default function EntityExtractionPage() {
                         value={f.label ?? ''}
                         onChange={onEntityChange(i, 'label')}
                         size="sm"
-                        rows={1}
+                        rows={Math.max(1, Math.ceil((f.label?.length || 0) / 30))}
                       />
                     </Column>
                     <Column sm={4} md={4} lg={12} className="entity-def-col">
@@ -760,7 +760,7 @@ export default function EntityExtractionPage() {
                         value={f.definition ?? ''}
                         onChange={onEntityChange(i, 'definition')}
                         size="sm"
-                        rows={1}
+                        rows={Math.max(1, Math.ceil((f.definition?.length || 0) / 80))}
                       />
                     </Column>
                   </React.Fragment>
