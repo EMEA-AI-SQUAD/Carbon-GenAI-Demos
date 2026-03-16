@@ -115,9 +115,9 @@ Extract information AND perform complex calculations from logistics requests
   - Demonstrates AI going beyond simple extraction
 - **Built by**: Bob with team requirements
 
-### PII Extraction Demo
+### PII Extraction Demos
 
-#### 🔒 **PII Extraction for Privacy Compliance**
+#### 🔒 **Tab 1: Fraud Complaint - Privacy Compliance**
 Extract and redact personal information from customer support tickets
 - **Use Case**: GDPR/CCPA compliance for customer support operations
 - **Scenario**: European fraud complaint (Sophie Müller)
@@ -127,10 +127,24 @@ Extract and redact personal information from customer support tickets
   - Side-by-side display: PII table (left) + redacted text (right)
   - L1 agent routing (no PII exposure)
   - Compliant long-term storage
-- **Tab Structure**: 3 tabs ready for multiple PII extraction scenarios
 - **Built by**: Bob with team requirements
 
-**Key Innovation**: Demonstrates complete compliance workflow - extract sensitive data, show what was found, and provide redacted version safe for agents and storage.
+#### 📄 **Tab 3: Document Discovery - Elinar GDPR Solution**
+Unstructured data discovery for GDPR compliance audits
+- **Use Case**: Legacy document scanning before system migration or data retention review
+- **Inspired by**: [Elinar's AI-powered GDPR solution on IBM Power](https://www.elinar.com/ai/privacy-gdpr/)
+- **Scenario**: Internal project memo with mixed business and personal data
+- **Features**:
+  - Scan unstructured documents for personal data
+  - **GDPR Risk Classification**: Color-coded banner (HIGH/MEDIUM/LOW/NO RISK)
+  - Extract 7 PII types: names, emails, phones, job titles, locations, dates, record counts
+  - Identify which documents contain GDPR-regulated content
+  - Side-by-side display: PII findings + redacted document
+  - European context: Anna Kowalski, Marcus Weber, Berlin office
+- **Built by**: Bob with team requirements
+- **Customer Reference**: Real IBM Power customer use case
+
+**Key Innovation**: Demonstrates complete compliance workflow - scan documents at scale, classify GDPR risk level, extract sensitive data, and provide redacted version safe for archival and analysis. Shows how Elinar's customers use IBM Power + AI to automate GDPR compliance.
 
 ---
 
