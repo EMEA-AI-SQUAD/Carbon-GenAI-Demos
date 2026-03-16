@@ -146,9 +146,11 @@ export default function PIIExtractionPage() {
               width={500}
               height={350}
             />
-            <Link href="https://www.ibm.com/think/topics/pii" target="_blank" rel="noopener noreferrer">
-              Learn more about Personally Identifiable Information (PII) →
-            </Link>
+            <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+              <Link href="https://www.ibm.com/think/topics/pii" target="_blank" rel="noopener noreferrer">
+                Learn more about Personally Identifiable Information (PII) →
+              </Link>
+            </div>
           </Column>
 
           {/* Use Case Scenario Box */}

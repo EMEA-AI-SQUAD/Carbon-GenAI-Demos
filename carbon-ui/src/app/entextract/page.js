@@ -708,9 +708,11 @@ export default function EntityExtractionPage() {
                     width={500}
                     height={280}
                   />
-                  <Link href="https://www.ibm.com/downloads/documents/us-en/1443d5dc5ecf4367" target="_blank" rel="noopener noreferrer">
-                    Read the Hans Geis IBM Case Study →
-                  </Link>
+                  <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+                    <Link href="https://www.ibm.com/downloads/documents/us-en/1443d5dc5ecf4367" target="_blank" rel="noopener noreferrer">
+                      Read the Hans Geis IBM Case Study →
+                    </Link>
+                  </div>
                 </Column>
 
                 <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
