@@ -20,6 +20,7 @@ import {
   AILabel,
   AILabelContent,
   Loading,
+  Tile,
 } from '@carbon/react';
 import Image from 'next/image';
 import React, { useMemo, useState } from 'react';
@@ -43,6 +44,7 @@ export default function PIIExtractionPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [extractedRows, setExtractedRows] = useState([]); // [{ id, label, value }]
+  const [redactedText, setRedactedText] = useState('');
 
   const onFreeFormChange = (e) =>
     setValues((prev) => ({ ...prev, free_form_text: e.target.value }));
@@ -66,6 +68,7 @@ export default function PIIExtractionPage() {
     setIsLoading(true);
     setErrorMsg('');
     setExtractedRows([]);
+    setRedactedText('');
 
     console.log("Calling LLM for PII extraction...");
     try {
@@ -96,6 +99,18 @@ export default function PIIExtractionPage() {
       }));
 
       setExtractedRows(rows);
+
+      // Create redacted version of the text
+      let redacted = values.free_form_text;
+      rows.forEach(row => {
+        if (row.value && row.value !== "Data not available") {
+          // Replace each PII value with [REDACTED]
+          const regex = new RegExp(row.value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+          redacted = redacted.replace(regex, '[REDACTED]');
+        }
+      });
+      setRedactedText(redacted);
+
     } catch (err) {
       console.error(err);
       setErrorMsg(err?.message || 'Failed to contact the LLM.');
@@ -122,11 +137,20 @@ export default function PIIExtractionPage() {
               This demo showcases how Granite 4.0 running on IBM Power solves a critical compliance
               challenge in customer support operations.
             </p>
+          </Column>
+          <Column md={4} lg={{ span: 8, offset: 7 }} sm={4}>
+            <Image
+              className="landing-page__illo"
+              src="/images/pii-protection.jpg"
+              alt="PII Protection and Data Security"
+              width={500}
+              height={350}
+            />
             <Link href="https://www.ibm.com/think/topics/pii" target="_blank" rel="noopener noreferrer">
               Learn more about Personally Identifiable Information (PII) →
             </Link>
           </Column>
-          
+
           {/* Use Case Scenario Box */}
           <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
             <div style={{
@@ -163,18 +187,6 @@ export default function PIIExtractionPage() {
                 </div>
               </div>
             </div>
-          </Column>
-          
-          <Column md={4} lg={7} sm={4} className="entity__tab-content">
-          </Column>
-          <Column md={4} lg={{ span: 8, offset: 7 }} sm={4}>
-            <Image
-              className="landing-page__illo"
-              src="/images/pii-protection.jpg"
-              alt="PII Protection and Data Security"
-              width={500}
-              height={350}
-            />
           </Column>
 
           <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
@@ -361,6 +373,43 @@ export default function PIIExtractionPage() {
               </DataTable>
             )}
           </Column>
+
+          {/* Redacted Text Display */}
+          {redactedText && (
+            <Column sm={4} md={8} lg={16} className="landing-page__tab-content" style={{ marginTop: '2rem' }}>
+              <Tile style={{ padding: '1.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                  <h4 style={{ margin: 0 }}>Redacted Text - Ready for L1 Agent & Long-term Storage</h4>
+                  <AILabel size="sm">
+                    <AILabelContent>
+                      <div>
+                        <p className="secondary">AI Generated</p>
+                        <p className="secondary">PII redacted by Granite 4.0</p>
+                      </div>
+                    </AILabelContent>
+                  </AILabel>
+                </div>
+                <p style={{
+                  fontSize: '0.875rem',
+                  color: 'var(--cds-text-secondary)',
+                  marginBottom: '1rem'
+                }}>
+                  This version has all PII replaced with [REDACTED] and is safe for L1 agents to view and for long-term compliance storage.
+                </p>
+                <div style={{
+                  background: 'var(--cds-layer-01)',
+                  padding: '1rem',
+                  borderRadius: '4px',
+                  fontFamily: 'monospace',
+                  fontSize: '0.875rem',
+                  whiteSpace: 'pre-wrap',
+                  lineHeight: '1.6'
+                }}>
+                  {redactedText}
+                </div>
+              </Tile>
+            </Column>
+          )}
         </Grid>
       </Column>
     </Grid>

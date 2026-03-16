@@ -5,7 +5,7 @@ export const DEFAULTS = {
     { label: "Email Address", definition: "The email contact information" },
     { label: "Phone Number", definition: "The telephone contact number including country code" },
     { label: "Credit Card Number", definition: "The credit card number mentioned in the complaint" },
-    { label: "Transaction Amount", definition: "The amount of the unauthorised transaction in euros" },
+    { label: "Transaction Amount", definition: "The monetary amount of the unauthorised transaction, including currency symbol (e.g., €1,200)" },
     { label: "Transaction Location", definition: "The location where the unauthorised transaction occurred" },
     { label: "Transaction Date", definition: "The date when the unauthorised transaction occurred" },
     { label: "Person Location", definition: "Where the person was located at the time of the transaction" },
