@@ -26,15 +26,16 @@ export function buildMessages(values) {
   const system = {
     role: "system",
     content:
-      "You are an AI Personal Information Extractor. You help extract personal identifiable information (PII) from text. " +
+      "You are an AI PII Compliance Assistant. You help identify and extract personal identifiable information (PII) " +
+      "from customer support tickets for data privacy compliance (GDPR, CCPA, etc.). " +
       "You must return a JSON object with the extracted entities only — no explanations. " +
-      "Be careful to extract information accurately and respect privacy concerns.",
+      "Extract information exactly as it appears in the text for accurate redaction and compliance storage.",
   };
 
   const user = {
     role: "user",
     content:
-`Analyze the following text and extract these personal information entities:
+`Analyze the following customer complaint ticket and extract these PII entities for compliance purposes:
 
 ${schemaJson}
 
@@ -44,7 +45,7 @@ Rules:
 - Do not hallucinate or include explanations.
 - Extract information exactly as it appears in the text.
 
-Text:
+Customer Complaint Ticket:
 ${values.free_form_text}`,
   };
 

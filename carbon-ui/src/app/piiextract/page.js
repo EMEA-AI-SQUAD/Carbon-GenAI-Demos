@@ -112,21 +112,22 @@ export default function PIIExtractionPage() {
             <a href="/">Return to main page</a>
           </BreadcrumbItem>
         </Breadcrumb>
-        <h1 className="landing-page__heading">Personal Information Extraction with IBM Power</h1>
+        <h1 className="landing-page__heading">PII Extraction for Privacy Compliance with IBM Power</h1>
       </Column>
       <Column lg={16} md={8} sm={4} className="landing-page__r2">
         <Grid className="tabs-group-content">
           <Column md={4} lg={7} sm={4} className="entity__tab-content">
-            <h3 className="landing-page__subheading">Extract Personal Information from Unstructured Text</h3>
+            <h3 className="landing-page__subheading">Privacy Compliance: Extract PII from Customer Support Tickets</h3>
             <p className="landing-page__p">
-              This demo showcases how Granite 4.0 running on IBM Power can extract personal identifiable 
-              information (PII) from unstructured text. This is useful for data privacy compliance, 
-              customer service automation, and document processing workflows.
+              This demo addresses a critical compliance challenge: A customer submits a complaint ticket
+              via email that needs to be routed to an L1 support agent who doesn't need to view PII
+              information to address the problem.
             </p>
             <p className="landing-page__p">
-              The AI can identify and extract various types of personal information including names, 
-              contact details, addresses, dates, and identification numbers while maintaining accuracy 
-              and respecting data privacy principles.
+              The ticket must also be stored long-term for historical analysis, but cannot contain any
+              PII information in accordance with GDPR, CCPA, and other compliance standards. Granite 4.0
+              running on IBM Power can automatically identify and extract sensitive personal information
+              including names, contact details, financial data, and location information.
             </p>
           </Column>
           <Column md={4} lg={{ span: 8, offset: 7 }} sm={4}>
@@ -141,8 +142,8 @@ export default function PIIExtractionPage() {
 
           <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
             <p className="landing-page__p">
-              Below is the free form text containing personal information. 
-              Feel free to modify this text to test different scenarios.
+              Below is a customer complaint ticket containing sensitive PII. The AI will extract all
+              personal information so it can be redacted or stored separately for compliance purposes.
             </p>
             <TextArea
               className="text-area-class"
@@ -155,8 +156,8 @@ export default function PIIExtractionPage() {
           </Column>
           <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
             <p className="landing-page__p">
-              Below are the personal information fields we want to extract from the text.
-              You can modify these to extract different types of information.
+              Below are the PII fields to extract from the complaint ticket. These will be identified
+              and can be redacted or stored separately to ensure compliance with data privacy regulations.
             </p>
           </Column>
         </Grid>
@@ -195,7 +196,7 @@ export default function PIIExtractionPage() {
         <Grid className="tabs-group-content">
           <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
             <Button className="send-to-llm-class" onClick={()=>completion()} disabled={isLoading}>
-              {isLoading ? 'Extracting…' : 'Extract Personal Information'}
+              {isLoading ? 'Extracting PII…' : 'Extract PII for Compliance'}
             </Button>
           </Column>
 
@@ -229,7 +230,7 @@ export default function PIIExtractionPage() {
                   <InlineNotification
                     kind="info"
                     title="Processing"
-                    subtitle="Granite 4.0 is extracting personal information..."
+                    subtitle="Granite 4.0 is identifying and extracting PII for compliance..."
                     hideCloseButton
                     lowContrast
                   />
@@ -255,14 +256,14 @@ export default function PIIExtractionPage() {
                 alignItems: 'center',
                 gap: '1rem'
               }}>
-                <h4 style={{ margin: 0 }}>No information extracted yet</h4>
+                <h4 style={{ margin: 0 }}>No PII extracted yet</h4>
                 <p style={{
                   color: 'var(--cds-text-secondary)',
                   maxWidth: '400px',
                   margin: 0
                 }}>
-                  Edit the text and field definitions above, then click
-                  <strong> Extract Personal Information</strong> to extract structured data.
+                  Review the complaint ticket above, then click
+                  <strong> Extract PII for Compliance</strong> to identify sensitive information.
                 </p>
               </div>
             ) : (
@@ -280,18 +281,18 @@ export default function PIIExtractionPage() {
                   <TableContainer
                     title={
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <span>Extracted Personal Information</span>
+                        <span>Extracted PII - Compliance Report</span>
                         <AILabel size="sm">
                           <AILabelContent>
                             <div>
                               <p className="secondary">AI Generated</p>
-                              <p className="secondary">Content extracted by Granite 4.0 LLM</p>
+                              <p className="secondary">PII identified by Granite 4.0 LLM</p>
                             </div>
                           </AILabelContent>
                         </AILabel>
                       </div>
                     }
-                    description="Personal information extracted from your text using AI"
+                    description="Sensitive personal information extracted for redaction and compliance storage"
                   >
                     <Table stickyHeader {...getTableProps()}>
                       <TableHead>
