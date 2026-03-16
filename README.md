@@ -82,16 +82,18 @@ Result: Production-ready demo showcasing team + AI collaboration
 
 ## 🎯 Overview
 
-This project demonstrates how IBM Granite AI models running on IBM Power can solve real business problems through three interactive entity extraction demos:
+This project demonstrates how IBM Granite AI models running on IBM Power can solve real business problems through interactive demos showcasing entity extraction and PII compliance:
 
-### 📚 **Demo 1: Book Review Analysis**
+### Entity Extraction Demos
+
+#### 📚 **Demo 1: Book Review Analysis**
 Extract structured information from unstructured book reviews
 - **Use Case**: Content analysis and cataloging
 - **Features**: Basic entity extraction from English text
 - **Based on**: [IBM Granite Cookbook](https://github.com/ibm-granite-community/granite-snack-cookbook)
 - **Built by**: Bob with team feedback
 
-### 🌍 **Demo 2: Multilingual IT Operations**
+#### 🌍 **Demo 2: Multilingual IT Operations**
 Assess priority and extract entities from support emails in multiple languages
 - **Use Case**: IT helpdesk automation and priority assessment
 - **Languages**: Italian (emotional), French (professional)
@@ -102,7 +104,7 @@ Assess priority and extract entities from support emails in multiple languages
   - Safety risk identification
 - **Built by**: Rinah-Jayne (earlier version), Bob (current implementation)
 
-### 🚚 **Demo 3: German Logistics Quote with AI Calculations**
+#### 🚚 **Demo 3: German Logistics Quote with AI Calculations**
 Extract information AND perform complex calculations from logistics requests
 - **Use Case**: Real customer scenario from [Hans Geis](https://www.ibm.com/downloads/documents/us-en/1443d5dc5ecf4367)
 - **Language**: German
@@ -112,6 +114,23 @@ Extract information AND perform complex calculations from logistics requests
   - **AI Math**: Determine pallet dimensions and load heights
   - Demonstrates AI going beyond simple extraction
 - **Built by**: Bob with team requirements
+
+### PII Extraction Demo
+
+#### 🔒 **PII Extraction for Privacy Compliance**
+Extract and redact personal information from customer support tickets
+- **Use Case**: GDPR/CCPA compliance for customer support operations
+- **Scenario**: European fraud complaint (Sophie Müller)
+- **Features**:
+  - Extract 8 types of PII (name, email, phone, credit card, amounts, locations, dates)
+  - Generate redacted text with [REDACTED] replacements
+  - Side-by-side display: PII table (left) + redacted text (right)
+  - L1 agent routing (no PII exposure)
+  - Compliant long-term storage
+- **Tab Structure**: 3 tabs ready for multiple PII extraction scenarios
+- **Built by**: Bob with team requirements
+
+**Key Innovation**: Demonstrates complete compliance workflow - extract sensitive data, show what was found, and provide redacted version safe for agents and storage.
 
 ---
 
@@ -271,6 +290,12 @@ Carbon-GenAI-Demos/
 │   │   │   │   ├── defaults.js        # Book review defaults
 │   │   │   │   ├── messages.js        # Prompt builder (Bob)
 │   │   │   │   ├── postprocess.js     # Response parser (Bob)
+│   │   │   │   └── extraction.js      # API client
+│   │   │   ├── piiextract/            # PII extraction demos (Bob)
+│   │   │   │   ├── page.js            # Main PII demo - 3 tabs (Bob)
+│   │   │   │   ├── defaults.js        # Fraud complaint scenario (Bob)
+│   │   │   │   ├── messages.js        # PII-specific prompts (Bob)
+│   │   │   │   ├── postprocess.js     # Response parser
 │   │   │   │   └── extraction.js      # API client
 │   │   │   ├── home/                  # Landing page (Bob)
 │   │   │   └── carbon/                # Carbon components demo
