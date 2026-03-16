@@ -32,6 +32,9 @@ const TutorialHeader = () => (
               <Link href="/entextract" passHref legacyBehavior>
                   <HeaderMenuItem>Entity Extraction</HeaderMenuItem>
               </Link>
+              <Link href="/piiextract" passHref legacyBehavior>
+                  <HeaderMenuItem>PII Extraction</HeaderMenuItem>
+              </Link>
               <Link href="/carbon" passHref legacyBehavior>
                   <HeaderMenuItem>Carbon Design System</HeaderMenuItem>
               </Link>
@@ -44,6 +47,9 @@ const TutorialHeader = () => (
             <HeaderSideNavItems>
               <Link href="/entextract" passHref legacyBehavior>
                   <HeaderMenuItem>Entity Extraction</HeaderMenuItem>
+              </Link>
+              <Link href="/piiextract" passHref legacyBehavior>
+                  <HeaderMenuItem>PII Extraction</HeaderMenuItem>
               </Link>
               <Link href="/carbon" passHref legacyBehavior>
                   <HeaderMenuItem>Carbon Design System</HeaderMenuItem>
