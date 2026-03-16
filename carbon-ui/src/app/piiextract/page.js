@@ -30,7 +30,7 @@ import {
 } from '@carbon/react';
 import Image from 'next/image';
 import React, { useMemo, useState } from 'react';
-import { DEFAULTS, DOCUMENT_SCAN } from "./defaults";
+import { DEFAULTS, PASSPORT_VERIFICATION, DOCUMENT_SCAN } from "./defaults";
 import { buildMessages } from "./messages";
 import { getExpectedKeys, parseModelJson, reconcileOutput, buildKeyLabelMap } from "./postprocess";
 import OpenAI from 'openai';
@@ -150,13 +150,15 @@ export default function PIIExtractionPage() {
           // Load appropriate defaults
           if (selectedIndex === 0) {
             setValues(DEFAULTS);
+          } else if (selectedIndex === 1) {
+            setValues(PASSPORT_VERIFICATION);
           } else if (selectedIndex === 2) {
             setValues(DOCUMENT_SCAN);
           }
         }}>
           <TabList className="tabs-group" aria-label="Tab navigation">
             <Tab>Fraud Complaint</Tab>
-            <Tab>Demo 2 (Coming Soon)</Tab>
+            <Tab>Passport Verification</Tab>
             <Tab>Document Discovery</Tab>
           </TabList>
           <TabPanels>
@@ -452,12 +454,293 @@ export default function PIIExtractionPage() {
             </TabPanel>
             <TabPanel>
               <Grid className="tabs-group-content">
-                <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
-                  <h3 className="landing-page__subheading">Demo 2 - Coming Soon</h3>
+                <Column md={4} lg={7} sm={4} className="entity__tab-content">
+                  <h3 className="landing-page__subheading">ID Document Verification - Passport OCR</h3>
                   <p className="landing-page__p">
-                    Additional PII extraction demo will be added here.
+                    This demo shows automated extraction of personal information from identity documents
+                    for visitor registration, KYC compliance, and pre-meeting verification.
                   </p>
                 </Column>
+                <Column md={4} lg={{ span: 8, offset: 7 }} sm={4}>
+                  <Image
+                    className="landing-page__illo"
+                    src="/images/mr-bean-passport.jpg"
+                    alt="Mr. Bean UK Passport - Sample ID Document"
+                    width={600}
+                    height={400}
+                    style={{ border: '2px solid var(--cds-border-subtle)', borderRadius: '4px' }}
+                  />
+                  <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+                    <p style={{ fontSize: '0.875rem', color: 'var(--cds-text-secondary)' }}>
+                      Sample passport for demonstration purposes
+                    </p>
+                  </div>
+                </Column>
+
+                {/* Use Case Scenario Box */}
+                <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
+                  <div style={{
+                    background: 'var(--cds-layer-02)',
+                    padding: '1.5rem',
+                    borderLeft: '4px solid var(--cds-border-interactive)',
+                    marginTop: '1rem',
+                    marginBottom: '1rem'
+                  }}>
+                    <h4 style={{ marginTop: 0, marginBottom: '1rem', fontSize: '1.125rem' }}>
+                      📋 Use Case Scenario: Pre-Meeting Identity Verification
+                    </h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <span style={{ fontWeight: 600, minWidth: '40px' }}>1.</span>
+                        <span>Visitors must submit passport/ID scans before facility access or customer meetings.</span>
+                      </div>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <span style={{ fontWeight: 600, minWidth: '40px' }}>2.</span>
+                        <span>Manual data entry is <strong>time-consuming and error-prone</strong>, especially with international documents.</span>
+                      </div>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <span style={{ fontWeight: 600, minWidth: '40px' }}>3.</span>
+                        <span>Security teams need <strong>structured data</strong> for visitor logs, access control, and compliance records.</span>
+                      </div>
+                      <div style={{
+                        marginTop: '0.5rem',
+                        paddingTop: '0.75rem',
+                        borderTop: '1px solid var(--cds-border-subtle)',
+                        fontStyle: 'italic',
+                        color: 'var(--cds-text-secondary)'
+                      }}>
+                        <strong>Solution:</strong> Granite 4.0 extracts structured PII from OCR text, automating visitor registration and KYC verification.
+                      </div>
+                    </div>
+                  </div>
+                </Column>
+
+                <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
+                  <p className="landing-page__p">
+                    Below is the OCR-extracted text from the passport image. The AI will parse this unstructured
+                    text and extract structured identity information for verification and record-keeping.
+                  </p>
+                  <TextArea
+                    className="text-area-class"
+                    id="free-form-text"
+                    value={values.free_form_text ?? ""}
+                    onChange={onFreeFormChange}
+                    size="lg"
+                    rows={12}
+                  />
+                </Column>
+                <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
+                  <p className="landing-page__p">
+                    Define the identity fields to extract from the passport OCR text. These will be used
+                    for visitor registration, security clearance, and compliance documentation.
+                  </p>
+                </Column>
+              </Grid>
+
+              {/* Entities - use single Grid with all entity pairs */}
+              <Grid className="entity-grid">
+                {(values.entities ?? []).map((f, i) => (
+                  <React.Fragment key={i}>
+                    {/* Label column */}
+                    <Column sm={4} md={4} lg={4} className="entity-label-col">
+                      <TextArea
+                        id={`label-${i}`}
+                        labelText={`Label ${i + 1}`}
+                        value={f.label ?? ''}
+                        onChange={onEntityChange(i, 'label')}
+                        size="sm"
+                        rows={Math.max(1, Math.ceil((f.label?.length || 0) / 30))}
+                      />
+                    </Column>
+
+                    {/* Definition column */}
+                    <Column sm={4} md={4} lg={12} className="entity-def-col">
+                      <TextArea
+                        id={`definition-${i}`}
+                        labelText={`Definition ${i + 1}`}
+                        value={f.definition ?? ''}
+                        onChange={onEntityChange(i, 'definition')}
+                        size="sm"
+                        rows={Math.max(1, Math.ceil((f.definition?.length || 0) / 80))}
+                      />
+                    </Column>
+                  </React.Fragment>
+                ))}
+              </Grid>
+
+              <Grid className="tabs-group-content">
+                <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
+                  <Button className="send-to-llm-class" onClick={()=>completion()} disabled={isLoading}>
+                    {isLoading ? 'Extracting Identity Data…' : 'Extract Passport Information'}
+                  </Button>
+                </Column>
+
+                {/* Error Display */}
+                {errorMsg && (
+                  <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
+                    <InlineNotification
+                      kind="error"
+                      title="Error"
+                      subtitle={errorMsg}
+                      onCloseButtonClick={() => setErrorMsg('')}
+                      lowContrast
+                    />
+                  </Column>
+                )}
+
+                {/* Results */}
+                {isLoading ? (
+                  <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
+                    <div style={{
+                      textAlign: 'center',
+                      padding: '2rem',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '1rem'
+                    }}>
+                      <Loading description="Processing" withOverlay={false} />
+                      <InlineNotification
+                        kind="info"
+                        title="Processing Passport"
+                        subtitle="Granite 4.0 is extracting identity information from OCR text..."
+                        hideCloseButton
+                        lowContrast
+                      />
+                    </div>
+                    <DataTableSkeleton
+                      headers={[
+                        { key: 'label', header: 'Field' },
+                        { key: 'value', header: 'Extracted Value' },
+                      ]}
+                      showHeader
+                      showToolbar
+                      rowCount={Math.max(3, values.entities.filter(e => (e.label || '').trim()).length)}
+                      columnCount={2}
+                    />
+                  </Column>
+                ) : extractedRows.length === 0 ? (
+                  <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
+                    <div style={{
+                      textAlign: 'center',
+                      padding: '3rem 1rem',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '1rem'
+                    }}>
+                      <h4 style={{ margin: 0 }}>No data extracted yet</h4>
+                      <p style={{
+                        color: 'var(--cds-text-secondary)',
+                        maxWidth: '400px',
+                        margin: 0
+                      }}>
+                        Review the OCR text above, then click
+                        <strong> Extract Passport Information</strong> to parse identity data.
+                      </p>
+                    </div>
+                  </Column>
+                ) : (
+                  <>
+                    {/* Identity Data Table - Left side */}
+                    <Column sm={4} md={3} lg={6} className="landing-page__tab-content">
+                      <DataTable
+                        rows={extractedRows}
+                        headers={[
+                          { key: 'label', header: 'Field' },
+                          { key: 'value', header: 'Extracted Value' },
+                        ]}
+                        isSortable
+                        size="sm"
+                        useStaticWidth
+                      >
+                        {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
+                          <TableContainer
+                            title={
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <span>Extracted Identity Data</span>
+                                <AILabel size="sm">
+                                  <AILabelContent>
+                                    <div>
+                                      <p className="secondary">AI Generated</p>
+                                      <p className="secondary">Parsed by Granite 4.0</p>
+                                    </div>
+                                  </AILabelContent>
+                                </AILabel>
+                              </div>
+                            }
+                            description="Structured data for visitor registration"
+                          >
+                            <Table stickyHeader {...getTableProps()}>
+                              <TableHead>
+                                <TableRow>
+                                  {headers.map((header) => (
+                                    <TableHeader
+                                      key={header.key}
+                                      {...getHeaderProps({ header })}
+                                    >
+                                      {header.header}
+                                    </TableHeader>
+                                  ))}
+                                </TableRow>
+                              </TableHead>
+                              <TableBody>
+                                {rows.map((row) => (
+                                  <TableRow key={row.id} {...getRowProps({ row })}>
+                                    {row.cells.map((cell) => (
+                                      <TableCell key={cell.id} style={{ whiteSpace: 'pre-wrap' }}>
+                                        {cell.value}
+                                      </TableCell>
+                                    ))}
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </TableContainer>
+                        )}
+                      </DataTable>
+                    </Column>
+
+                    {/* Redacted OCR Text - Right side */}
+                    {redactedText && (
+                      <Column sm={4} md={5} lg={10} className="landing-page__tab-content">
+                        <Tile style={{ padding: '1.5rem', height: '100%' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                            <h4 style={{ margin: 0, fontSize: '1rem' }}>Redacted OCR Text</h4>
+                            <AILabel size="sm">
+                              <AILabelContent>
+                                <div>
+                                  <p className="secondary">AI Generated</p>
+                                  <p className="secondary">PII redacted by Granite 4.0</p>
+                                </div>
+                              </AILabelContent>
+                            </AILabel>
+                          </div>
+                          <p style={{
+                            fontSize: '0.75rem',
+                            color: 'var(--cds-text-secondary)',
+                            marginBottom: '1rem'
+                          }}>
+                            Safe for logging and audit trails
+                          </p>
+                          <div style={{
+                            background: 'var(--cds-layer-01)',
+                            padding: '1rem',
+                            borderRadius: '4px',
+                            fontFamily: 'monospace',
+                            fontSize: '0.75rem',
+                            whiteSpace: 'pre-wrap',
+                            lineHeight: '1.6',
+                            maxHeight: '500px',
+                            overflow: 'auto'
+                          }}>
+                            {redactedText}
+                          </div>
+                        </Tile>
+                      </Column>
+                    )}
+                  </>
+                )}
               </Grid>
             </TabPanel>
             <TabPanel>

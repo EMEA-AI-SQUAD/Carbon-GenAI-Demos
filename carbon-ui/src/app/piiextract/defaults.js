@@ -13,6 +13,46 @@ export const DEFAULTS = {
   ]
 };
 
+// Tab 2: ID Document Verification - Passport OCR (Mr. Bean)
+export const PASSPORT_VERIFICATION = {
+  free_form_text: `PASSPORT OCR EXTRACTION RESULT:
+
+United Kingdom of Great Britain and Northern Ireland
+Passport Passeport
+
+Type/Type: P
+Code of issuing state/Code de l'État émetteur: GBR
+Passport No./Passeport No.: 023477812
+Surname/Nom: BEAN
+Given names/Prénoms: MR
+Nationality/Nationalité: BRITISH CITIZEN
+Date of birth/Date de naissance: 6 JAN/JAN 55
+Sex/Sexe: M
+Place of birth/Lieu de naissance: ENFIELD
+Date of issue/Date de délivrance: 20 SEP/SEP 96
+Date of expiry/Date d'expiration: 20 SEP/SEP 06
+Authority/Autorité: UNITED KINGDOM PASSPORT AGENCY
+Observations/Observations: 0
+
+Machine Readable Zone (MRZ):
+P<GB<MR<BEAN<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+023477812GBR8111063M0004422<<<<<<<<<<<<06`,
+  entities: [
+    { label: "Document Type", definition: "Type of identity document (e.g., P for Passport)" },
+    { label: "Passport Number", definition: "The unique passport identification number" },
+    { label: "Surname", definition: "Family name or last name of the passport holder" },
+    { label: "Given Names", definition: "First name(s) of the passport holder" },
+    { label: "Nationality", definition: "Citizenship of the passport holder" },
+    { label: "Date of Birth", definition: "Birth date in format DD MMM YY" },
+    { label: "Sex", definition: "Gender of the passport holder (M/F)" },
+    { label: "Place of Birth", definition: "City or location where the passport holder was born" },
+    { label: "Issue Date", definition: "Date when the passport was issued" },
+    { label: "Expiry Date", definition: "Date when the passport expires" },
+    { label: "Issuing Authority", definition: "Government agency that issued the passport" },
+    { label: "", definition: "" } // optional spare row for the UI
+  ]
+};
+
 // Tab 3: Unstructured Data Discovery - Document Scan (Elinar-inspired)
 export const DOCUMENT_SCAN = {
   free_form_text: `PROJECT STATUS UPDATE - Q1 2024
