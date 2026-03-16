@@ -9,7 +9,6 @@ import {
   TabList,
   TabPanels,
   TabPanel,
-  Link,
   Grid,
   Column,
   TextArea,
@@ -180,9 +179,14 @@ export default function EntityExtractionPage() {
                     example from the Granite Cafe, which you can see more about by
                     following the link below.
                   </p>
-                  <Link href="https://github.com/ibm-granite-community/granite-snack-cookbook/blob/main/recipes/Entity-Extraction/entity_extraction.ipynb">
+                  <a
+                    href="https://github.com/ibm-granite-community/granite-snack-cookbook/blob/main/recipes/Entity-Extraction/entity_extraction.ipynb"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: '#0f62fe', textDecoration: 'none' }}
+                  >
                     Entity Extraction from text using Granite
-                  </Link>
+                  </a>
                 </Column>
                 <Column md={4} lg={{ span: 8, offset: 7 }} sm={4}>
                   <Image
@@ -709,9 +713,14 @@ export default function EntityExtractionPage() {
                     height={280}
                   />
                   <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-                    <Link href="https://www.ibm.com/downloads/documents/us-en/1443d5dc5ecf4367" target="_blank" rel="noopener noreferrer">
+                    <a
+                      href="https://www.ibm.com/downloads/documents/us-en/1443d5dc5ecf4367"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: '#0f62fe', textDecoration: 'none' }}
+                    >
                       Read the Hans Geis IBM Case Study →
-                    </Link>
+                    </a>
                   </div>
                 </Column>
 

@@ -222,9 +222,9 @@ export default function PIIExtractionPage() {
                     height={350}
                   />
                   <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-                    <Link href="https://www.ibm.com/think/topics/pii" target="_blank" rel="noopener noreferrer">
+                    <a href="https://www.ibm.com/think/topics/pii" target="_blank" rel="noopener noreferrer" style={{ color: '#0f62fe', textDecoration: 'underline' }}>
                       Learn more about Personally Identifiable Information (PII) →
-                    </Link>
+                    </a>
                   </div>
                 </Column>
 
@@ -809,9 +809,9 @@ export default function PIIExtractionPage() {
                     height={350}
                   />
                   <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-                    <Link href="https://www.elinar.com/ai/privacy-gdpr/" target="_blank" rel="noopener noreferrer">
+                    <a href="https://www.elinar.com/ai/privacy-gdpr/" target="_blank" rel="noopener noreferrer" style={{ color: '#0f62fe', textDecoration: 'underline' }}>
                       Based on Elinar's real-world GDPR solution →
-                    </Link>
+                    </a>
                   </div>
                 </Column>
 
