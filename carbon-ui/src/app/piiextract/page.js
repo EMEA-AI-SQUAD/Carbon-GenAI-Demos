@@ -577,6 +577,36 @@ export default function PIIExtractionPage() {
                     </p>
                   </div>
                 </Column>
+
+                {/* Performance Notice */}
+                <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
+                  <InlineNotification
+                    kind="warning"
+                    title="Demo Environment Performance"
+                    subtitle=""
+                    hideCloseButton
+                    lowContrast
+                    style={{ marginTop: '1rem' }}
+                  >
+                    <div style={{ marginTop: '0.5rem', lineHeight: '1.6' }}>
+                      <p style={{ margin: '0 0 0.5rem 0' }}>
+                        <strong>Note:</strong> Vision processing in this demo environment may take 4-5 minutes on first load,
+                        then 20-30 seconds when cached. Performance is not optimal due to demo infrastructure constraints.
+                      </p>
+                      <p style={{ margin: 0 }}>
+                        Production deployments on IBM Power with proper NUMA configuration achieve significantly faster inference.
+                        Learn more about{' '}
+                        <Link
+                          href="https://community.ibm.com/community/user/blogs/sebastian-lehrig/2024/03/26/sizing-for-ai"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          optimal AI workload sizing on IBM Power →
+                        </Link>
+                      </p>
+                    </div>
+                  </InlineNotification>
+                </Column>
               </Grid>
 
               <Grid className="tabs-group-content">
