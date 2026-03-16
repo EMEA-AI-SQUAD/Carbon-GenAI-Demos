@@ -122,6 +122,9 @@ export default function PIIExtractionPage() {
               This demo showcases how Granite 4.0 running on IBM Power solves a critical compliance
               challenge in customer support operations.
             </p>
+            <Link href="https://www.ibm.com/think/topics/pii" target="_blank" rel="noopener noreferrer">
+              Learn more about Personally Identifiable Information (PII) →
+            </Link>
           </Column>
           
           {/* Use Case Scenario Box */}
@@ -167,10 +170,10 @@ export default function PIIExtractionPage() {
           <Column md={4} lg={{ span: 8, offset: 7 }} sm={4}>
             <Image
               className="landing-page__illo"
-              src="https://assets.ibm.com/is/image/ibm/security-privacy?$original$"
-              alt="Data Privacy and Security"
+              src="/images/pii-protection.jpg"
+              alt="PII Protection and Data Security"
               width={500}
-              height={208}
+              height={350}
             />
           </Column>
 
