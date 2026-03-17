@@ -477,10 +477,12 @@ export default function PIIExtractionPage() {
             <TabPanel>
               <Grid className="tabs-group-content">
                 <Column md={4} lg={7} sm={4} className="entity__tab-content">
-                  <h3 className="landing-page__subheading">ID Document Verification - Passport OCR</h3>
+                  <h3 className="landing-page__subheading">ID Document Verification - Future Vision Capability</h3>
                   <p className="landing-page__p">
                     This demo shows automated extraction of personal information from identity documents
-                    for visitor registration, KYC compliance, and pre-meeting verification.
+                    for visitor registration, KYC compliance, and pre-meeting verification. Currently using
+                    OCR-extracted text, with plans to integrate IBM Granite Vision models for direct image
+                    processing via cloud APIs.
                   </p>
                 </Column>
                 <Column md={4} lg={{ span: 8, offset: 7 }} sm={4}>
@@ -531,7 +533,9 @@ export default function PIIExtractionPage() {
                         fontStyle: 'italic',
                         color: 'var(--cds-text-secondary)'
                       }}>
-                        <strong>Solution:</strong> Granite 4.0 extracts structured PII from OCR text, automating visitor registration and KYC verification.
+                        <strong>Current Solution:</strong> Granite 4.0 extracts structured PII from OCR text, automating visitor registration and KYC verification.
+                        <br/><br/>
+                        <strong>Future Enhancement:</strong> Integration with IBM Granite Vision models via cloud APIs will enable direct passport image processing without OCR pre-processing.
                       </div>
                     </div>
                   </div>
