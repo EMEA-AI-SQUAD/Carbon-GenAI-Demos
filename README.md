@@ -82,7 +82,18 @@ Result: Production-ready demo showcasing team + AI collaboration
 
 ## 🎯 Overview
 
-This project demonstrates how IBM Granite AI models running on IBM Power can solve real business problems through interactive demos showcasing entity extraction and PII compliance:
+This project demonstrates how IBM Granite AI models running on IBM Power can solve real business problems through interactive demos showcasing entity extraction and PII compliance.
+
+### 🚀 New Feature: Pre-load Demo Buttons
+
+All 6 demo tabs now include **"Pre-load Demo Results"** buttons that trigger LLM processing in the background while you explain the demo. This eliminates wait times during presentations and creates a seamless demo experience.
+
+**Benefits:**
+- ✅ Start LLM processing immediately when opening a tab
+- ✅ Explain the use case while AI processes in background
+- ✅ Results appear by the time you scroll down
+- ✅ Professional presentation flow without awkward pauses
+- ✅ Consistent UX across all 6 tabs
 
 ### Entity Extraction Demos
 
@@ -129,17 +140,18 @@ Extract and redact personal information from customer support tickets
   - Compliant long-term storage
 - **Built by**: Bob with team requirements
 
-#### 🛂 **Tab 2: Passport Verification - ID Document OCR**
+#### 🛂 **Tab 2: Passport Verification - Future Vision Capability**
 Automated identity verification from passport/ID document scans
 - **Use Case**: Pre-meeting visitor verification, KYC compliance, facility access control
 - **Scenario**: UK Passport (Mr. Bean - sample document for demonstration)
-- **Features**:
+- **Current Implementation**:
   - Display passport image with OCR-extracted text
   - Parse unstructured OCR output into structured identity data
   - Extract 11 identity fields: document type, passport number, name, DOB, nationality, sex, birthplace, issue/expiry dates, issuing authority
   - Machine Readable Zone (MRZ) data extraction
   - Side-by-side display: Identity data table + redacted OCR text
   - Automated visitor registration workflow
+- **Future Enhancement**: Integration with IBM Granite Vision models via cloud APIs for direct passport image processing without OCR pre-processing
 - **Built by**: Bob with team requirements
 - **Innovation**: Shows complete ID verification pipeline - image → OCR text → structured data → compliance records
 
