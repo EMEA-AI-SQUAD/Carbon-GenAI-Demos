@@ -224,6 +224,28 @@ export default function PIIExtractionPage() {
             </div>
           </Column>
 
+          <Column lg={16} md={8} sm={4} className="landing-page__tab-content" style={{ marginTop: '1rem' }}>
+            <Button
+              kind="primary"
+              size="lg"
+              onClick={()=>completion()}
+              disabled={isLoading}
+              style={{ marginBottom: '1rem' }}
+            >
+              {isLoading ? 'Processing...' : '🚀 Pre-load Demo Results'}
+            </Button>
+            {isLoading && (
+              <InlineNotification
+                kind="info"
+                title="Processing in background"
+                subtitle="Results will appear below when ready. Continue explaining the demo!"
+                hideCloseButton
+                lowContrast
+                style={{ marginTop: '0.5rem' }}
+              />
+            )}
+          </Column>
+
           <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
             <p className="landing-page__p">
               Below is a customer complaint ticket containing sensitive PII. The AI will extract all
@@ -515,6 +537,28 @@ export default function PIIExtractionPage() {
                   </div>
                 </Column>
 
+                <Column lg={16} md={8} sm={4} className="landing-page__tab-content" style={{ marginTop: '1rem' }}>
+                  <Button
+                    kind="primary"
+                    size="lg"
+                    onClick={()=>completion()}
+                    disabled={isLoading}
+                    style={{ marginBottom: '1rem' }}
+                  >
+                    {isLoading ? 'Processing...' : '🚀 Pre-load Demo Results'}
+                  </Button>
+                  {isLoading && (
+                    <InlineNotification
+                      kind="info"
+                      title="Processing in background"
+                      subtitle="Results will appear below when ready. Continue explaining the demo!"
+                      hideCloseButton
+                      lowContrast
+                      style={{ marginTop: '0.5rem' }}
+                    />
+                  )}
+                </Column>
+
                 <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
                   <p className="landing-page__p">
                     Below is the OCR-extracted text from the passport image. The AI will parse this unstructured
@@ -803,6 +847,28 @@ export default function PIIExtractionPage() {
                       </div>
                     </div>
                   </div>
+                </Column>
+
+                <Column lg={16} md={8} sm={4} className="landing-page__tab-content" style={{ marginTop: '1rem' }}>
+                  <Button
+                    kind="primary"
+                    size="lg"
+                    onClick={()=>completion()}
+                    disabled={isLoading}
+                    style={{ marginBottom: '1rem' }}
+                  >
+                    {isLoading ? 'Processing...' : '🚀 Pre-load Demo Results'}
+                  </Button>
+                  {isLoading && (
+                    <InlineNotification
+                      kind="info"
+                      title="Processing in background"
+                      subtitle="Results will appear below when ready. Continue explaining the demo!"
+                      hideCloseButton
+                      lowContrast
+                      style={{ marginTop: '0.5rem' }}
+                    />
+                  )}
                 </Column>
 
                 <Column lg={16} md={8} sm={4} className="landing-page__tab-content">

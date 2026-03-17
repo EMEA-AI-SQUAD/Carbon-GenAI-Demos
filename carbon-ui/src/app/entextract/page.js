@@ -184,6 +184,27 @@ export default function EntityExtractionPage() {
                     Entity Extraction from text using Granite
                   </Link>
                 </Column>
+                <Column lg={16} md={8} sm={4} className="landing-page__tab-content" style={{ marginTop: '1rem' }}>
+                  <Button
+                    kind="primary"
+                    size="lg"
+                    onClick={()=>completion()}
+                    disabled={isLoading}
+                    style={{ marginBottom: '1rem' }}
+                  >
+                    {isLoading ? 'Processing...' : '🚀 Pre-load Demo Results'}
+                  </Button>
+                  {isLoading && (
+                    <InlineNotification
+                      kind="info"
+                      title="Processing in background"
+                      subtitle="Results will appear below when ready. Continue explaining the demo!"
+                      hideCloseButton
+                      lowContrast
+                      style={{ marginTop: '0.5rem' }}
+                    />
+                  )}
+                </Column>
                 <Column md={4} lg={{ span: 8, offset: 7 }} sm={4}>
                   <Image
                     className="landing-page__illo"
@@ -390,6 +411,28 @@ export default function EntityExtractionPage() {
                     Toggle between an emotional Italian email (low priority) and a professional French email (critical safety issue).
                     The AI extracts entities and translates them to English while correctly assessing business impact.
                   </p>
+                </Column>
+
+                <Column lg={16} md={8} sm={4} className="landing-page__tab-content" style={{ marginTop: '1rem' }}>
+                  <Button
+                    kind="primary"
+                    size="lg"
+                    onClick={()=>completion()}
+                    disabled={isLoading}
+                    style={{ marginBottom: '1rem' }}
+                  >
+                    {isLoading ? 'Processing...' : '🚀 Pre-load Demo Results'}
+                  </Button>
+                  {isLoading && (
+                    <InlineNotification
+                      kind="info"
+                      title="Processing in background"
+                      subtitle="Results will appear below when ready. Continue explaining the demo!"
+                      hideCloseButton
+                      lowContrast
+                      style={{ marginTop: '0.5rem' }}
+                    />
+                  )}
                 </Column>
 
                 {/* Toggle to select scenario */}
@@ -699,6 +742,27 @@ export default function EntityExtractionPage() {
                     configuration, and compute the total load height - demonstrating reasoning beyond
                     simple extraction.
                   </p>
+                </Column>
+                <Column lg={16} md={8} sm={4} className="landing-page__tab-content" style={{ marginTop: '1rem' }}>
+                  <Button
+                    kind="primary"
+                    size="lg"
+                    onClick={()=>completion()}
+                    disabled={isLoading}
+                    style={{ marginBottom: '1rem' }}
+                  >
+                    {isLoading ? 'Processing...' : '🚀 Pre-load Demo Results'}
+                  </Button>
+                  {isLoading && (
+                    <InlineNotification
+                      kind="info"
+                      title="Processing in background"
+                      subtitle="Results will appear below when ready. Continue explaining the demo!"
+                      hideCloseButton
+                      lowContrast
+                      style={{ marginTop: '0.5rem' }}
+                    />
+                  )}
                 </Column>
                 <Column md={4} lg={{span: 8, offset: 7}} sm={4}>
                   <Image
