@@ -184,7 +184,17 @@ export default function EntityExtractionPage() {
                     Entity Extraction from text using Granite
                   </Link>
                 </Column>
-                <Column lg={16} md={8} sm={4} className="landing-page__tab-content" style={{ marginTop: '1rem' }}>
+                <Column md={4} lg={{ span: 8, offset: 7 }} sm={4}>
+                  <Image
+                    className="landing-page__illo"
+                    src="https://assets.ibm.com/is/image/ibm/thinkstudio?$original$"
+                    alt="People Studying Books"
+                    width={500}
+                    height={208}
+                  />
+                </Column>
+
+                <Column lg={16} md={8} sm={4} className="landing-page__tab-content" style={{ marginTop: '2rem' }}>
                   <Button
                     kind="primary"
                     size="lg"
@@ -204,15 +214,6 @@ export default function EntityExtractionPage() {
                       style={{ marginTop: '0.5rem' }}
                     />
                   )}
-                </Column>
-                <Column md={4} lg={{ span: 8, offset: 7 }} sm={4}>
-                  <Image
-                    className="landing-page__illo"
-                    src="https://assets.ibm.com/is/image/ibm/thinkstudio?$original$"
-                    alt="People Studying Books"
-                    width={500}
-                    height={208}
-                  />
                 </Column>
 
                 <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
@@ -743,7 +744,22 @@ export default function EntityExtractionPage() {
                     simple extraction.
                   </p>
                 </Column>
-                <Column lg={16} md={8} sm={4} className="landing-page__tab-content" style={{ marginTop: '1rem' }}>
+                <Column md={4} lg={{span: 8, offset: 7}} sm={4}>
+                  <Image
+                    className="landing-page__illo"
+                    src="/images/Hans Geis Truck.png"
+                    alt="Hans Geis Global Logistics Truck"
+                    width={500}
+                    height={280}
+                  />
+                  <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+                    <Link href="https://www.ibm.com/downloads/documents/us-en/1443d5dc5ecf4367" target="_blank" rel="noopener noreferrer">
+                      Read the Hans Geis IBM Case Study →
+                    </Link>
+                  </div>
+                </Column>
+
+                <Column lg={16} md={8} sm={4} className="landing-page__tab-content" style={{ marginTop: '2rem' }}>
                   <Button
                     kind="primary"
                     size="lg"
@@ -763,20 +779,6 @@ export default function EntityExtractionPage() {
                       style={{ marginTop: '0.5rem' }}
                     />
                   )}
-                </Column>
-                <Column md={4} lg={{span: 8, offset: 7}} sm={4}>
-                  <Image
-                    className="landing-page__illo"
-                    src="/images/Hans Geis Truck.png"
-                    alt="Hans Geis Global Logistics Truck"
-                    width={500}
-                    height={280}
-                  />
-                  <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-                    <Link href="https://www.ibm.com/downloads/documents/us-en/1443d5dc5ecf4367" target="_blank" rel="noopener noreferrer">
-                      Read the Hans Geis IBM Case Study →
-                    </Link>
-                  </div>
                 </Column>
 
                 <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
