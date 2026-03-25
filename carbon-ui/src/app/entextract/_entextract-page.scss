@@ -145,27 +145,21 @@ html {
   }
 }
 
-// Sticky notification container - wraps the entire notification
-// Now positioned inside TabPanel to stick within tab content
+// Fixed notification container - stays in viewport during scroll
+// Uses position: fixed since the entire page scrolls, not just tab content
 .sticky-notification-container {
-  position: -webkit-sticky !important; // Safari support
-  position: sticky !important;
-  top: 0 !important; // Stick to top of tab content area
-  z-index: 9999 !important; // Higher than most elements
-  background-color: $layer-01 !important; // Use Carbon theme variable
-  padding: $spacing-05 $spacing-06; // Padding all around
-  margin: 0 0 $spacing-05 0; // Bottom margin for spacing
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); // Subtle shadow for depth
-  width: 100%; // Ensure full width
+  position: fixed !important;
+  top: 48px !important; // Below the Carbon header (48px height)
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 8000 !important; // Below header (9000) but above content
+  background-color: $layer-01 !important;
+  padding: $spacing-05 $spacing-06;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); // Stronger shadow for fixed element
   
-  // Make notification full width
+  // Center content with max-width matching page content
   .cds--inline-notification {
-    max-width: 100%;
+    max-width: 1584px; // Carbon's max content width
+    margin: 0 auto;
   }
-}
-
-// Ensure TabPanel allows sticky positioning
-.cds--tab-content {
-  overflow: visible !important; // Don't clip sticky elements
-  position: relative; // Create positioning context
 }
