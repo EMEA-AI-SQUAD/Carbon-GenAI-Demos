@@ -134,7 +134,7 @@ export default function ConversationIntelligencePage() {
 
   // Get demo tab name for display
   const getDemoTabName = (tabIndex) => {
-    const names = ['Why IBM Power', 'Customer Service', 'Sales Call', 'Support Ticket', 'What We\'re Using'];
+    const names = ['Why IBM Power', 'Sales Intelligence', 'Multilingual Support', 'Meeting Intelligence', 'What We\'re Using'];
     return names[tabIndex] || 'Demo';
   };
 
@@ -170,9 +170,9 @@ export default function ConversationIntelligencePage() {
         }}>
           <TabList className="tabs-group" aria-label="Tab navigation">
             <Tab>Why IBM Power</Tab>
-            <Tab>Customer Service</Tab>
-            <Tab>Sales Call</Tab>
-            <Tab>Support Ticket</Tab>
+            <Tab>Sales Intelligence</Tab>
+            <Tab>Multilingual Support</Tab>
+            <Tab>Meeting Intelligence</Tab>
             <Tab>What We're Using</Tab>
           </TabList>
           <TabPanels>
@@ -560,10 +560,10 @@ export default function ConversationIntelligencePage() {
             <TabPanel>
               <Grid className="tabs-group-content">
                 <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
-                  <h3 className="landing-page__subheading">Sales Call Intelligence</h3>
+                  <h3 className="landing-page__subheading">Multilingual Customer Support with Sentiment Analysis</h3>
                   <p className="landing-page__p">
-                    Analyze sales conversations to identify lead quality, buying intent, objections, and next steps.
-                    This helps sales teams prioritize opportunities and improve conversion rates.
+                    Below is a customer support conversation in German. The AI will analyze sentiment journey,
+                    detect urgency, translate key points, and assess resolution quality.
                   </p>
                 </Column>
               </Grid>
@@ -573,8 +573,10 @@ export default function ConversationIntelligencePage() {
             <TabPanel>
               <Grid className="tabs-group-content">
                 <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
-                  <h3 className="landing-page__subheading">Support Ticket Analysis</h3>
+                  <h3 className="landing-page__subheading">Meeting Intelligence & Action Items</h3>
                   <p className="landing-page__p">
+                    Below is an internal team meeting transcript. The AI will extract action items with owners,
+                    identify key decisions, and generate a structured meeting summary.
                     Extract insights from support interactions to track issue severity, resolution time,
                     and customer satisfaction. Identify patterns for proactive support improvements.
                   </p>

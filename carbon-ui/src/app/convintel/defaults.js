@@ -57,78 +57,146 @@ Client: Thank you, Sophie. Speak soon.`,
   ]
 };
 
-// Tab 2: Sales Call Analysis
+// Tab 2: Multilingual Customer Service with Sentiment Analysis
 export const SALES_CALL = {
-  free_form_text: `Sales Rep: Good morning! This is Michael from TechSolutions. I'm following up on your inquiry about our enterprise software package.
+  free_form_text: `Kundenservice: Guten Tag, hier ist Anna von TechSupport Deutschland. Wie kann ich Ihnen heute helfen?
 
-Prospect: Hi Michael. Yes, I submitted a form last week. We're looking to upgrade our current CRM system.
+Kunde: Endlich! Ich warte schon seit 45 Minuten in der Warteschleife! Das ist absolut inakzeptabel!
 
-Sales Rep: Excellent! Can you tell me about your current pain points with your existing system?
+Kundenservice: Es tut mir sehr leid für die lange Wartezeit, Herr Schmidt. Ich verstehe Ihre Frustration vollkommen. Lassen Sie mich Ihnen sofort helfen. Was ist das Problem?
 
-Prospect: Well, our team of 50 sales reps finds it slow and the reporting features are limited. We're also struggling with mobile access.
+Kunde: Unser gesamtes System ist seit heute Morgen 8 Uhr ausgefallen. Wir haben 30 Mitarbeiter, die nicht arbeiten können! Das kostet uns Tausende von Euro pro Stunde! Ich habe bereits drei E-Mails geschickt und niemand hat geantwortet!
 
-Sales Rep: I see. Our Enterprise Plus package would be perfect for your needs. It includes advanced analytics, mobile apps, and can handle teams up to 200 users. The implementation typically takes 4-6 weeks.
+Kundenservice: Das ist natürlich eine sehr ernste Situation. Ich sehe hier Ihre E-Mails und entschuldige mich, dass wir nicht schneller reagiert haben. Lassen Sie mich sofort Ihre Kundennummer überprüfen. Können Sie mir bitte Ihre Vertragsnummer geben?
 
-Prospect: What's the pricing like? We're working with a budget of around $50,000 annually.
+Kunde: Die Vertragsnummer ist DE-2024-8756. Aber ich brauche keine Überprüfung, ich brauche eine Lösung! Sofort!
 
-Sales Rep: Our Enterprise Plus is $65,000 per year, but given your team size, I can offer a 15% discount bringing it to $55,250. That includes full support and quarterly training sessions.
+Kundenservice: Ich verstehe, Herr Schmidt. Ich habe Ihr Konto jetzt geöffnet. Ich sehe, dass Sie unseren Premium-Support-Vertrag haben, was bedeutet, dass ich dies sofort an unser technisches Notfallteam eskalieren kann. Können Sie mir kurz beschreiben, welche Fehlermeldung Sie sehen?
 
-Prospect: That's slightly over budget. What about the Professional tier?
+Kunde: Es kommt eine Meldung "Verbindung zum Server fehlgeschlagen - Error 503". Alle unsere Anwendungen sind betroffen - CRM, E-Mail, Buchhaltung, alles!
 
-Sales Rep: The Professional tier is $35,000 annually and covers up to 50 users, but it lacks some advanced features like AI-powered forecasting and custom integrations. However, you can upgrade anytime.
+Kundenservice: Danke für diese Information. Error 503 deutet auf ein Serverproblem hin. Ich erstelle jetzt ein Notfall-Ticket mit höchster Priorität und verbinde Sie direkt mit unserem Senior-Techniker, Markus Weber. Er ist unser Spezialist für solche Fälle. Können Sie bitte einen Moment in der Leitung bleiben?
 
-Prospect: Let me discuss with my team and get back to you next week. Can you send me a detailed comparison?
+Kunde: Ja, aber bitte schnell!
 
-Sales Rep: Absolutely! I'll email you a comparison sheet and a demo video. Would Tuesday at 2 PM work for a follow-up call?
+[2 Minuten Wartezeit]
 
-Prospect: Tuesday works. Talk to you then.
+Senior-Techniker: Guten Tag, Herr Schmidt. Hier ist Markus Weber vom technischen Team. Ich habe bereits Ihre Systemlogs überprüft. Wir hatten heute Morgen um 7:45 Uhr ein automatisches Update, das bei einigen Kunden zu Problemen geführt hat. Ich kann das Update für Sie zurückrollen. Das dauert etwa 10 Minuten.
 
-Sales Rep: Perfect! Looking forward to it. Have a great day!`,
+Kunde: Endlich jemand, der weiß, was er tut! Ja, bitte machen Sie das sofort!
+
+Senior-Techniker: Ich starte den Rollback jetzt. Sie sollten in etwa 8-10 Minuten wieder Zugriff haben. Ich bleibe die ganze Zeit in der Leitung und überwache den Prozess. Außerdem werde ich sicherstellen, dass Ihr System von zukünftigen automatischen Updates ausgenommen wird, bis wir das Problem vollständig gelöst haben.
+
+Kunde: Das klingt gut. Ich schätze, dass Sie sich jetzt persönlich darum kümmern.
+
+[8 Minuten später]
+
+Senior-Techniker: Herr Schmidt, der Rollback ist abgeschlossen. Können Sie bitte versuchen, sich anzumelden?
+
+Kunde: Moment... Ja! Es funktioniert wieder! Alle Systeme sind online. Gott sei Dank!
+
+Senior-Techniker: Ausgezeichnet! Ich habe auch eine Gutschrift von zwei Wochen auf Ihren nächsten Rechnungszyklus hinzugefügt als Entschädigung für die Unannehmlichkeiten. Außerdem erhalten Sie einen detaillierten Bericht über den Vorfall bis morgen Mittag.
+
+Kunde: Das ist sehr fair. Vielen Dank für Ihre schnelle Hilfe, Herr Weber. Und auch Danke an Anna, die mich sofort weitergeleitet hat. Ich war am Anfang sehr wütend, aber Sie haben das wirklich professionell gelöst.
+
+Kundenservice (Anna): Sehr gerne, Herr Schmidt. Es tut uns nochmals leid für die Unannehmlichkeiten. Gibt es noch etwas, womit wir Ihnen helfen können?
+
+Kunde: Nein, das war alles. Danke und einen schönen Tag noch!`,
   entities: [
-    { label: "Lead Quality", definition: "Assessment of prospect potential (Hot, Warm, Cold, Qualified, Unqualified)" },
-    { label: "Buying Intent", definition: "Likelihood of purchase (High, Medium, Low)" },
-    { label: "Budget Range", definition: "Stated or implied budget amount" },
-    { label: "Decision Timeline", definition: "Expected timeframe for decision (Immediate, 1-4 weeks, 1-3 months, 3+ months)" },
-    { label: "Key Pain Points", definition: "Main problems prospect is trying to solve" },
-    { label: "Competitors Mentioned", definition: "Other solutions being considered" },
-    { label: "Next Steps", definition: "Agreed follow-up actions and timeline" },
-    { label: "Objections Raised", definition: "Concerns or hesitations expressed" },
+    { label: "Conversation Summary (English)", definition: "A concise 2-3 sentence summary of the conversation in English, regardless of the original language" },
+    { label: "Original Language", definition: "The primary language of the conversation. Choose from: English, German, French, Spanish, Italian, Dutch, Portuguese, Other" },
+    { label: "Initial Sentiment", definition: "Customer's emotional state at the start. Choose from: Very Positive, Positive, Neutral, Frustrated, Angry, Very Angry" },
+    { label: "Final Sentiment", definition: "Customer's emotional state at the end. Choose from: Very Positive, Positive, Neutral, Frustrated, Angry, Very Angry" },
+    { label: "Sentiment Journey", definition: "Brief description of how sentiment changed during the conversation" },
+    { label: "Urgency Level", definition: "Priority of the issue. Choose from: Critical, High, Medium, Low" },
+    { label: "Issue Category", definition: "Type of problem. Choose from: Technical Outage, Performance, Billing, Account Access, Feature Request, General Inquiry, Other" },
+    { label: "Resolution Status", definition: "Outcome of the conversation. Choose from: Resolved, Partially Resolved, Escalated, Pending Follow-up, Unresolved" },
+    { label: "Customer Satisfaction", definition: "Implied satisfaction at end. Choose from: Very Satisfied, Satisfied, Neutral, Dissatisfied, Very Dissatisfied" },
+    { label: "Business Impact", definition: "Effect on customer's business operations" },
+    { label: "Compensation Offered", definition: "Any credits, refunds, or compensation provided" },
+    { label: "Follow-up Required", definition: "Whether additional follow-up is needed. Choose from: Yes, No" },
     { label: "", definition: "" } // optional spare row for the UI
   ]
 };
 
-// Tab 3: Support Ticket Analysis
+// Tab 3: Meeting Intelligence & Action Items
 export const SUPPORT_TICKET = {
-  free_form_text: `Ticket #SUP-2024-1847
-Priority: High
-Created: 2024-03-20 09:15 AM
+  free_form_text: `Product Strategy Meeting - Q2 2024 Planning
+Date: March 25, 2024, 10:00-11:30 AM CET
+Attendees: Sarah Chen (Product Director), Marcus Weber (Engineering Lead), Lisa Anderson (UX Lead), James O'Brien (Marketing Manager)
 
-Customer: Our production server has been experiencing intermittent outages for the past 2 hours. This is affecting approximately 200 users and causing significant business disruption.
+Sarah Chen: Good morning everyone. Thanks for joining. Today we need to finalize our Q2 roadmap and make some key decisions about the mobile app redesign. Let's start with where we are. Marcus, can you give us a status update on the current development sprint?
 
-Support Agent (Level 1): Thank you for reporting this. I've checked our monitoring systems and can see elevated error rates on your instance. I'm escalating this to our Level 2 team immediately.
+Marcus Weber: Sure. We're 80% through Sprint 23. The API performance improvements are complete and tested. However, we've hit a blocker with the new authentication system - it's not compatible with our legacy user database. We need to decide whether to refactor the database or build a compatibility layer.
 
-Support Agent (Level 2): I've reviewed the logs and identified a memory leak in the application server. This appears to be related to the recent update deployed on March 18th. I'm rolling back to the previous stable version now.
+Sarah Chen: That's a critical decision. What's your recommendation?
 
-Customer: How long will the rollback take? We have critical end-of-quarter processing that needs to complete today.
+Marcus Weber: The compatibility layer is faster - about 2 weeks. But refactoring the database is the right long-term solution, though it'll take 6 weeks. My team recommends the refactor, but we'd need to push the mobile app launch from May to July.
 
-Support Agent (Level 2): The rollback will take approximately 15 minutes. I'm also implementing additional monitoring to prevent this from recurring. Your system should be stable within 20 minutes.
+Lisa Anderson: From a UX perspective, I'd rather have a solid foundation. We've been getting user complaints about slow login times. If we do the refactor properly, we can improve performance significantly. I support the 6-week option.
 
-Customer: Okay, please keep me updated. We may need to extend our processing window.
+James O'Brien: Marketing perspective - we've already announced a May launch to our beta users. Pushing to July could damage credibility. Can we do a phased approach? Launch basic features in May and add the performance improvements in June?
 
-Support Agent (Level 2): Rollback complete. System is now stable and all services are operational. I've added enhanced monitoring and will watch for the next 2 hours. I'm also creating a bug report for the development team to fix the memory leak before the next update.
+Sarah Chen: That's an interesting compromise. Marcus, is that technically feasible?
 
-Customer: Thank you for the quick response. System is working normally now. Please ensure this doesn't happen again.
+Marcus Weber: Yes, we could do that. We'd launch with the compatibility layer in May, then do the database refactor in the background and switch over in June. It means doing the work twice, but it keeps us on schedule.
 
-Support Agent (Level 2): Understood. I've documented everything and our development team will address the root cause. You'll receive a detailed incident report within 24 hours.`,
+Sarah Chen: Okay, let's go with the phased approach. Marcus, you'll own the technical implementation. Target is May 15th for initial launch, June 30th for the performance upgrade. James, you'll need to manage communications about the phased rollout. Lisa, I need you to prioritize which features go into the May release versus June.
+
+Lisa Anderson: Got it. I'll have a feature priority list by end of this week. One thing though - we still haven't resolved the navigation redesign debate. The user testing showed mixed results. Some users loved the bottom navigation, others preferred the hamburger menu.
+
+James O'Brien: The analytics show that 65% of our users are on iOS, and iOS users strongly prefer bottom navigation. I think we should go with that.
+
+Marcus Weber: From an engineering standpoint, bottom navigation is actually simpler to implement. It's also more accessible. I vote for bottom navigation.
+
+Sarah Chen: Agreed. Let's go with bottom navigation. Lisa, can you finalize those designs by next Tuesday?
+
+Lisa Anderson: Yes, I'll have them ready for review by Tuesday afternoon.
+
+Sarah Chen: Perfect. Now, let's talk about the AI features roadmap. We've had requests for AI-powered search and recommendations. James, what's the market demand looking like?
+
+James O'Brien: It's huge. Our competitor analysis shows that 4 out of 5 major competitors have launched AI features in the last quarter. We're falling behind. I think we need to prioritize this for Q3 at the latest.
+
+Sarah Chen: Marcus, what's the technical feasibility?
+
+Marcus Weber: We'd need to integrate with an AI service provider. I've been evaluating options - we could use IBM watsonx, OpenAI, or build something custom. IBM watsonx makes the most sense for our enterprise customers due to data privacy and compliance. Implementation would take about 8-10 weeks.
+
+Sarah Chen: Okay, let's plan for Q3. Marcus, I need you to prepare a detailed technical proposal with cost estimates by April 15th. James, you'll work on the business case and ROI projections. We'll present to the executive team in late April.
+
+Lisa Anderson: Should I start thinking about the UX for AI features?
+
+Sarah Chen: Yes, but keep it exploratory for now. We need executive approval first. Do some concept designs that we can use in the presentation.
+
+Marcus Weber: One more thing - we need to discuss the infrastructure costs. Our cloud spending has increased 40% this quarter due to the increased user base. We need to either optimize our architecture or increase the budget.
+
+Sarah Chen: That's concerning. Can you quantify the optimization potential?
+
+Marcus Weber: My team estimates we can reduce costs by 25-30% through better caching, database optimization, and moving some workloads to reserved instances. But it'll take dedicated engineering time - probably 3-4 weeks of work.
+
+Sarah Chen: That's a good ROI. Let's make that a priority for April. Marcus, assign someone from your team to lead the optimization project. I want weekly progress reports.
+
+Marcus Weber: Will do. I'll assign Chen Li - she's our infrastructure specialist.
+
+Sarah Chen: Excellent. Let me summarize our action items and decisions. Any questions before we wrap up?
+
+James O'Brien: Just one - when's our next strategy meeting?
+
+Sarah Chen: Let's schedule for April 22nd, same time. That gives us time to complete the AI proposal and see progress on the mobile launch. I'll send out the calendar invite.
+
+Lisa Anderson: Sounds good. Thanks everyone!`,
   entities: [
-    { label: "Severity Level", definition: "Impact level of the issue (Critical, High, Medium, Low)" },
-    { label: "Issue Type", definition: "Category of technical problem (Performance, Bug, Configuration, Security, etc.)" },
-    { label: "Root Cause", definition: "Identified cause of the problem" },
-    { label: "Resolution Time", definition: "Time taken to resolve the issue" },
-    { label: "Business Impact", definition: "Effect on customer operations (High, Medium, Low)" },
-    { label: "Escalation Level", definition: "Support tier that handled the issue (L1, L2, L3, Engineering)" },
-    { label: "Preventive Actions", definition: "Steps taken to prevent recurrence" },
-    { label: "Customer Satisfaction", definition: "Implied satisfaction level (Satisfied, Neutral, Dissatisfied)" },
+    { label: "Meeting Summary", definition: "A concise 2-3 sentence summary of the meeting's key discussion points and outcomes" },
+    { label: "Meeting Type", definition: "Category of meeting. Choose from: Planning, Review, Brainstorm, Decision-making, Status Update, Strategy, Other" },
+    { label: "Key Decisions Made", definition: "List of important decisions reached during the meeting with brief context" },
+    { label: "Action Item 1", definition: "First action item with format: 'Task description | Owner | Deadline'" },
+    { label: "Action Item 2", definition: "Second action item with format: 'Task description | Owner | Deadline'" },
+    { label: "Action Item 3", definition: "Third action item with format: 'Task description | Owner | Deadline'" },
+    { label: "Action Item 4", definition: "Fourth action item with format: 'Task description | Owner | Deadline'" },
+    { label: "Action Item 5", definition: "Fifth action item with format: 'Task description | Owner | Deadline'" },
+    { label: "Open Questions", definition: "Topics or issues that require follow-up or further discussion" },
+    { label: "Key Priorities", definition: "Top 2-3 priorities identified in the meeting" },
+    { label: "Next Meeting", definition: "Date and agenda for the next meeting if mentioned" },
+    { label: "Budget/Resource Concerns", definition: "Any budget, resource, or capacity issues discussed" },
     { label: "", definition: "" } // optional spare row for the UI
   ]
 };
