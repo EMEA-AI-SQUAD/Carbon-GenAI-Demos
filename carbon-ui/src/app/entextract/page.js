@@ -56,6 +56,8 @@ export default function EntityExtractionPage() {
   const [errorMsg, setErrorMsg] = useState('');
   const [extractedRows, setExtractedRows] = useState([]); // [{ id, label, value }]
   const [activeTab, setActiveTab] = useState(0);
+  const [processingTab, setProcessingTab] = useState(null); // Track which demo tab is processing
+  const [isComplete, setIsComplete] = useState(false); // Track if LLM processing is complete
   
   // IT Ops email selection state
   const [selectedScenario, setSelectedScenario] = useState('italian_emotional'); // 'italian_emotional' or 'french_professional'
@@ -108,6 +110,9 @@ export default function EntityExtractionPage() {
   async function completion() {
     setIsLoading(true);
     setErrorMsg('');
+    setIsComplete(false);
+    // Track which demo tab initiated the request (0, 1, or 2)
+    setProcessingTab(activeTab);
     // Optionally clear previous results while loading:
     setExtractedRows([]);
 
@@ -142,6 +147,7 @@ export default function EntityExtractionPage() {
       }));
 
       setExtractedRows(rows);
+      setIsComplete(true);
     } catch (err) {
       console.error(err);
       setErrorMsg(err?.message || 'Failed to contact the LLM.');
@@ -149,6 +155,19 @@ export default function EntityExtractionPage() {
       setIsLoading(false);
     }
   }
+
+  // Function to handle clicking the sticky notification to return to results
+  const handleReturnToResults = () => {
+    if (processingTab !== null) {
+      setActiveTab(processingTab);
+    }
+  };
+
+  // Get demo tab name for display
+  const getDemoTabName = (tabIndex) => {
+    const names = ['Book Review', 'IT Ops Email', 'Quote Email'];
+    return names[tabIndex] || 'Demo';
+  };
 
   return (
     <Grid className="landing-page" fullWidth>
@@ -160,12 +179,41 @@ export default function EntityExtractionPage() {
         </Breadcrumb>
         <h1 className="landing-page__heading">Demonstrate using GenAI to extract entities with IBM Power</h1>
       </Column>
+
+      {/* Sticky notification for LLM processing status */}
+      {(isLoading || isComplete) && processingTab !== null && (
+        <Column lg={16} md={8} sm={4} style={{ position: 'sticky', top: 0, zIndex: 1000, paddingTop: '1rem', paddingBottom: '1rem', backgroundColor: 'white' }}>
+          <InlineNotification
+            kind={isComplete ? "success" : "info"}
+            title={isComplete ? "🎉 Demo Results Ready!" : "🔥 Baking Your Demo..."}
+            subtitle={
+              isComplete
+                ? `Your ${getDemoTabName(processingTab)} results are ready. Click here to view them!`
+                : `Processing ${getDemoTabName(processingTab)} in the background. Feel free to explore the What and Why tabs while you wait.`
+            }
+            hideCloseButton={false}
+            onCloseButtonClick={() => {
+              setIsComplete(false);
+              setProcessingTab(null);
+            }}
+            lowContrast={false}
+            style={{
+              cursor: isComplete ? 'pointer' : 'default',
+              marginBottom: '0'
+            }}
+            onClick={isComplete ? handleReturnToResults : undefined}
+          />
+        </Column>
+      )}
+
       <Column lg={16} md={8} sm={4} className="landing-page__r2">
-        <Tabs defaultSelectedIndex={0} onChange={({ selectedIndex }) => setActiveTab(selectedIndex)}>
+        <Tabs selectedIndex={activeTab} onChange={({ selectedIndex }) => setActiveTab(selectedIndex)}>
           <TabList className="tabs-group" aria-label="Tab navigation">
             <Tab>Book Review</Tab>
             <Tab>IT Ops Email</Tab>
             <Tab>Quote Email</Tab>
+            <Tab>What We're Using</Tab>
+            <Tab>Why IBM Power</Tab>
           </TabList>
           <TabPanels>
             <TabPanel>
@@ -963,6 +1011,144 @@ export default function EntityExtractionPage() {
                       )}
                     </DataTable>
                   )}
+                </Column>
+              </Grid>
+            </TabPanel>
+
+            {/* What We're Using Tab */}
+            <TabPanel>
+              <Grid className="tabs-group-content">
+                <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
+                  <h2 className="landing-page__subheading">What We're Using</h2>
+                  <p className="landing-page__p" style={{ marginTop: '2rem' }}>
+                    This demonstration showcases a complete AI inference stack running entirely on IBM Power architecture.
+                    Here's what makes it work:
+                  </p>
+
+                  <h3 className="landing-page__label" style={{ marginTop: '2rem' }}>IBM Granite 4.0 Micro</h3>
+                  <p className="landing-page__p">
+                    Our foundation is IBM's Granite 4.0 Micro large language model, specifically designed for enterprise use cases.
+                    This model excels at entity extraction, text analysis, and structured data generation while maintaining a
+                    compact footprint suitable for on-premises deployment.
+                  </p>
+
+                  <h3 className="landing-page__label" style={{ marginTop: '2rem' }}>llama.cpp Inference Engine</h3>
+                  <p className="landing-page__p">
+                    We're using llama.cpp as our inference engine, running in CPU-only mode. This is important to note:
+                    <strong> we are not using GPUs, and we are not using IBM Spyre accelerators</strong> for this demonstration.
+                    The entire inference workload runs on standard IBM Power CPU cores, demonstrating the raw computational
+                    capability of the Power architecture for AI workloads.
+                  </p>
+
+                  <h3 className="landing-page__label" style={{ marginTop: '2rem' }}>RHEL on IBM Power</h3>
+                  <p className="landing-page__p">
+                    Everything runs within a single Red Hat Enterprise Linux (RHEL) logical partition (LPAR) on IBM Power.
+                    The LLM server, proxy layer, and web application all coexist in the same virtual server environment,
+                    demonstrating the consolidation capabilities of IBM Power.
+                  </p>
+
+                  <h3 className="landing-page__label" style={{ marginTop: '2rem' }}>Modern Web Stack</h3>
+                  <p className="landing-page__p">
+                    The user interface is built with Next.js and IBM's Carbon Design System, providing a responsive and
+                    accessible experience. A Node.js proxy layer handles communication between the web frontend and the
+                    llama.cpp server, managing API requests and responses efficiently.
+                  </p>
+
+                  <h3 className="landing-page__label" style={{ marginTop: '2rem' }}>Architecture Overview</h3>
+                  <p className="landing-page__p">
+                    The complete stack consists of three components running in the same RHEL LPAR:
+                  </p>
+                  <ul style={{ marginLeft: '2rem', marginTop: '1rem' }}>
+                    <li><strong>Web Server (Port 3000):</strong> Next.js application serving the Carbon UI</li>
+                    <li><strong>Proxy Server (Port 3001):</strong> Node.js middleware handling API routing</li>
+                    <li><strong>LLM Server (Port 8080):</strong> llama.cpp serving the Granite 4.0 Micro model</li>
+                  </ul>
+                  <p className="landing-page__p" style={{ marginTop: '1rem' }}>
+                    All three components communicate locally within the same virtual server, ensuring low latency
+                    and maintaining complete control over data flow.
+                  </p>
+                </Column>
+              </Grid>
+            </TabPanel>
+
+            {/* Why IBM Power Tab */}
+            <TabPanel>
+              <Grid className="tabs-group-content">
+                <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
+                  <h2 className="landing-page__subheading">Why IBM Power for AI Inference</h2>
+                  <p className="landing-page__p" style={{ marginTop: '2rem' }}>
+                    Running AI inference on IBM Power offers unique advantages that align with enterprise requirements
+                    for security, efficiency, and operational excellence.
+                  </p>
+
+                  <h3 className="landing-page__label" style={{ marginTop: '2rem' }}>Data Sovereignty and Security</h3>
+                  <p className="landing-page__p">
+                    <strong>Your data never leaves the virtual server.</strong> Unlike cloud-based AI services where data
+                    must be transmitted to external systems, this approach keeps all processing local. This is critical for:
+                  </p>
+                  <ul style={{ marginLeft: '2rem', marginTop: '1rem' }}>
+                    <li>Compliance with data residency requirements</li>
+                    <li>Adherence to data sovereignty principles</li>
+                    <li>Protection of sensitive business information</li>
+                    <li>Meeting regulatory requirements (GDPR, HIPAA, etc.)</li>
+                  </ul>
+
+                  <h3 className="landing-page__label" style={{ marginTop: '2rem' }}>In-Line Processing</h3>
+                  <p className="landing-page__p">
+                    AI inference can be integrated directly into existing business processes without data movement.
+                    There's no need to:
+                  </p>
+                  <ul style={{ marginLeft: '2rem', marginTop: '1rem' }}>
+                    <li>Copy data to cloud services</li>
+                    <li>Move data to specialized GPU hardware</li>
+                    <li>Create data pipelines for external processing</li>
+                    <li>Manage data synchronization across systems</li>
+                  </ul>
+                  <p className="landing-page__p" style={{ marginTop: '1rem' }}>
+                    The AI capability becomes a natural extension of your existing workflows, processing data where it lives.
+                  </p>
+
+                  <h3 className="landing-page__label" style={{ marginTop: '2rem' }}>Resource Efficiency</h3>
+                  <p className="landing-page__p">
+                    IBM Power servers are designed for consolidation and multi-workload environments. This AI inference
+                    capability can run <strong>"in the corner"</strong> of a larger Power server that's already running
+                    mission-critical business applications. You don't need:
+                  </p>
+                  <ul style={{ marginLeft: '2rem', marginTop: '1rem' }}>
+                    <li>Dedicated GPU servers</li>
+                    <li>Separate AI infrastructure</li>
+                    <li>Additional data center footprint</li>
+                    <li>Complex networking between systems</li>
+                  </ul>
+
+                  <h3 className="landing-page__label" style={{ marginTop: '2rem' }}>Mission-Critical Integration</h3>
+                  <p className="landing-page__p">
+                    IBM Power is trusted for the world's most critical workloads. By running AI inference on the same
+                    platform as your core business systems, you benefit from:
+                  </p>
+                  <ul style={{ marginLeft: '2rem', marginTop: '1rem' }}>
+                    <li>Enterprise-grade reliability and availability</li>
+                    <li>Consistent security and compliance posture</li>
+                    <li>Simplified operations and management</li>
+                    <li>Reduced complexity in your IT architecture</li>
+                  </ul>
+
+                  <h3 className="landing-page__label" style={{ marginTop: '2rem' }}>No GPU Required</h3>
+                  <p className="landing-page__p">
+                    This demonstration proves that effective AI inference doesn't always require GPUs. IBM Power's
+                    CPU architecture provides sufficient performance for many real-world use cases, offering:
+                  </p>
+                  <ul style={{ marginLeft: '2rem', marginTop: '1rem' }}>
+                    <li>Lower infrastructure costs</li>
+                    <li>Simplified deployment and maintenance</li>
+                    <li>Better resource utilization</li>
+                    <li>Flexibility to scale with existing infrastructure</li>
+                  </ul>
+
+                  <p className="landing-page__p" style={{ marginTop: '2rem', fontStyle: 'italic' }}>
+                    This approach represents a pragmatic path to AI adoption for enterprises that prioritize data control,
+                    operational simplicity, and integration with existing mission-critical systems.
+                  </p>
                 </Column>
               </Grid>
             </TabPanel>
