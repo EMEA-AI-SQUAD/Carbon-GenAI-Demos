@@ -29,7 +29,7 @@ import {
   Tile,
   Loading,
 } from '@carbon/react';
-import { Application, CloudDataOps, MachineLearningModel } from '@carbon/pictograms-react';
+import { Application, CloudServices, MachineLearningModel } from '@carbon/pictograms-react';
 import Image from 'next/image';
 import React, { useMemo, useState, useEffect } from 'react';
 import { DEFAULTS } from "./defaults";
@@ -1116,7 +1116,7 @@ export default function EntityExtractionPage() {
 
                     {/* Middleware Layer */}
                     <Tile style={{ width: '100%', maxWidth: '400px', textAlign: 'center', padding: '1.5rem' }}>
-                      <CloudDataOps style={{ width: '64px', height: '64px', margin: '0 auto 1rem' }} />
+                      <CloudServices style={{ width: '64px', height: '64px', margin: '0 auto 1rem' }} />
                       <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1.125rem', fontWeight: 600 }}>llama.cpp Server</h4>
                       <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--cds-text-secondary)' }}>
                         Inference Engine + Node.js Proxy<br/>
