@@ -28,7 +28,16 @@ import {
   Tile,
   Tag,
 } from '@carbon/react';
-import Image from 'next/image';
+import {
+  Application,
+  CloudServices,
+  MachineLearningModel,
+  Security,
+  DataStorage,
+  Enterprise,
+  Microservices,
+  Globe,
+} from '@carbon/icons-react';
 import React, { useMemo, useState } from 'react';
 import { DEFAULTS, PASSPORT_VERIFICATION, DOCUMENT_SCAN } from "./defaults";
 import { buildMessages } from "./messages";
@@ -148,20 +157,151 @@ export default function PIIExtractionPage() {
           setRedactedText('');
           setErrorMsg('');
           // Load appropriate defaults
-          if (selectedIndex === 0) {
+          if (selectedIndex === 1) {
             setValues(DEFAULTS);
-          } else if (selectedIndex === 1) {
-            setValues(PASSPORT_VERIFICATION);
           } else if (selectedIndex === 2) {
+            setValues(PASSPORT_VERIFICATION);
+          } else if (selectedIndex === 3) {
             setValues(DOCUMENT_SCAN);
           }
         }}>
           <TabList className="tabs-group" aria-label="Tab navigation">
+            <Tab>Why IBM Power</Tab>
             <Tab>Fraud Complaint</Tab>
             <Tab>Passport Verification</Tab>
             <Tab>Document Discovery</Tab>
+            <Tab>What We're Using</Tab>
           </TabList>
           <TabPanels>
+            {/* Why IBM Power Tab */}
+            <TabPanel>
+              <Grid className="tabs-group-content">
+                <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
+                  <h2 className="landing-page__subheading">Why IBM Power for AI Inference</h2>
+                  <p className="landing-page__p" style={{ marginTop: '2rem', marginBottom: '3rem' }}>
+                    Running AI inference on IBM Power offers unique advantages that align with enterprise requirements
+                    for security, efficiency, and operational excellence.
+                  </p>
+                </Column>
+
+                {/* Benefit 1: Data Sovereignty */}
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
+                    <Security style={{ width: '80px', height: '80px', flexShrink: 0 }} />
+                    <div>
+                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>Data Sovereignty & Security</h3>
+                      <p className="landing-page__p">
+                        <strong>Your data never leaves the virtual server.</strong> Unlike cloud-based AI services, all processing stays local.
+                      </p>
+                    </div>
+                  </div>
+                </Column>
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
+                  <ul style={{ marginLeft: '1rem', marginTop: '1.5rem' }}>
+                    <li>Compliance with data residency requirements</li>
+                    <li>Adherence to data sovereignty principles</li>
+                    <li>Protection of sensitive business information</li>
+                    <li>Meeting regulatory requirements (GDPR, HIPAA, etc.)</li>
+                  </ul>
+                </Column>
+
+                {/* Benefit 2: In-Line Processing */}
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
+                    <DataStorage style={{ width: '80px', height: '80px', flexShrink: 0 }} />
+                    <div>
+                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>In-Line Processing</h3>
+                      <p className="landing-page__p">
+                        AI inference integrates directly into existing business processes without data movement.
+                      </p>
+                    </div>
+                  </div>
+                </Column>
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
+                  <ul style={{ marginLeft: '1rem', marginTop: '1.5rem' }}>
+                    <li>No copying data to cloud services</li>
+                    <li>No moving data to specialized GPU hardware</li>
+                    <li>No data pipelines for external processing</li>
+                    <li>No data synchronization across systems</li>
+                  </ul>
+                </Column>
+
+                {/* Benefit 3: Resource Efficiency */}
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
+                    <Enterprise style={{ width: '80px', height: '80px', flexShrink: 0 }} />
+                    <div>
+                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>Resource Efficiency</h3>
+                      <p className="landing-page__p">
+                        AI runs <strong>"in the corner"</strong> of existing Power servers alongside mission-critical applications.
+                      </p>
+                    </div>
+                  </div>
+                </Column>
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
+                  <ul style={{ marginLeft: '1rem', marginTop: '1.5rem' }}>
+                    <li>No dedicated GPU servers needed</li>
+                    <li>No separate AI infrastructure</li>
+                    <li>No additional data center footprint</li>
+                    <li>No complex networking between systems</li>
+                  </ul>
+                </Column>
+
+                {/* Benefit 4: Mission-Critical Integration */}
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
+                    <Globe style={{ width: '80px', height: '80px', flexShrink: 0 }} />
+                    <div>
+                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>Mission-Critical Integration</h3>
+                      <p className="landing-page__p">
+                        IBM Power is trusted for the world's most critical workloads. AI runs on the same platform.
+                      </p>
+                    </div>
+                  </div>
+                </Column>
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
+                  <ul style={{ marginLeft: '1rem', marginTop: '1.5rem' }}>
+                    <li>Enterprise-grade reliability and availability</li>
+                    <li>Consistent security and compliance posture</li>
+                    <li>Simplified operations and management</li>
+                    <li>Reduced complexity in IT architecture</li>
+                  </ul>
+                </Column>
+
+                {/* Benefit 5: No GPU Required */}
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
+                    <Microservices style={{ width: '80px', height: '80px', flexShrink: 0 }} />
+                    <div>
+                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>No GPU Required</h3>
+                      <p className="landing-page__p">
+                        IBM Power's CPU architecture provides sufficient performance for many real-world AI use cases.
+                      </p>
+                    </div>
+                  </div>
+                </Column>
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
+                  <ul style={{ marginLeft: '1rem', marginTop: '1.5rem' }}>
+                    <li>Lower infrastructure costs</li>
+                    <li>Simplified deployment and maintenance</li>
+                    <li>Better resource utilization</li>
+                    <li>Flexibility to scale with existing infrastructure</li>
+                  </ul>
+                </Column>
+
+                {/* Summary */}
+                <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
+                  <Tile style={{ marginTop: '2rem', padding: '2rem', background: 'var(--cds-layer-02)' }}>
+                    <p style={{ margin: 0, fontSize: '1.125rem', fontStyle: 'italic', textAlign: 'center' }}>
+                      This approach represents a pragmatic path to AI adoption for enterprises that prioritize data control,
+                      operational simplicity, and integration with existing mission-critical systems.
+                    </p>
+                  </Tile>
+                </Column>
+              </Grid>
+            </TabPanel>
+
+            {/* Fraud Complaint Tab */}
             <TabPanel>
               <Grid className="tabs-group-content">
                 <Column md={4} lg={7} sm={4} className="entity__tab-content">
@@ -1149,6 +1289,127 @@ export default function PIIExtractionPage() {
                     )}
                   </>
                 )}
+              </Grid>
+            </TabPanel>
+
+            {/* What We're Using Tab */}
+            <TabPanel>
+              <Grid className="tabs-group-content">
+                {/* Left Column - Text Content */}
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
+                  <h2 className="landing-page__subheading">What We're Using</h2>
+                  <p className="landing-page__p" style={{ marginTop: '2rem' }}>
+                    This demonstration showcases a complete AI inference stack running entirely on IBM Power architecture.
+                    Here's what makes it work:
+                  </p>
+
+                  <h3 className="landing-page__label" style={{ marginTop: '2rem' }}>IBM Granite 4.0 Micro</h3>
+                  <p className="landing-page__p">
+                    Our foundation is IBM's Granite 4.0 Micro large language model, specifically designed for enterprise use cases.
+                    This model excels at entity extraction, text analysis, and structured data generation while maintaining a
+                    compact footprint suitable for on-premises deployment.
+                  </p>
+
+                  <h3 className="landing-page__label" style={{ marginTop: '2rem' }}>llama.cpp Inference Engine</h3>
+                  <p className="landing-page__p">
+                    We're using llama.cpp as our inference engine, running in CPU-only mode. This is important to note:
+                    <strong> we are not using GPUs, and we are not using IBM Spyre accelerators</strong> for this demonstration.
+                    The entire inference workload runs on standard IBM Power CPU cores, demonstrating the raw computational
+                    capability of the Power architecture for AI workloads.
+                  </p>
+
+                  <h3 className="landing-page__label" style={{ marginTop: '2rem' }}>RHEL on IBM Power</h3>
+                  <p className="landing-page__p">
+                    Everything runs within a single Red Hat Enterprise Linux (RHEL) logical partition (LPAR) on IBM Power.
+                    The LLM server, proxy layer, and web application all coexist in the same virtual server environment,
+                    demonstrating the consolidation capabilities of IBM Power.
+                  </p>
+
+                  <h3 className="landing-page__label" style={{ marginTop: '2rem' }}>Modern Web Stack</h3>
+                  <p className="landing-page__p">
+                    The user interface is built with Next.js and IBM's Carbon Design System, providing a responsive and
+                    accessible experience. A Node.js proxy layer handles communication between the web frontend and the
+                    llama.cpp server, managing API requests and responses efficiently.
+                  </p>
+                </Column>
+
+                {/* Right Column - Visual Stack Diagram */}
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '1rem',
+                    padding: '2rem 1rem',
+                    marginTop: '3rem'
+                  }}>
+                    <h3 className="landing-page__label" style={{ marginBottom: '2rem', textAlign: 'center' }}>
+                      Technology Stack
+                    </h3>
+
+                    {/* Application Layer */}
+                    <Tile style={{ width: '100%', maxWidth: '400px', textAlign: 'center', padding: '1.5rem' }}>
+                      <Application style={{ width: '64px', height: '64px', margin: '0 auto 1rem' }} />
+                      <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1.125rem', fontWeight: 600 }}>Carbon UI</h4>
+                      <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--cds-text-secondary)' }}>
+                        Next.js + Carbon Design System<br/>
+                        <strong>Port 3000</strong>
+                      </p>
+                    </Tile>
+
+                    {/* Middleware Layer */}
+                    <Tile style={{ width: '100%', maxWidth: '400px', textAlign: 'center', padding: '1.5rem' }}>
+                      <CloudServices style={{ width: '64px', height: '64px', margin: '0 auto 1rem' }} />
+                      <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1.125rem', fontWeight: 600 }}>llama.cpp Server</h4>
+                      <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--cds-text-secondary)' }}>
+                        Inference Engine + Node.js Proxy<br/>
+                        <strong>Ports 8080 & 3001</strong>
+                      </p>
+                    </Tile>
+
+                    {/* AI Model Layer */}
+                    <Tile style={{ width: '100%', maxWidth: '400px', textAlign: 'center', padding: '1.5rem' }}>
+                      <MachineLearningModel style={{ width: '64px', height: '64px', margin: '0 auto 1rem' }} />
+                      <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1.125rem', fontWeight: 600 }}>Granite 4.0 Micro</h4>
+                      <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--cds-text-secondary)' }}>
+                        IBM's Enterprise LLM<br/>
+                        <strong>GGUF Format</strong>
+                      </p>
+                    </Tile>
+
+                    {/* OS Layer */}
+                    <Tile style={{
+                      width: '100%',
+                      maxWidth: '400px',
+                      textAlign: 'center',
+                      padding: '1.5rem',
+                      background: 'linear-gradient(135deg, #EE0000 0%, #CC0000 100%)',
+                      color: 'white'
+                    }}>
+                      <div style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>RHEL</div>
+                      <p style={{ margin: 0, fontSize: '0.875rem', opacity: 0.9 }}>
+                        Red Hat Enterprise Linux<br/>
+                        <strong>Single LPAR</strong>
+                      </p>
+                    </Tile>
+
+                    {/* IBM Power Foundation */}
+                    <Tile style={{
+                      width: '100%',
+                      maxWidth: '400px',
+                      textAlign: 'center',
+                      padding: '1.5rem',
+                      background: 'linear-gradient(135deg, #0F62FE 0%, #0043CE 100%)',
+                      color: 'white'
+                    }}>
+                      <div style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>IBM Power</div>
+                      <p style={{ margin: 0, fontSize: '0.875rem', opacity: 0.9 }}>
+                        PPC64LE Architecture<br/>
+                        <strong>CPU-Only AI Inference</strong>
+                      </p>
+                    </Tile>
+                  </div>
+                </Column>
               </Grid>
             </TabPanel>
           </TabPanels>
