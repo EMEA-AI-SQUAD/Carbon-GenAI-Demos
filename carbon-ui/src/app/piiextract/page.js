@@ -1343,6 +1343,31 @@ export default function PIIExtractionPage() {
 
             {/* What We're Using Tab */}
             <TabPanel>
+              {/* Sticky notification for this tab */}
+              {(isLoading || isComplete) && processingTab !== null && (
+                <div className="sticky-notification-container">
+                  <InlineNotification
+                    kind={isComplete ? "success" : "info"}
+                    title={isComplete ? "🎉 Demo Results Ready!" : "🔥 Baking Your Demo..."}
+                    subtitle={
+                      isComplete
+                        ? `Your ${getDemoTabName(processingTab)} results are ready. Click to return to that tab!`
+                        : `Processing ${getDemoTabName(processingTab)} in the background. Explore this tab while you wait!`
+                    }
+                    hideCloseButton={false}
+                    onCloseButtonClick={() => {
+                      setIsComplete(false);
+                      setProcessingTab(null);
+                    }}
+                    lowContrast={false}
+                    style={{
+                      cursor: isComplete ? 'pointer' : 'default',
+                      marginBottom: '1rem'
+                    }}
+                    onClick={isComplete ? handleReturnToResults : undefined}
+                  />
+                </div>
+              )}
               <Grid className="tabs-group-content">
                 {/* Left Column - Text Content */}
                 <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
