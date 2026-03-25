@@ -84,16 +84,42 @@ Result: Production-ready demo showcasing team + AI collaboration
 
 This project demonstrates how IBM Granite AI models running on IBM Power can solve real business problems through interactive demos showcasing entity extraction and PII compliance.
 
-### 🚀 New Feature: Pre-load Demo Buttons
+### 🚀 New Features: Enhanced Demo Experience
 
-All 6 demo tabs now include **"Pre-load Demo Results"** buttons that trigger LLM processing in the background while you explain the demo. This eliminates wait times during presentations and creates a seamless demo experience.
+#### Sticky AI Processing Indicator
+All demo tabs now feature a **persistent sticky notification** that provides real-time feedback during LLM processing:
+
+**During Processing:**
+- 🔥 "Baking Your Demo..." notification appears at the top of the screen
+- Stays visible as you navigate between tabs
+- Allows you to explore "Why IBM Power" and "What We're Using" tabs while waiting
+- Professional presentation flow without awkward pauses
+
+**After Completion:**
+- 🎉 "Demo Results Ready!" success notification
+- Remains visible across all tabs until dismissed
+- Click notification to instantly return to the results tab
+- Never lose track of which demo completed
 
 **Benefits:**
-- ✅ Start LLM processing immediately when opening a tab
-- ✅ Explain the use case while AI processes in background
+- ✅ Real-time processing status across all tabs
+- ✅ Navigate freely during LLM processing
+- ✅ One-click return to results
+- ✅ Professional presentation experience
+- ✅ Consistent UX across all 6 demo tabs
+
+#### Pre-load Demo Buttons
+All 6 demo tabs include **"Pre-load Demo Results"** buttons that trigger LLM processing in the background:
+- ✅ Start processing immediately when opening a tab
+- ✅ Explain the use case while AI processes
 - ✅ Results appear by the time you scroll down
-- ✅ Professional presentation flow without awkward pauses
-- ✅ Consistent UX across all 6 tabs
+- ✅ Seamless demo flow
+
+#### Improved Tab Organization
+Both demo pages now start with **"Why IBM Power"** as the first tab, providing context before diving into demos:
+- **Tab 1**: Why IBM Power (context and value proposition)
+- **Tabs 2-4**: Interactive demos with LLM
+- **Tab 5**: What We're Using (technical stack)
 
 ### Entity Extraction Demos
 
