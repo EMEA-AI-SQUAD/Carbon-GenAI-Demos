@@ -78,6 +78,13 @@ export default function EntityExtractionPage() {
     const shouldClearResults = !(isComplete && activeTab === processingTab);
     
     if (activeTab === 1) {
+      // Book Review tab - load defaults
+      setValues(DEFAULTS);
+      if (shouldClearResults) {
+        setExtractedRows([]);
+      }
+      setErrorMsg('');
+    } else if (activeTab === 2) {
       // IT Ops tab - load Italian scenario
       const scenario = IT_OPS_SCENARIOS.italian_emotional;
       setValues({
@@ -88,19 +95,12 @@ export default function EntityExtractionPage() {
         setExtractedRows([]);
       }
       setErrorMsg('');
-    } else if (activeTab === 2) {
+    } else if (activeTab === 3) {
       // Logistics tab - load German scenario
       setValues({
         free_form_text: LOGISTICS_QUOTE_SCENARIO.email,
         entities: LOGISTICS_QUOTE_SCENARIO.entities
       });
-      if (shouldClearResults) {
-        setExtractedRows([]);
-      }
-      setErrorMsg('');
-    } else if (activeTab === 0) {
-      // Book Review tab - load defaults
-      setValues(DEFAULTS);
       if (shouldClearResults) {
         setExtractedRows([]);
       }
@@ -184,7 +184,7 @@ export default function EntityExtractionPage() {
 
   // Get demo tab name for display
   const getDemoTabName = (tabIndex) => {
-    const names = ['Book Review', 'IT Ops Email', 'Quote Email'];
+    const names = ['Why IBM Power', 'Book Review', 'IT Ops Email', 'Quote Email', 'What We\'re Using'];
     return names[tabIndex] || 'Demo';
   };
 
@@ -202,16 +202,16 @@ export default function EntityExtractionPage() {
       <Column lg={16} md={8} sm={4} className="landing-page__r2">
         <Tabs selectedIndex={activeTab} onChange={({ selectedIndex }) => setActiveTab(selectedIndex)}>
           <TabList className="tabs-group" aria-label="Tab navigation">
+            <Tab>Why IBM Power</Tab>
             <Tab>Book Review</Tab>
             <Tab>IT Ops Email</Tab>
             <Tab>Quote Email</Tab>
             <Tab>What We're Using</Tab>
-            <Tab>Why IBM Power</Tab>
           </TabList>
           <TabPanels>
             <TabPanel>
               {/* Sticky notification for this tab */}
-              {(isLoading || isComplete) && processingTab === 0 && (
+              {(isLoading || isComplete) && processingTab !== null && (
                 <div className="sticky-notification-container">
                   <InlineNotification
                     kind={isComplete ? "success" : "info"}

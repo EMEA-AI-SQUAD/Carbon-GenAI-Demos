@@ -62,6 +62,8 @@ export default function PIIExtractionPage() {
   const [extractedRows, setExtractedRows] = useState([]); // [{ id, label, value }]
   const [redactedText, setRedactedText] = useState('');
   const [activeTab, setActiveTab] = useState(0);
+  const [processingTab, setProcessingTab] = useState(null); // Track which demo tab is processing
+  const [isComplete, setIsComplete] = useState(false); // Track if LLM processing is complete
 
   const onFreeFormChange = (e) =>
     setValues((prev) => ({ ...prev, free_form_text: e.target.value }));
@@ -84,6 +86,8 @@ export default function PIIExtractionPage() {
   async function completion() {
     setIsLoading(true);
     setErrorMsg('');
+    setIsComplete(false);
+    setProcessingTab(activeTab);
     setExtractedRows([]);
     setRedactedText('');
 
@@ -131,6 +135,7 @@ export default function PIIExtractionPage() {
         }
       });
       setRedactedText(redacted);
+      setIsComplete(true);
 
     } catch (err) {
       console.error(err);
@@ -139,6 +144,19 @@ export default function PIIExtractionPage() {
       setIsLoading(false);
     }
   }
+
+  // Function to handle clicking the sticky notification to return to results
+  const handleReturnToResults = () => {
+    if (processingTab !== null) {
+      setActiveTab(processingTab);
+    }
+  };
+
+  // Get demo tab name for display
+  const getDemoTabName = (tabIndex) => {
+    const names = ['Why IBM Power', 'Fraud Complaint', 'Passport Verification', 'Document Discovery', 'What We\'re Using'];
+    return names[tabIndex] || 'Demo';
+  };
 
   return (
     <Grid className="landing-page" fullWidth>
@@ -176,6 +194,31 @@ export default function PIIExtractionPage() {
           <TabPanels>
             {/* Why IBM Power Tab */}
             <TabPanel>
+              {/* Sticky notification for this tab */}
+              {(isLoading || isComplete) && processingTab !== null && (
+                <div className="sticky-notification-container">
+                  <InlineNotification
+                    kind={isComplete ? "success" : "info"}
+                    title={isComplete ? "🎉 Demo Results Ready!" : "🔥 Baking Your Demo..."}
+                    subtitle={
+                      isComplete
+                        ? `Your ${getDemoTabName(processingTab)} results are ready. Scroll down to view them!`
+                        : `Processing ${getDemoTabName(processingTab)} in the background. Feel free to explore the What and Why tabs while you wait.`
+                    }
+                    hideCloseButton={false}
+                    onCloseButtonClick={() => {
+                      setIsComplete(false);
+                      setProcessingTab(null);
+                    }}
+                    lowContrast={false}
+                    style={{
+                      cursor: isComplete ? 'pointer' : 'default',
+                      marginBottom: '1rem'
+                    }}
+                    onClick={isComplete ? handleReturnToResults : undefined}
+                  />
+                </div>
+              )}
               <Grid className="tabs-group-content">
                 <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
                   <h2 className="landing-page__subheading">Why IBM Power for AI Inference</h2>
