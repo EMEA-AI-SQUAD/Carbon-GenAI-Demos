@@ -34,9 +34,9 @@ import {
   CloudServices,
   MachineLearningModel,
   Security,
-  DataBase,
+  DataStorage,
   Enterprise,
-  Chip,
+  Microservices,
   Globe
 } from '@carbon/pictograms-react';
 import Image from 'next/image';
@@ -1239,7 +1239,7 @@ export default function EntityExtractionPage() {
                 {/* Benefit 2: In-Line Processing */}
                 <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
-                    <DataBase style={{ width: '80px', height: '80px', flexShrink: 0 }} />
+                    <DataStorage style={{ width: '80px', height: '80px', flexShrink: 0 }} />
                     <div>
                       <h3 className="landing-page__label" style={{ marginTop: 0 }}>In-Line Processing</h3>
                       <p className="landing-page__p">
@@ -1302,7 +1302,7 @@ export default function EntityExtractionPage() {
                 {/* Benefit 5: No GPU Required */}
                 <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
-                    <Chip style={{ width: '80px', height: '80px', flexShrink: 0 }} />
+                    <Microservices style={{ width: '80px', height: '80px', flexShrink: 0 }} />
                     <div>
                       <h3 className="landing-page__label" style={{ marginTop: 0 }}>No GPU Required</h3>
                       <p className="landing-page__p">
