@@ -64,6 +64,9 @@ export default function EntityExtractionPage() {
 
   // Initialize scenarios when tab changes
   useEffect(() => {
+    // Only clear results if we're not returning to a tab with completed results
+    const shouldClearResults = !(isComplete && activeTab === processingTab);
+    
     if (activeTab === 1) {
       // IT Ops tab - load Italian scenario
       const scenario = IT_OPS_SCENARIOS.italian_emotional;
@@ -71,7 +74,9 @@ export default function EntityExtractionPage() {
         free_form_text: scenario.email,
         entities: scenario.entities
       });
-      setExtractedRows([]);
+      if (shouldClearResults) {
+        setExtractedRows([]);
+      }
       setErrorMsg('');
     } else if (activeTab === 2) {
       // Logistics tab - load German scenario
@@ -79,15 +84,19 @@ export default function EntityExtractionPage() {
         free_form_text: LOGISTICS_QUOTE_SCENARIO.email,
         entities: LOGISTICS_QUOTE_SCENARIO.entities
       });
-      setExtractedRows([]);
+      if (shouldClearResults) {
+        setExtractedRows([]);
+      }
       setErrorMsg('');
     } else if (activeTab === 0) {
       // Book Review tab - load defaults
       setValues(DEFAULTS);
-      setExtractedRows([]);
+      if (shouldClearResults) {
+        setExtractedRows([]);
+      }
       setErrorMsg('');
     }
-  }, [activeTab]);
+  }, [activeTab, isComplete, processingTab]);
 
   const onFreeFormChange = (e) =>
     setValues((prev) => ({ ...prev, free_form_text: e.target.value }));
