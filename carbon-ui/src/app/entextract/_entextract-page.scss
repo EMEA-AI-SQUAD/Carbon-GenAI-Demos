@@ -144,3 +144,22 @@ html {
     opacity: 0.5;
   }
 }
+
+// Fixed notification container - stays in viewport during scroll
+// Uses position: fixed since the entire page scrolls, not just tab content
+.sticky-notification-container {
+  position: fixed !important;
+  top: 48px !important; // Below the Carbon header (48px height)
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 8000 !important; // Below header (9000) but above content
+  background-color: $layer-01 !important;
+  padding: $spacing-05 $spacing-06;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); // Stronger shadow for fixed element
+  
+  // Center content with max-width matching page content
+  .cds--inline-notification {
+    max-width: 1584px; // Carbon's max content width
+    margin: 0 auto;
+  }
+}

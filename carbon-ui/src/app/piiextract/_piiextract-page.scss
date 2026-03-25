@@ -145,4 +145,22 @@ html {
   }
 }
 
+// Sticky notification styles
+// Uses position: fixed since the entire page scrolls, not just tab content
+.sticky-notification-container {
+  position: fixed !important;
+  top: 48px; // Below the Carbon header
+  left: 0;
+  right: 0;
+  z-index: 8000; // Above most content but below modals
+  padding: 0 1rem;
+  background: transparent;
+  pointer-events: none; // Allow clicks through the container
+  
+  // But enable clicks on the notification itself
+  > * {
+    pointer-events: auto;
+  }
+}
+
 // Made with Bob
