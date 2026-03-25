@@ -1,0 +1,12 @@
+@use '@carbon/react/scss/spacing' as *;
+@use '@carbon/react/scss/theme' as *;
+
+.cds--tabs--scrollable .cds--tabs--scrollable__nav-link {
+  padding: $spacing-04 $spacing-05;
+}
+
+.cds--tab-content {
+  padding: $spacing-05 0;
+}
+
+// Made with Bob

@@ -1,0 +1,16 @@
+@use '@carbon/react/scss/spacing' as *;
+@use '@carbon/react/scss/breakpoint' as *;
+
+@mixin landing-page-background() {
+  background-color: $layer-01;
+  position: relative;
+  padding-top: $spacing-05;
+  padding-bottom: $spacing-07 * 4;
+
+  @include breakpoint-down(md) {
+    padding-top: $spacing-04;
+    padding-bottom: $spacing-07 * 4;
+  }
+}
+
+// Made with Bob
