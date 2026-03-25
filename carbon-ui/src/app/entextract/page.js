@@ -29,6 +29,7 @@ import {
   Tile,
   Loading,
 } from '@carbon/react';
+import { Application, CloudDataOps, MachineLearningModel } from '@carbon/pictograms-react';
 import Image from 'next/image';
 import React, { useMemo, useState, useEffect } from 'react';
 import { DEFAULTS } from "./defaults";
@@ -1051,7 +1052,8 @@ export default function EntityExtractionPage() {
                 </div>
               )}
               <Grid className="tabs-group-content">
-                <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
+                {/* Left Column - Text Content */}
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
                   <h2 className="landing-page__subheading">What We're Using</h2>
                   <p className="landing-page__p" style={{ marginTop: '2rem' }}>
                     This demonstration showcases a complete AI inference stack running entirely on IBM Power architecture.
@@ -1086,20 +1088,84 @@ export default function EntityExtractionPage() {
                     accessible experience. A Node.js proxy layer handles communication between the web frontend and the
                     llama.cpp server, managing API requests and responses efficiently.
                   </p>
+                </Column>
 
-                  <h3 className="landing-page__label" style={{ marginTop: '2rem' }}>Architecture Overview</h3>
-                  <p className="landing-page__p">
-                    The complete stack consists of three components running in the same RHEL LPAR:
-                  </p>
-                  <ul style={{ marginLeft: '2rem', marginTop: '1rem' }}>
-                    <li><strong>Web Server (Port 3000):</strong> Next.js application serving the Carbon UI</li>
-                    <li><strong>Proxy Server (Port 3001):</strong> Node.js middleware handling API routing</li>
-                    <li><strong>LLM Server (Port 8080):</strong> llama.cpp serving the Granite 4.0 Micro model</li>
-                  </ul>
-                  <p className="landing-page__p" style={{ marginTop: '1rem' }}>
-                    All three components communicate locally within the same virtual server, ensuring low latency
-                    and maintaining complete control over data flow.
-                  </p>
+                {/* Right Column - Visual Stack Diagram */}
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '1rem',
+                    padding: '2rem 1rem',
+                    marginTop: '3rem'
+                  }}>
+                    <h3 className="landing-page__label" style={{ marginBottom: '2rem', textAlign: 'center' }}>
+                      Technology Stack
+                    </h3>
+
+                    {/* Application Layer */}
+                    <Tile style={{ width: '100%', maxWidth: '400px', textAlign: 'center', padding: '1.5rem' }}>
+                      <Application style={{ width: '64px', height: '64px', margin: '0 auto 1rem' }} />
+                      <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1.125rem', fontWeight: 600 }}>Carbon UI</h4>
+                      <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--cds-text-secondary)' }}>
+                        Next.js + Carbon Design System<br/>
+                        <strong>Port 3000</strong>
+                      </p>
+                    </Tile>
+
+                    {/* Middleware Layer */}
+                    <Tile style={{ width: '100%', maxWidth: '400px', textAlign: 'center', padding: '1.5rem' }}>
+                      <CloudDataOps style={{ width: '64px', height: '64px', margin: '0 auto 1rem' }} />
+                      <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1.125rem', fontWeight: 600 }}>llama.cpp Server</h4>
+                      <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--cds-text-secondary)' }}>
+                        Inference Engine + Node.js Proxy<br/>
+                        <strong>Ports 8080 & 3001</strong>
+                      </p>
+                    </Tile>
+
+                    {/* AI Model Layer */}
+                    <Tile style={{ width: '100%', maxWidth: '400px', textAlign: 'center', padding: '1.5rem' }}>
+                      <MachineLearningModel style={{ width: '64px', height: '64px', margin: '0 auto 1rem' }} />
+                      <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1.125rem', fontWeight: 600 }}>Granite 4.0 Micro</h4>
+                      <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--cds-text-secondary)' }}>
+                        IBM's Enterprise LLM<br/>
+                        <strong>GGUF Format</strong>
+                      </p>
+                    </Tile>
+
+                    {/* OS Layer */}
+                    <Tile style={{
+                      width: '100%',
+                      maxWidth: '400px',
+                      textAlign: 'center',
+                      padding: '1.5rem',
+                      background: 'linear-gradient(135deg, #EE0000 0%, #CC0000 100%)',
+                      color: 'white'
+                    }}>
+                      <div style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>RHEL</div>
+                      <p style={{ margin: 0, fontSize: '0.875rem', opacity: 0.9 }}>
+                        Red Hat Enterprise Linux<br/>
+                        <strong>Single LPAR</strong>
+                      </p>
+                    </Tile>
+
+                    {/* IBM Power Foundation */}
+                    <Tile style={{
+                      width: '100%',
+                      maxWidth: '400px',
+                      textAlign: 'center',
+                      padding: '1.5rem',
+                      background: 'linear-gradient(135deg, #0F62FE 0%, #0043CE 100%)',
+                      color: 'white'
+                    }}>
+                      <div style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>IBM Power</div>
+                      <p style={{ margin: 0, fontSize: '0.875rem', opacity: 0.9 }}>
+                        PPC64LE Architecture<br/>
+                        <strong>CPU-Only AI Inference</strong>
+                      </p>
+                    </Tile>
+                  </div>
                 </Column>
               </Grid>
             </TabPanel>
