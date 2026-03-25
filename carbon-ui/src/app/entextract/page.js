@@ -77,6 +77,7 @@ export default function EntityExtractionPage() {
     // Only clear results if we're not returning to a tab with completed results
     const shouldClearResults = !(isComplete && activeTab === processingTab);
     
+    // Tab indices: 0=Why, 1=Book Review, 2=IT Ops, 3=Quote, 4=What
     if (activeTab === 1) {
       // Book Review tab (index 1) - load defaults
       setValues(DEFAULTS);
@@ -209,6 +210,157 @@ export default function EntityExtractionPage() {
             <Tab>What We're Using</Tab>
           </TabList>
           <TabPanels>
+            <TabPanel>
+              {/* Sticky notification for this tab */}
+              {(isLoading || isComplete) && processingTab !== null && (
+                <div className="sticky-notification-container">
+                  <InlineNotification
+                    kind={isComplete ? "success" : "info"}
+                    title={isComplete ? "🎉 Demo Results Ready!" : "🔥 Baking Your Demo..."}
+                    subtitle={
+                      isComplete
+                        ? `Your ${getDemoTabName(processingTab)} results are ready. Click to return to that tab!`
+                        : `Processing ${getDemoTabName(processingTab)} in the background. Explore this tab while you wait!`
+                    }
+                    hideCloseButton={false}
+                    onCloseButtonClick={() => {
+                      setIsComplete(false);
+                      setProcessingTab(null);
+                    }}
+                    lowContrast={false}
+                    style={{
+                      cursor: isComplete ? 'pointer' : 'default',
+                      marginBottom: '1rem'
+                    }}
+                    onClick={isComplete ? handleReturnToResults : undefined}
+                  />
+                </div>
+              )}
+              <Grid className="tabs-group-content">
+                <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
+                  <h2 className="landing-page__subheading">Why IBM Power for AI Inference</h2>
+                  <p className="landing-page__p" style={{ marginTop: '2rem', marginBottom: '3rem' }}>
+                    Running AI inference on IBM Power offers unique advantages that align with enterprise requirements
+                    for security, efficiency, and operational excellence.
+                  </p>
+                </Column>
+
+                {/* Benefit 1: Data Sovereignty */}
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
+                    <Security style={{ width: '80px', height: '80px', flexShrink: 0 }} />
+                    <div>
+                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>Data Sovereignty & Security</h3>
+                      <p className="landing-page__p">
+                        <strong>Your data never leaves the virtual server.</strong> Unlike cloud-based AI services, all processing stays local.
+                      </p>
+                    </div>
+                  </div>
+                </Column>
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
+                  <ul style={{ marginLeft: '1rem', marginTop: '1.5rem' }}>
+                    <li>Compliance with data residency requirements</li>
+                    <li>Adherence to data sovereignty principles</li>
+                    <li>Protection of sensitive business information</li>
+                    <li>Meeting regulatory requirements (GDPR, HIPAA, etc.)</li>
+                  </ul>
+                </Column>
+
+                {/* Benefit 2: In-Line Processing */}
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
+                    <DataStorage style={{ width: '80px', height: '80px', flexShrink: 0 }} />
+                    <div>
+                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>In-Line Processing</h3>
+                      <p className="landing-page__p">
+                        AI inference integrates directly into existing business processes without data movement.
+                      </p>
+                    </div>
+                  </div>
+                </Column>
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
+                  <ul style={{ marginLeft: '1rem', marginTop: '1.5rem' }}>
+                    <li>No copying data to cloud services</li>
+                    <li>No moving data to specialized GPU hardware</li>
+                    <li>No data pipelines for external processing</li>
+                    <li>No data synchronization across systems</li>
+                  </ul>
+                </Column>
+
+                {/* Benefit 3: Resource Efficiency */}
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
+                    <Enterprise style={{ width: '80px', height: '80px', flexShrink: 0 }} />
+                    <div>
+                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>Resource Efficiency</h3>
+                      <p className="landing-page__p">
+                        AI runs <strong>"in the corner"</strong> of existing Power servers alongside mission-critical applications.
+                      </p>
+                    </div>
+                  </div>
+                </Column>
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
+                  <ul style={{ marginLeft: '1rem', marginTop: '1.5rem' }}>
+                    <li>No dedicated GPU servers needed</li>
+                    <li>No separate AI infrastructure</li>
+                    <li>No additional data center footprint</li>
+                    <li>No complex networking between systems</li>
+                  </ul>
+                </Column>
+
+                {/* Benefit 4: Mission-Critical Integration */}
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
+                    <Globe style={{ width: '80px', height: '80px', flexShrink: 0 }} />
+                    <div>
+                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>Mission-Critical Integration</h3>
+                      <p className="landing-page__p">
+                        IBM Power is trusted for the world's most critical workloads. AI runs on the same platform.
+                      </p>
+                    </div>
+                  </div>
+                </Column>
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
+                  <ul style={{ marginLeft: '1rem', marginTop: '1.5rem' }}>
+                    <li>Enterprise-grade reliability and availability</li>
+                    <li>Consistent security and compliance posture</li>
+                    <li>Simplified operations and management</li>
+                    <li>Reduced complexity in IT architecture</li>
+                  </ul>
+                </Column>
+
+                {/* Benefit 5: No GPU Required */}
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
+                    <Microservices style={{ width: '80px', height: '80px', flexShrink: 0 }} />
+                    <div>
+                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>No GPU Required</h3>
+                      <p className="landing-page__p">
+                        IBM Power's CPU architecture provides sufficient performance for many real-world AI use cases.
+                      </p>
+                    </div>
+                  </div>
+                </Column>
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
+                  <ul style={{ marginLeft: '1rem', marginTop: '1.5rem' }}>
+                    <li>Lower infrastructure costs</li>
+                    <li>Simplified deployment and maintenance</li>
+                    <li>Better resource utilization</li>
+                    <li>Flexibility to scale with existing infrastructure</li>
+                  </ul>
+                </Column>
+
+                {/* Summary */}
+                <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
+                  <Tile style={{ marginTop: '2rem', padding: '2rem', background: 'var(--cds-layer-02)' }}>
+                    <p style={{ margin: 0, fontSize: '1.125rem', fontStyle: 'italic', textAlign: 'center' }}>
+                      This approach represents a pragmatic path to AI adoption for enterprises that prioritize data control,
+                      operational simplicity, and integration with existing mission-critical systems.
+                    </p>
+                  </Tile>
+                </Column>
+              </Grid>
+            </TabPanel>
             <TabPanel>
               {/* Sticky notification for this tab */}
               {(isLoading || isComplete) && processingTab !== null && (
@@ -1180,157 +1332,6 @@ export default function EntityExtractionPage() {
             </TabPanel>
 
             {/* Why IBM Power Tab */}
-            <TabPanel>
-              {/* Sticky notification for this tab */}
-              {(isLoading || isComplete) && processingTab !== null && (
-                <div className="sticky-notification-container">
-                  <InlineNotification
-                    kind={isComplete ? "success" : "info"}
-                    title={isComplete ? "🎉 Demo Results Ready!" : "🔥 Baking Your Demo..."}
-                    subtitle={
-                      isComplete
-                        ? `Your ${getDemoTabName(processingTab)} results are ready. Click to return to that tab!`
-                        : `Processing ${getDemoTabName(processingTab)} in the background. Explore this tab while you wait!`
-                    }
-                    hideCloseButton={false}
-                    onCloseButtonClick={() => {
-                      setIsComplete(false);
-                      setProcessingTab(null);
-                    }}
-                    lowContrast={false}
-                    style={{
-                      cursor: isComplete ? 'pointer' : 'default',
-                      marginBottom: '1rem'
-                    }}
-                    onClick={isComplete ? handleReturnToResults : undefined}
-                  />
-                </div>
-              )}
-              <Grid className="tabs-group-content">
-                <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
-                  <h2 className="landing-page__subheading">Why IBM Power for AI Inference</h2>
-                  <p className="landing-page__p" style={{ marginTop: '2rem', marginBottom: '3rem' }}>
-                    Running AI inference on IBM Power offers unique advantages that align with enterprise requirements
-                    for security, efficiency, and operational excellence.
-                  </p>
-                </Column>
-
-                {/* Benefit 1: Data Sovereignty */}
-                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
-                    <Security style={{ width: '80px', height: '80px', flexShrink: 0 }} />
-                    <div>
-                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>Data Sovereignty & Security</h3>
-                      <p className="landing-page__p">
-                        <strong>Your data never leaves the virtual server.</strong> Unlike cloud-based AI services, all processing stays local.
-                      </p>
-                    </div>
-                  </div>
-                </Column>
-                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
-                  <ul style={{ marginLeft: '1rem', marginTop: '1.5rem' }}>
-                    <li>Compliance with data residency requirements</li>
-                    <li>Adherence to data sovereignty principles</li>
-                    <li>Protection of sensitive business information</li>
-                    <li>Meeting regulatory requirements (GDPR, HIPAA, etc.)</li>
-                  </ul>
-                </Column>
-
-                {/* Benefit 2: In-Line Processing */}
-                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
-                    <DataStorage style={{ width: '80px', height: '80px', flexShrink: 0 }} />
-                    <div>
-                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>In-Line Processing</h3>
-                      <p className="landing-page__p">
-                        AI inference integrates directly into existing business processes without data movement.
-                      </p>
-                    </div>
-                  </div>
-                </Column>
-                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
-                  <ul style={{ marginLeft: '1rem', marginTop: '1.5rem' }}>
-                    <li>No copying data to cloud services</li>
-                    <li>No moving data to specialized GPU hardware</li>
-                    <li>No data pipelines for external processing</li>
-                    <li>No data synchronization across systems</li>
-                  </ul>
-                </Column>
-
-                {/* Benefit 3: Resource Efficiency */}
-                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
-                    <Enterprise style={{ width: '80px', height: '80px', flexShrink: 0 }} />
-                    <div>
-                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>Resource Efficiency</h3>
-                      <p className="landing-page__p">
-                        AI runs <strong>"in the corner"</strong> of existing Power servers alongside mission-critical applications.
-                      </p>
-                    </div>
-                  </div>
-                </Column>
-                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
-                  <ul style={{ marginLeft: '1rem', marginTop: '1.5rem' }}>
-                    <li>No dedicated GPU servers needed</li>
-                    <li>No separate AI infrastructure</li>
-                    <li>No additional data center footprint</li>
-                    <li>No complex networking between systems</li>
-                  </ul>
-                </Column>
-
-                {/* Benefit 4: Mission-Critical Integration */}
-                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
-                    <Globe style={{ width: '80px', height: '80px', flexShrink: 0 }} />
-                    <div>
-                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>Mission-Critical Integration</h3>
-                      <p className="landing-page__p">
-                        IBM Power is trusted for the world's most critical workloads. AI runs on the same platform.
-                      </p>
-                    </div>
-                  </div>
-                </Column>
-                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
-                  <ul style={{ marginLeft: '1rem', marginTop: '1.5rem' }}>
-                    <li>Enterprise-grade reliability and availability</li>
-                    <li>Consistent security and compliance posture</li>
-                    <li>Simplified operations and management</li>
-                    <li>Reduced complexity in IT architecture</li>
-                  </ul>
-                </Column>
-
-                {/* Benefit 5: No GPU Required */}
-                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
-                    <Microservices style={{ width: '80px', height: '80px', flexShrink: 0 }} />
-                    <div>
-                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>No GPU Required</h3>
-                      <p className="landing-page__p">
-                        IBM Power's CPU architecture provides sufficient performance for many real-world AI use cases.
-                      </p>
-                    </div>
-                  </div>
-                </Column>
-                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
-                  <ul style={{ marginLeft: '1rem', marginTop: '1.5rem' }}>
-                    <li>Lower infrastructure costs</li>
-                    <li>Simplified deployment and maintenance</li>
-                    <li>Better resource utilization</li>
-                    <li>Flexibility to scale with existing infrastructure</li>
-                  </ul>
-                </Column>
-
-                {/* Summary */}
-                <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
-                  <Tile style={{ marginTop: '2rem', padding: '2rem', background: 'var(--cds-layer-02)' }}>
-                    <p style={{ margin: 0, fontSize: '1.125rem', fontStyle: 'italic', textAlign: 'center' }}>
-                      This approach represents a pragmatic path to AI adoption for enterprises that prioritize data control,
-                      operational simplicity, and integration with existing mission-critical systems.
-                    </p>
-                  </Tile>
-                </Column>
-              </Grid>
-            </TabPanel>
           </TabPanels>
         </Tabs>
       </Column>
