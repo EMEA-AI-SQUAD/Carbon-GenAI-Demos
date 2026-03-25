@@ -33,12 +33,10 @@ import {
   CloudServices,
   MachineLearningModel,
   Security,
-  Enterprise,
-  Globe,
-} from '@carbon/icons-react';
-import {
   DataStorage,
+  Enterprise,
   Microservices,
+  Globe,
 } from '@carbon/pictograms-react';
 import React, { useMemo, useState } from 'react';
 import { DEFAULTS, PASSPORT_VERIFICATION, DOCUMENT_SCAN } from "./defaults";
