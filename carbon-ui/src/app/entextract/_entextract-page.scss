@@ -145,17 +145,19 @@ html {
   }
 }
 
-// Sticky notification wrapper
-.sticky-notification-wrapper {
+// Sticky notification container - wraps the entire notification
+.sticky-notification-container {
   position: sticky;
   top: 48px; // Height of the Carbon header
   z-index: 9999; // Higher than most elements
-  padding-top: $spacing-05;
-  padding-bottom: $spacing-05;
   background-color: $layer-01; // Use Carbon theme variable
-  margin-left: -$spacing-06; // Extend to edges
-  margin-right: -$spacing-06;
-  padding-left: $spacing-06;
-  padding-right: $spacing-06;
+  padding: $spacing-05 0; // Vertical padding
+  margin: 0 -20px; // Extend to full width (compensate for Grid padding)
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); // Subtle shadow for depth
+  
+  // Ensure the Column inside doesn't add extra margins
+  .cds--col {
+    padding-left: $spacing-06;
+    padding-right: $spacing-06;
+  }
 }

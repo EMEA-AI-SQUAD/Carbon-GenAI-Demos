@@ -182,33 +182,30 @@ export default function EntityExtractionPage() {
 
       {/* Sticky notification for LLM processing status */}
       {(isLoading || isComplete) && processingTab !== null && (
-        <Column
-          lg={16}
-          md={8}
-          sm={4}
-          className="sticky-notification-wrapper"
-        >
-          <InlineNotification
-            kind={isComplete ? "success" : "info"}
-            title={isComplete ? "🎉 Demo Results Ready!" : "🔥 Baking Your Demo..."}
-            subtitle={
-              isComplete
-                ? `Your ${getDemoTabName(processingTab)} results are ready. Click here to view them!`
-                : `Processing ${getDemoTabName(processingTab)} in the background. Feel free to explore the What and Why tabs while you wait.`
-            }
-            hideCloseButton={false}
-            onCloseButtonClick={() => {
-              setIsComplete(false);
-              setProcessingTab(null);
-            }}
-            lowContrast={false}
-            style={{
-              cursor: isComplete ? 'pointer' : 'default',
-              marginBottom: '0'
-            }}
-            onClick={isComplete ? handleReturnToResults : undefined}
-          />
-        </Column>
+        <div className="sticky-notification-container">
+          <Column lg={16} md={8} sm={4}>
+            <InlineNotification
+              kind={isComplete ? "success" : "info"}
+              title={isComplete ? "🎉 Demo Results Ready!" : "🔥 Baking Your Demo..."}
+              subtitle={
+                isComplete
+                  ? `Your ${getDemoTabName(processingTab)} results are ready. Click here to view them!`
+                  : `Processing ${getDemoTabName(processingTab)} in the background. Feel free to explore the What and Why tabs while you wait.`
+              }
+              hideCloseButton={false}
+              onCloseButtonClick={() => {
+                setIsComplete(false);
+                setProcessingTab(null);
+              }}
+              lowContrast={false}
+              style={{
+                cursor: isComplete ? 'pointer' : 'default',
+                marginBottom: '0'
+              }}
+              onClick={isComplete ? handleReturnToResults : undefined}
+            />
+          </Column>
+        </div>
       )}
 
       <Column lg={16} md={8} sm={4} className="landing-page__r2">
