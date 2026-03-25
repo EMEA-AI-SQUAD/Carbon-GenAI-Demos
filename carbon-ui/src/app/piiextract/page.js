@@ -38,6 +38,7 @@ import {
   Microservices,
   Globe,
 } from '@carbon/pictograms-react';
+import Image from 'next/image';
 import React, { useMemo, useState } from 'react';
 import { DEFAULTS, PASSPORT_VERIFICATION, DOCUMENT_SCAN } from "./defaults";
 import { buildMessages } from "./messages";
