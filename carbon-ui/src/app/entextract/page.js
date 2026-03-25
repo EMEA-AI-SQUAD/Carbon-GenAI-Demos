@@ -180,34 +180,6 @@ export default function EntityExtractionPage() {
         <h1 className="landing-page__heading">Demonstrate using GenAI to extract entities with IBM Power</h1>
       </Column>
 
-      {/* Sticky notification for LLM processing status */}
-      {(isLoading || isComplete) && processingTab !== null && (
-        <div className="sticky-notification-container">
-          <Column lg={16} md={8} sm={4}>
-            <InlineNotification
-              kind={isComplete ? "success" : "info"}
-              title={isComplete ? "🎉 Demo Results Ready!" : "🔥 Baking Your Demo..."}
-              subtitle={
-                isComplete
-                  ? `Your ${getDemoTabName(processingTab)} results are ready. Click here to view them!`
-                  : `Processing ${getDemoTabName(processingTab)} in the background. Feel free to explore the What and Why tabs while you wait.`
-              }
-              hideCloseButton={false}
-              onCloseButtonClick={() => {
-                setIsComplete(false);
-                setProcessingTab(null);
-              }}
-              lowContrast={false}
-              style={{
-                cursor: isComplete ? 'pointer' : 'default',
-                marginBottom: '0'
-              }}
-              onClick={isComplete ? handleReturnToResults : undefined}
-            />
-          </Column>
-        </div>
-      )}
-
       <Column lg={16} md={8} sm={4} className="landing-page__r2">
         <Tabs selectedIndex={activeTab} onChange={({ selectedIndex }) => setActiveTab(selectedIndex)}>
           <TabList className="tabs-group" aria-label="Tab navigation">
@@ -219,6 +191,31 @@ export default function EntityExtractionPage() {
           </TabList>
           <TabPanels>
             <TabPanel>
+              {/* Sticky notification for this tab */}
+              {(isLoading || isComplete) && processingTab === 0 && (
+                <div className="sticky-notification-container">
+                  <InlineNotification
+                    kind={isComplete ? "success" : "info"}
+                    title={isComplete ? "🎉 Demo Results Ready!" : "🔥 Baking Your Demo..."}
+                    subtitle={
+                      isComplete
+                        ? `Your ${getDemoTabName(processingTab)} results are ready. Scroll down to view them!`
+                        : `Processing ${getDemoTabName(processingTab)} in the background. Feel free to explore the What and Why tabs while you wait.`
+                    }
+                    hideCloseButton={false}
+                    onCloseButtonClick={() => {
+                      setIsComplete(false);
+                      setProcessingTab(null);
+                    }}
+                    lowContrast={false}
+                    style={{
+                      cursor: isComplete ? 'pointer' : 'default',
+                      marginBottom: '1rem'
+                    }}
+                    onClick={isComplete ? handleReturnToResults : undefined}
+                  />
+                </div>
+              )}
               <Grid className="tabs-group-content">
                 <Column md={4} lg={7} sm={4} className="entity__tab-content">
                   <h3 className="landing-page__subheading">Extract key points from unstructured text</h3>
@@ -1019,6 +1016,31 @@ export default function EntityExtractionPage() {
 
             {/* What We're Using Tab */}
             <TabPanel>
+              {/* Sticky notification for this tab */}
+              {(isLoading || isComplete) && processingTab !== null && (
+                <div className="sticky-notification-container">
+                  <InlineNotification
+                    kind={isComplete ? "success" : "info"}
+                    title={isComplete ? "🎉 Demo Results Ready!" : "🔥 Baking Your Demo..."}
+                    subtitle={
+                      isComplete
+                        ? `Your ${getDemoTabName(processingTab)} results are ready. Click to return to that tab!`
+                        : `Processing ${getDemoTabName(processingTab)} in the background. Explore this tab while you wait!`
+                    }
+                    hideCloseButton={false}
+                    onCloseButtonClick={() => {
+                      setIsComplete(false);
+                      setProcessingTab(null);
+                    }}
+                    lowContrast={false}
+                    style={{
+                      cursor: isComplete ? 'pointer' : 'default',
+                      marginBottom: '1rem'
+                    }}
+                    onClick={isComplete ? handleReturnToResults : undefined}
+                  />
+                </div>
+              )}
               <Grid className="tabs-group-content">
                 <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
                   <h2 className="landing-page__subheading">What We're Using</h2>
@@ -1075,6 +1097,31 @@ export default function EntityExtractionPage() {
 
             {/* Why IBM Power Tab */}
             <TabPanel>
+              {/* Sticky notification for this tab */}
+              {(isLoading || isComplete) && processingTab !== null && (
+                <div className="sticky-notification-container">
+                  <InlineNotification
+                    kind={isComplete ? "success" : "info"}
+                    title={isComplete ? "🎉 Demo Results Ready!" : "🔥 Baking Your Demo..."}
+                    subtitle={
+                      isComplete
+                        ? `Your ${getDemoTabName(processingTab)} results are ready. Click to return to that tab!`
+                        : `Processing ${getDemoTabName(processingTab)} in the background. Explore this tab while you wait!`
+                    }
+                    hideCloseButton={false}
+                    onCloseButtonClick={() => {
+                      setIsComplete(false);
+                      setProcessingTab(null);
+                    }}
+                    lowContrast={false}
+                    style={{
+                      cursor: isComplete ? 'pointer' : 'default',
+                      marginBottom: '1rem'
+                    }}
+                    onClick={isComplete ? handleReturnToResults : undefined}
+                  />
+                </div>
+              )}
               <Grid className="tabs-group-content">
                 <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
                   <h2 className="landing-page__subheading">Why IBM Power for AI Inference</h2>
