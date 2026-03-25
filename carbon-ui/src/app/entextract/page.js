@@ -182,7 +182,12 @@ export default function EntityExtractionPage() {
 
       {/* Sticky notification for LLM processing status */}
       {(isLoading || isComplete) && processingTab !== null && (
-        <Column lg={16} md={8} sm={4} style={{ position: 'sticky', top: 0, zIndex: 1000, paddingTop: '1rem', paddingBottom: '1rem', backgroundColor: 'white' }}>
+        <Column
+          lg={16}
+          md={8}
+          sm={4}
+          className="sticky-notification-wrapper"
+        >
           <InlineNotification
             kind={isComplete ? "success" : "info"}
             title={isComplete ? "🎉 Demo Results Ready!" : "🔥 Baking Your Demo..."}
