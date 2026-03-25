@@ -26,27 +26,48 @@ export function buildMessages(values) {
   const system = {
     role: "system",
     content:
-      "You are an AI Conversation Intelligence Assistant. You analyze customer service interactions, sales calls, and support tickets " +
-      "to extract key insights about sentiment, resolution status, agent performance, and business outcomes. " +
-      "You must return a JSON object with the extracted insights only — no explanations. " +
-      "Analyze the conversation context, tone, and outcomes to provide accurate intelligence metrics.",
+      "You are an AI Sales Conversation Intelligence Assistant. You analyze sales call transcripts " +
+      "to extract actionable insights including summaries, classifications, and key entities. " +
+      "You must return a JSON object with the extracted information only — no explanations or additional text.",
   };
 
   const user = {
     role: "user",
     content:
-`Analyze the following conversation transcript and extract these intelligence metrics:
+`Analyze the following sales conversation transcript and extract these insights:
 
 ${schemaJson}
 
-Rules:
-- Output must be valid JSON with key-value pairs only.
-- If a metric cannot be determined, output "Not determined" for that key.
-- Do not hallucinate or include explanations.
-- Base your analysis on the actual conversation content and context.
-- For sentiment and quality assessments, consider the overall tone and outcome.
+IMPORTANT INSTRUCTIONS:
 
-Conversation Transcript:
+1. CONVERSATION SUMMARY (1-shot learning):
+   Create a concise 2-3 sentence summary capturing the key discussion points.
+   
+   Example:
+   Input: "Sales Rep: Hi, I'm calling about our CRM software. Client: We need better customer tracking. Sales Rep: Our Enterprise plan offers advanced analytics. Client: Sounds good, send me pricing."
+   Output: "Client expressed need for improved customer tracking capabilities. Sales rep presented Enterprise CRM plan with advanced analytics features. Next step is to send detailed pricing information."
+
+2. INDUSTRY CLASSIFICATION (0-shot learning):
+   Classify the client's industry based on the conversation context.
+   Valid options: Finance, Manufacturing, Healthcare, Retail, Technology, Energy, Logistics, Education, Government, Other
+   Choose the single most appropriate category.
+
+3. CALL-TO-ACTION (0-shot learning):
+   Identify the primary next step agreed upon in the conversation.
+   Valid options: Send Proposal, Schedule Demo, Follow-up Call, Send Pricing, Technical Discussion, Contract Review, No Action Needed
+   Choose the single most appropriate action.
+
+4. ENTITY EXTRACTION:
+   Extract specific entities mentioned in the conversation (names, companies, roles, budget, timeline, pain points, competitors).
+   If an entity is not mentioned, output "Not mentioned" for that field.
+
+OUTPUT FORMAT:
+- Return valid JSON only
+- Use the exact keys from the schema
+- No explanations or additional text
+- For classification fields, use only the predefined options listed above
+
+Sales Conversation Transcript:
 ${values.free_form_text}`,
   };
 

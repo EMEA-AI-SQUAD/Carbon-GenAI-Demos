@@ -1,32 +1,58 @@
 export const DEFAULTS = {
-  free_form_text: `Customer: Hi, I'm calling about my recent order #ORD-2024-5891. I placed it three weeks ago and still haven't received it.
+  free_form_text: `Sales Agent: Good afternoon, this is Sophie Laurent from G2 EMEA. Am I speaking with Thomas Müller?
 
-Agent: I apologize for the delay. Let me look that up for you. Can I have your email address to verify your account?
+Client: Yes, speaking. Hello Sophie.
 
-Customer: Sure, it's sarah.johnson@email.com. I'm getting really frustrated because I paid for express shipping.
+Sales Agent: Excellent! Thank you for taking my call. I'm reaching out because you recently downloaded our buyer intent report for the financial services sector. I wanted to see if you had a chance to review it and whether you'd like to discuss how G2's solutions could help Deutsche FinTech Solutions increase your market visibility.
 
-Agent: I understand your frustration, Ms. Johnson. I see your order here. It looks like there was a warehouse issue that caused the delay. The item shipped yesterday and should arrive by Friday.
+Client: Yes, I did have a look. We're currently exploring ways to improve our lead generation, particularly in the DACH region. Our marketing team is struggling to identify prospects who are actively researching solutions like ours.
 
-Customer: That's not acceptable! I needed this for an event last week. I want a full refund and compensation for the inconvenience.
+Sales Agent: That's exactly what we specialise in. We work with over 200 financial technology companies across Europe. Can you tell me a bit more about your current challenges? What's your primary goal for the next quarter?
 
-Agent: I completely understand. Let me process a full refund right away and I'll also add a $50 credit to your account for the trouble. Would that be satisfactory?
+Client: Well, we've just launched a new payment processing platform, and we need to reach CFOs and finance directors at mid-sized enterprises - companies with 100 to 500 employees. Our sales team is spending too much time on cold outreach with low conversion rates. We need warmer leads.
 
-Customer: Well, I suppose that's fair. Can you confirm the refund will go back to my credit card ending in 4532?
+Sales Agent: I understand completely. We have two main solutions that could help. First, our Buyer Intent data identifies companies actively researching payment processing solutions on G2 - we track over 90 million buyers annually. Second, our Review Generation programme helps you build social proof, which is crucial in financial services where trust is paramount. Which approach sounds more aligned with your immediate needs?
 
-Agent: Yes, the refund of $127.99 will be processed to your card ending in 4532 within 3-5 business days. Is there anything else I can help you with today?
+Client: The buyer intent data sounds very interesting. How does that actually work in practice?
 
-Customer: No, that's all. Thank you for resolving this quickly.
+Sales Agent: Great question. We track anonymous visitors to your G2 profile and your competitors' profiles. When a company shows high intent - for example, viewing multiple payment processing solutions, reading reviews, and comparing features - we identify that company and provide you with their details, including company size, location, and the specific solutions they're researching. Your sales team can then reach out with highly targeted messaging.
 
-Agent: You're welcome, Ms. Johnson. We've also noted your feedback about the warehouse delay. Have a great day!`,
+Client: That could be quite valuable. What about pricing? We have a budget of approximately €50,000 for marketing technology this year, and we're already using Salesforce and HubSpot.
+
+Sales Agent: Perfect - we integrate seamlessly with both platforms. For your requirements, our Professional Intent package would be ideal. It's €3,500 per month, which includes up to 150 qualified intent signals monthly, CRM integration, and a dedicated customer success manager. That's €42,000 annually, well within your budget. We also offer a 90-day pilot programme if you'd like to test the ROI before committing to the full year.
+
+Client: The pilot sounds sensible. What kind of results are your financial services clients seeing?
+
+Sales Agent: Excellent question. Our FinTech clients typically see a 40-60% increase in qualified pipeline within the first quarter. For example, PaymentHub in Amsterdam saw a 55% increase in demo bookings and reduced their sales cycle from 90 days to 60 days. I can send you a detailed case study if that would be helpful.
+
+Client: Yes, please do. I'll need to discuss this with our CMO, Rebecca Schmidt, and our Head of Sales. Can you send me a proposal with the case studies and implementation timeline?
+
+Sales Agent: Absolutely. I'll prepare a comprehensive proposal and send it to your email by tomorrow morning. Would you prefer I include information about our Review Generation programme as well, or focus solely on the Buyer Intent solution for now?
+
+Client: Let's focus on the intent data for now. We can explore reviews in a future conversation.
+
+Sales Agent: Perfect. I'll send everything to thomas.muller@deutschefintech.de - is that correct?
+
+Client: Yes, that's correct.
+
+Sales Agent: Wonderful. I'll also include some information about our GDPR compliance and data privacy measures, as I know that's critical for financial services companies. Would next Thursday at 10:00 CET work for a follow-up call to discuss the proposal with you and your team?
+
+Client: Thursday at 10:00 works well. I'll have Rebecca join the call as well.
+
+Sales Agent: Excellent! I'll send a calendar invitation. Thank you for your time today, Thomas. I look forward to speaking with you and Rebecca next week.
+
+Client: Thank you, Sophie. Speak soon.`,
   entities: [
-    { label: "Customer Sentiment", definition: "Overall emotional tone of the customer (Positive, Neutral, Negative, Mixed)" },
-    { label: "Issue Category", definition: "Primary type of customer issue (Delivery Delay, Product Quality, Billing, Technical Support, etc.)" },
-    { label: "Resolution Status", definition: "Whether the issue was resolved (Resolved, Partially Resolved, Unresolved, Escalated)" },
-    { label: "Agent Performance", definition: "Quality of agent's handling (Excellent, Good, Satisfactory, Needs Improvement)" },
-    { label: "Key Action Items", definition: "Specific actions taken or promised (refunds, credits, follow-ups, etc.)" },
-    { label: "Customer Effort Score", definition: "Estimated effort required by customer (Low, Medium, High)" },
-    { label: "Escalation Required", definition: "Whether issue needs escalation (Yes/No)" },
-    { label: "Follow-up Needed", definition: "Whether follow-up contact is required (Yes/No)" },
+    { label: "Conversation Summary", definition: "A concise 2-3 sentence summary of the key points discussed in the conversation" },
+    { label: "Industry Classification", definition: "The client's industry sector. Choose from: Finance, Manufacturing, Healthcare, Retail, Technology, Energy, Logistics, Education, Government, Other" },
+    { label: "Call-to-Action", definition: "The primary next step or action required. Choose from: Send Proposal, Schedule Demo, Follow-up Call, Send Pricing, Technical Discussion, Contract Review, No Action Needed" },
+    { label: "Client Name", definition: "Full name of the client contact person" },
+    { label: "Client Company", definition: "Name of the client's organization" },
+    { label: "Client Role", definition: "Job title or role of the client contact" },
+    { label: "Budget Range", definition: "Stated or implied budget amount for the project" },
+    { label: "Timeline", definition: "Expected implementation or decision timeline" },
+    { label: "Key Pain Points", definition: "Main challenges or problems the client is trying to solve" },
+    { label: "Competitors Mentioned", definition: "Any competing solutions or vendors mentioned" },
     { label: "", definition: "" } // optional spare row for the UI
   ]
 };
