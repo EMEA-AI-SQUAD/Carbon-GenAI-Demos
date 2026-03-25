@@ -169,12 +169,17 @@ export default function PIIExtractionPage() {
         <h1 className="landing-page__heading">PII Extraction for Privacy Compliance with IBM Power</h1>
       </Column>
       <Column lg={16} md={8} sm={4} className="landing-page__r2">
-        <Tabs defaultSelectedIndex={0} onChange={({ selectedIndex }) => {
+        <Tabs selectedIndex={activeTab} onChange={({ selectedIndex }) => {
           setActiveTab(selectedIndex);
-          // Reset state when switching tabs
-          setExtractedRows([]);
-          setRedactedText('');
-          setErrorMsg('');
+          // Only clear results if we're not returning to a tab with completed results
+          const shouldClearResults = !(isComplete && selectedIndex === processingTab);
+          
+          if (shouldClearResults) {
+            setExtractedRows([]);
+            setRedactedText('');
+            setErrorMsg('');
+          }
+          
           // Load appropriate defaults
           if (selectedIndex === 1) {
             setValues(DEFAULTS);
