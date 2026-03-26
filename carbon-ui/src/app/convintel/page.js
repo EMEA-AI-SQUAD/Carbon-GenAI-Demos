@@ -557,31 +557,519 @@ export default function ConversationIntelligencePage() {
               </Grid>
             </TabPanel>
 
-            {/* Sales Call Tab */}
+            {/* Tab 2: Multilingual Support */}
             <TabPanel>
               <Grid className="tabs-group-content">
-                <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
+                <Column md={4} lg={16} sm={4} className="entity__tab-content">
                   <h3 className="landing-page__subheading">Multilingual Customer Support with Sentiment Analysis</h3>
+                  <p className="landing-page__p">
+                    This demo analyzes customer support conversations in multiple languages. The AI detects sentiment changes,
+                    assesses urgency levels, translates key points to English, and evaluates resolution quality - all while
+                    understanding the nuances of different languages and cultural communication styles.
+                  </p>
+                </Column>
+
+                {/* Use Case Scenario Box */}
+                <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
+                  <div style={{
+                    background: 'var(--cds-layer-02)',
+                    padding: '1.5rem',
+                    borderLeft: '4px solid var(--cds-border-interactive)',
+                    marginTop: '1rem',
+                    marginBottom: '1rem'
+                  }}>
+                    <h4 style={{ marginTop: 0, marginBottom: '1rem', fontSize: '1rem' }}>
+                      🌍 Use Case: Global Customer Support Operations
+                    </h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <span style={{ fontWeight: 600, minWidth: '40px' }}>1.</span>
+                        <span>A multinational company provides support in <strong>German, French, Italian, and other languages</strong>, but quality monitoring requires native speakers.</span>
+                      </div>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <span style={{ fontWeight: 600, minWidth: '40px' }}>2.</span>
+                        <span>Managers need to <strong>track sentiment across languages</strong> and identify escalations regardless of the conversation language.</span>
+                      </div>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <span style={{ fontWeight: 600, minWidth: '40px' }}>3.</span>
+                        <span>The team must <strong>translate and analyze conversations</strong> without sending sensitive customer data to external translation services.</span>
+                      </div>
+                      <div style={{
+                        marginTop: '0.5rem',
+                        paddingTop: '0.75rem',
+                        borderTop: '1px solid var(--cds-border-subtle)',
+                        fontStyle: 'italic',
+                        color: 'var(--cds-text-secondary)'
+                      }}>
+                        <strong>Solution:</strong> Granite 4.0 analyzes conversations in their original language, extracts sentiment and urgency, and provides English summaries - all on-premises without external API calls.
+                      </div>
+                    </div>
+                  </div>
+                </Column>
+
+                <Column lg={16} md={8} sm={4} className="landing-page__tab-content" style={{ marginTop: '1rem' }}>
+                  <Button
+                    kind="primary"
+                    size="lg"
+                    onClick={()=>completion()}
+                    disabled={isLoading}
+                    style={{ marginBottom: '1rem' }}
+                  >
+                    {isLoading ? 'Processing...' : '🚀 Pre-load Demo Results'}
+                  </Button>
+                  {isLoading && (
+                    <InlineNotification
+                      kind="info"
+                      title="Processing in background"
+                      subtitle="Results will appear below when ready. Continue explaining the demo!"
+                      hideCloseButton
+                      lowContrast
+                      style={{ marginTop: '0.5rem' }}
+                    />
+                  )}
+                </Column>
+
+                <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
                   <p className="landing-page__p">
                     Below is a customer support conversation in German. The AI will analyze sentiment journey,
                     detect urgency, translate key points, and assess resolution quality.
                   </p>
+                  <TextArea
+                    className="text-area-class"
+                    id="free-form-text"
+                    value={values.free_form_text ?? ""}
+                    onChange={onFreeFormChange}
+                    size="lg"
+                    rows={12}
+                  />
                 </Column>
+                <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
+                  <p className="landing-page__p">
+                    Below are the multilingual intelligence metrics to extract. These insights help monitor
+                    global support quality, track sentiment across languages, and identify critical issues.
+                  </p>
+                </Column>
+              </Grid>
+
+              {/* Entities - use single Grid with all entity pairs */}
+              <Grid className="entity-grid">
+                {(values.entities ?? []).map((f, i) => (
+                  <React.Fragment key={i}>
+                    {/* Label column */}
+                    <Column sm={4} md={4} lg={4} className="entity-label-col">
+                      <TextArea
+                        id={`label-${i}`}
+                        labelText={`Label ${i + 1}`}
+                        value={f.label ?? ''}
+                        onChange={onEntityChange(i, 'label')}
+                        size="sm"
+                        rows={Math.max(1, Math.ceil((f.label?.length || 0) / 30))}
+                      />
+                    </Column>
+
+                    {/* Definition column */}
+                    <Column sm={4} md={4} lg={12} className="entity-def-col">
+                      <TextArea
+                        id={`definition-${i}`}
+                        labelText={`Definition ${i + 1}`}
+                        value={f.definition ?? ''}
+                        onChange={onEntityChange(i, 'definition')}
+                        size="sm"
+                        rows={Math.max(1, Math.ceil((f.definition?.length || 0) / 80))}
+                      />
+                    </Column>
+                  </React.Fragment>
+                ))}
+              </Grid>
+
+              <Grid className="tabs-group-content">
+                <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
+                  <Button className="send-to-llm-class" onClick={()=>completion()} disabled={isLoading}>
+                    {isLoading ? 'Analyzing Conversation…' : 'Analyze Conversation'}
+                  </Button>
+                </Column>
+
+                {/* Error Display */}
+                {errorMsg && (
+                  <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
+                    <InlineNotification
+                      kind="error"
+                      title="Error"
+                      subtitle={errorMsg}
+                      onCloseButtonClick={() => setErrorMsg('')}
+                      lowContrast
+                    />
+                  </Column>
+                )}
+
+                {/* Results */}
+                {isLoading ? (
+                  <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
+                    <div style={{
+                      textAlign: 'center',
+                      padding: '2rem',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '1rem'
+                    }}>
+                      <Loading description="Processing" withOverlay={false} />
+                      <InlineNotification
+                        kind="info"
+                        title="Processing"
+                        subtitle="Granite 4.0 is analyzing the multilingual conversation..."
+                        hideCloseButton
+                        lowContrast
+                      />
+                    </div>
+                    <DataTableSkeleton
+                      headers={[
+                        { key: 'label', header: 'Metric' },
+                        { key: 'value', header: 'Analysis Result' },
+                      ]}
+                      showHeader
+                      showToolbar
+                      rowCount={Math.max(3, values.entities.filter(e => (e.label || '').trim()).length)}
+                      columnCount={2}
+                    />
+                  </Column>
+                ) : extractedRows.length === 0 ? (
+                  <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
+                    <div style={{
+                      textAlign: 'center',
+                      padding: '3rem 1rem',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '1rem'
+                    }}>
+                      <h4 style={{ margin: 0 }}>No analysis yet</h4>
+                      <p style={{
+                        color: 'var(--cds-text-secondary)',
+                        maxWidth: '400px',
+                        margin: 0
+                      }}>
+                        Review the conversation above, then click
+                        <strong> Analyze Conversation</strong> to extract multilingual insights.
+                      </p>
+                    </div>
+                  </Column>
+                ) : (
+                  <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
+                    <DataTable
+                      rows={extractedRows}
+                      headers={[
+                        { key: 'label', header: 'Metric' },
+                        { key: 'value', header: 'Analysis Result' },
+                      ]}
+                      isSortable
+                      size="md"
+                    >
+                      {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
+                        <TableContainer
+                          title={
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <span>Multilingual Support Intelligence</span>
+                              <AILabel size="sm">
+                                <AILabelContent>
+                                  <div>
+                                    <p className="secondary">AI Generated</p>
+                                    <p className="secondary">Insights by Granite 4.0</p>
+                                  </div>
+                                </AILabelContent>
+                              </AILabel>
+                            </div>
+                          }
+                          description="Key insights extracted from multilingual conversation analysis"
+                        >
+                          <Table {...getTableProps()}>
+                            <TableHead>
+                              <TableRow>
+                                {headers.map((header) => (
+                                  <TableHeader
+                                    key={header.key}
+                                    {...getHeaderProps({ header })}
+                                  >
+                                    {header.header}
+                                  </TableHeader>
+                                ))}
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {rows.map((row) => (
+                                <TableRow key={row.id} {...getRowProps({ row })}>
+                                  {row.cells.map((cell) => (
+                                    <TableCell key={cell.id} style={{ whiteSpace: 'pre-wrap' }}>
+                                      {cell.value}
+                                    </TableCell>
+                                  ))}
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      )}
+                    </DataTable>
+                  </Column>
+                )}
               </Grid>
             </TabPanel>
 
-            {/* Support Ticket Tab */}
+            {/* Tab 3: Meeting Intelligence */}
             <TabPanel>
               <Grid className="tabs-group-content">
-                <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
+                <Column md={4} lg={16} sm={4} className="entity__tab-content">
                   <h3 className="landing-page__subheading">Meeting Intelligence & Action Items</h3>
+                  <p className="landing-page__p">
+                    This demo analyzes internal team meetings to extract actionable insights. The AI identifies action items
+                    with owners and deadlines, captures key decisions, summarizes discussions, and highlights priorities -
+                    turning unstructured meeting transcripts into structured, trackable outcomes.
+                  </p>
+                </Column>
+
+                {/* Use Case Scenario Box */}
+                <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
+                  <div style={{
+                    background: 'var(--cds-layer-02)',
+                    padding: '1.5rem',
+                    borderLeft: '4px solid var(--cds-border-interactive)',
+                    marginTop: '1rem',
+                    marginBottom: '1rem'
+                  }}>
+                    <h4 style={{ marginTop: 0, marginBottom: '1rem', fontSize: '1rem' }}>
+                      📋 Use Case: Automated Meeting Documentation
+                    </h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <span style={{ fontWeight: 600, minWidth: '40px' }}>1.</span>
+                        <span>Teams hold <strong>dozens of meetings weekly</strong>, but action items get lost in notes, and decisions aren't clearly documented.</span>
+                      </div>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <span style={{ fontWeight: 600, minWidth: '40px' }}>2.</span>
+                        <span>Managers need to <strong>track commitments, deadlines, and decisions</strong> across multiple projects without manual note-taking.</span>
+                      </div>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <span style={{ fontWeight: 600, minWidth: '40px' }}>3.</span>
+                        <span>The team must <strong>ensure accountability</strong> by clearly assigning owners to action items and following up on commitments.</span>
+                      </div>
+                      <div style={{
+                        marginTop: '0.5rem',
+                        paddingTop: '0.75rem',
+                        borderTop: '1px solid var(--cds-border-subtle)',
+                        fontStyle: 'italic',
+                        color: 'var(--cds-text-secondary)'
+                      }}>
+                        <strong>Solution:</strong> Granite 4.0 automatically extracts action items with owners and deadlines, identifies key decisions, and generates structured meeting summaries for immediate follow-up.
+                      </div>
+                    </div>
+                  </div>
+                </Column>
+
+                <Column lg={16} md={8} sm={4} className="landing-page__tab-content" style={{ marginTop: '1rem' }}>
+                  <Button
+                    kind="primary"
+                    size="lg"
+                    onClick={()=>completion()}
+                    disabled={isLoading}
+                    style={{ marginBottom: '1rem' }}
+                  >
+                    {isLoading ? 'Processing...' : '🚀 Pre-load Demo Results'}
+                  </Button>
+                  {isLoading && (
+                    <InlineNotification
+                      kind="info"
+                      title="Processing in background"
+                      subtitle="Results will appear below when ready. Continue explaining the demo!"
+                      hideCloseButton
+                      lowContrast
+                      style={{ marginTop: '0.5rem' }}
+                    />
+                  )}
+                </Column>
+
+                <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
                   <p className="landing-page__p">
                     Below is an internal team meeting transcript. The AI will extract action items with owners,
                     identify key decisions, and generate a structured meeting summary.
-                    Extract insights from support interactions to track issue severity, resolution time,
-                    and customer satisfaction. Identify patterns for proactive support improvements.
+                  </p>
+                  <TextArea
+                    className="text-area-class"
+                    id="free-form-text"
+                    value={values.free_form_text ?? ""}
+                    onChange={onFreeFormChange}
+                    size="lg"
+                    rows={12}
+                  />
+                </Column>
+                <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
+                  <p className="landing-page__p">
+                    Below are the meeting intelligence metrics to extract. These insights help track commitments,
+                    document decisions, and ensure accountability across the team.
                   </p>
                 </Column>
+              </Grid>
+
+              {/* Entities - use single Grid with all entity pairs */}
+              <Grid className="entity-grid">
+                {(values.entities ?? []).map((f, i) => (
+                  <React.Fragment key={i}>
+                    {/* Label column */}
+                    <Column sm={4} md={4} lg={4} className="entity-label-col">
+                      <TextArea
+                        id={`label-${i}`}
+                        labelText={`Label ${i + 1}`}
+                        value={f.label ?? ''}
+                        onChange={onEntityChange(i, 'label')}
+                        size="sm"
+                        rows={Math.max(1, Math.ceil((f.label?.length || 0) / 30))}
+                      />
+                    </Column>
+
+                    {/* Definition column */}
+                    <Column sm={4} md={4} lg={12} className="entity-def-col">
+                      <TextArea
+                        id={`definition-${i}`}
+                        labelText={`Definition ${i + 1}`}
+                        value={f.definition ?? ''}
+                        onChange={onEntityChange(i, 'definition')}
+                        size="sm"
+                        rows={Math.max(1, Math.ceil((f.definition?.length || 0) / 80))}
+                      />
+                    </Column>
+                  </React.Fragment>
+                ))}
+              </Grid>
+
+              <Grid className="tabs-group-content">
+                <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
+                  <Button className="send-to-llm-class" onClick={()=>completion()} disabled={isLoading}>
+                    {isLoading ? 'Analyzing Meeting…' : 'Analyze Meeting'}
+                  </Button>
+                </Column>
+
+                {/* Error Display */}
+                {errorMsg && (
+                  <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
+                    <InlineNotification
+                      kind="error"
+                      title="Error"
+                      subtitle={errorMsg}
+                      onCloseButtonClick={() => setErrorMsg('')}
+                      lowContrast
+                    />
+                  </Column>
+                )}
+
+                {/* Results */}
+                {isLoading ? (
+                  <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
+                    <div style={{
+                      textAlign: 'center',
+                      padding: '2rem',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '1rem'
+                    }}>
+                      <Loading description="Processing" withOverlay={false} />
+                      <InlineNotification
+                        kind="info"
+                        title="Processing"
+                        subtitle="Granite 4.0 is analyzing the meeting transcript..."
+                        hideCloseButton
+                        lowContrast
+                      />
+                    </div>
+                    <DataTableSkeleton
+                      headers={[
+                        { key: 'label', header: 'Metric' },
+                        { key: 'value', header: 'Analysis Result' },
+                      ]}
+                      showHeader
+                      showToolbar
+                      rowCount={Math.max(3, values.entities.filter(e => (e.label || '').trim()).length)}
+                      columnCount={2}
+                    />
+                  </Column>
+                ) : extractedRows.length === 0 ? (
+                  <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
+                    <div style={{
+                      textAlign: 'center',
+                      padding: '3rem 1rem',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '1rem'
+                    }}>
+                      <h4 style={{ margin: 0 }}>No analysis yet</h4>
+                      <p style={{
+                        color: 'var(--cds-text-secondary)',
+                        maxWidth: '400px',
+                        margin: 0
+                      }}>
+                        Review the meeting transcript above, then click
+                        <strong> Analyze Meeting</strong> to extract action items and decisions.
+                      </p>
+                    </div>
+                  </Column>
+                ) : (
+                  <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
+                    <DataTable
+                      rows={extractedRows}
+                      headers={[
+                        { key: 'label', header: 'Metric' },
+                        { key: 'value', header: 'Analysis Result' },
+                      ]}
+                      isSortable
+                      size="md"
+                    >
+                      {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
+                        <TableContainer
+                          title={
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <span>Meeting Intelligence</span>
+                              <AILabel size="sm">
+                                <AILabelContent>
+                                  <div>
+                                    <p className="secondary">AI Generated</p>
+                                    <p className="secondary">Insights by Granite 4.0</p>
+                                  </div>
+                                </AILabelContent>
+                              </AILabel>
+                            </div>
+                          }
+                          description="Key insights extracted from meeting analysis"
+                        >
+                          <Table {...getTableProps()}>
+                            <TableHead>
+                              <TableRow>
+                                {headers.map((header) => (
+                                  <TableHeader
+                                    key={header.key}
+                                    {...getHeaderProps({ header })}
+                                  >
+                                    {header.header}
+                                  </TableHeader>
+                                ))}
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {rows.map((row) => (
+                                <TableRow key={row.id} {...getRowProps({ row })}>
+                                  {row.cells.map((cell) => (
+                                    <TableCell key={cell.id} style={{ whiteSpace: 'pre-wrap' }}>
+                                      {cell.value}
+                                    </TableCell>
+                                  ))}
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      )}
+                    </DataTable>
+                  </Column>
+                )}
               </Grid>
             </TabPanel>
 
