@@ -238,116 +238,126 @@ export default function EntityExtractionPage() {
               )}
               <Grid className="tabs-group-content">
                 <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
-                  <h2 className="landing-page__subheading">Why IBM Power for AI Inference</h2>
+                  <h2 className="landing-page__subheading">Why IBM Power for Entity Extraction</h2>
                   <p className="landing-page__p" style={{ marginTop: '2rem', marginBottom: '3rem' }}>
-                    Running AI inference on IBM Power offers unique advantages that align with enterprise requirements
-                    for security, efficiency, and operational excellence.
+                    Extracting structured information from unstructured documents with AI on IBM Power provides
+                    unique advantages for enterprise document processing, business intelligence, and operational automation.
                   </p>
                 </Column>
 
-                {/* Benefit 1: Data Sovereignty */}
+                {/* Benefit 1: Document Security */}
                 <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
                     <Security style={{ width: '80px', height: '80px', flexShrink: 0 }} />
                     <div>
-                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>Data Sovereignty & Security</h3>
+                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>Secure Document Processing</h3>
                       <p className="landing-page__p">
-                        <strong>Your data never leaves the virtual server.</strong> Unlike cloud-based AI services, all processing stays local.
+                        <strong>Business documents never leave your infrastructure.</strong> Process contracts, emails, and reports without cloud exposure.
                       </p>
                     </div>
                   </div>
                 </Column>
                 <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
                   <ul style={{ marginLeft: '1rem', marginTop: '1.5rem' }}>
-                    <li>Compliance with data residency requirements</li>
-                    <li>Adherence to data sovereignty principles</li>
-                    <li>Protection of sensitive business information</li>
-                    <li>Meeting regulatory requirements (GDPR, HIPAA, etc.)</li>
+                    <li>Confidential contracts stay on-premises</li>
+                    <li>Proprietary information protected</li>
+                    <li>Customer data remains secure</li>
+                    <li>Compliance with document retention policies</li>
                   </ul>
                 </Column>
 
-                {/* Benefit 2: In-Line Processing */}
+                {/* Benefit 2: Real-time Extraction */}
                 <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
                     <DataStorage style={{ width: '80px', height: '80px', flexShrink: 0 }} />
                     <div>
-                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>In-Line Processing</h3>
+                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>Real-time Document Intelligence</h3>
                       <p className="landing-page__p">
-                        AI inference integrates directly into existing business processes without data movement.
+                        Extract entities from documents as they arrive - emails, quotes, invoices - without batch processing delays.
                       </p>
                     </div>
                   </div>
                 </Column>
                 <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
                   <ul style={{ marginLeft: '1rem', marginTop: '1.5rem' }}>
-                    <li>No copying data to cloud services</li>
-                    <li>No moving data to specialized GPU hardware</li>
-                    <li>No data pipelines for external processing</li>
-                    <li>No data synchronization across systems</li>
+                    <li>Instant processing of incoming emails</li>
+                    <li>Immediate quote and invoice analysis</li>
+                    <li>Real-time business intelligence updates</li>
+                    <li>No waiting for cloud API responses</li>
                   </ul>
                 </Column>
 
-                {/* Benefit 3: Resource Efficiency */}
+                {/* Benefit 3: Integrated with Business Systems */}
                 <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
                     <Enterprise style={{ width: '80px', height: '80px', flexShrink: 0 }} />
                     <div>
-                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>Resource Efficiency</h3>
+                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>Integrated Business Workflows</h3>
                       <p className="landing-page__p">
-                        AI runs <strong>"in the corner"</strong> of existing Power servers alongside mission-critical applications.
+                        Entity extraction runs alongside ERP, CRM, and document management systems on the same platform.
                       </p>
                     </div>
                   </div>
                 </Column>
                 <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
                   <ul style={{ marginLeft: '1rem', marginTop: '1.5rem' }}>
-                    <li>No dedicated GPU servers needed</li>
-                    <li>No separate AI infrastructure</li>
-                    <li>No additional data center footprint</li>
-                    <li>No complex networking between systems</li>
+                    <li>Direct integration with SAP, Oracle, Salesforce</li>
+                    <li>Automated data enrichment in databases</li>
+                    <li>Seamless workflow automation</li>
+                    <li>No middleware or data transformation needed</li>
                   </ul>
                 </Column>
 
-                {/* Benefit 4: Mission-Critical Integration */}
+                {/* Benefit 4: Cost-Effective at Scale */}
                 <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
                     <Globe style={{ width: '80px', height: '80px', flexShrink: 0 }} />
                     <div>
-                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>Mission-Critical Integration</h3>
+                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>Unlimited Document Processing</h3>
                       <p className="landing-page__p">
-                        IBM Power is trusted for the world's most critical workloads. AI runs on the same platform.
+                        Process thousands of documents without per-document API costs or cloud service fees.
                       </p>
                     </div>
                   </div>
                 </Column>
                 <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
                   <ul style={{ marginLeft: '1rem', marginTop: '1.5rem' }}>
-                    <li>Enterprise-grade reliability and availability</li>
-                    <li>Consistent security and compliance posture</li>
-                    <li>Simplified operations and management</li>
-                    <li>Reduced complexity in IT architecture</li>
+                    <li>No per-page or per-document charges</li>
+                    <li>Predictable infrastructure costs</li>
+                    <li>Process entire document archives</li>
+                    <li>No bandwidth costs for large files</li>
                   </ul>
                 </Column>
 
-                {/* Benefit 5: No GPU Required */}
+                {/* Benefit 5: Multilingual Support */}
                 <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
                     <Microservices style={{ width: '80px', height: '80px', flexShrink: 0 }} />
                     <div>
-                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>No GPU Required</h3>
+                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>Global Document Processing</h3>
                       <p className="landing-page__p">
-                        IBM Power's CPU architecture provides sufficient performance for many real-world AI use cases.
+                        Extract entities from documents in multiple languages without separate translation services.
                       </p>
                     </div>
                   </div>
                 </Column>
                 <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
                   <ul style={{ marginLeft: '1rem', marginTop: '1.5rem' }}>
-                    <li>Lower infrastructure costs</li>
-                    <li>Simplified deployment and maintenance</li>
-                    <li>Better resource utilization</li>
-                    <li>Flexibility to scale with existing infrastructure</li>
+                    <li>Process documents in any language</li>
+                    <li>No translation API costs</li>
+                    <li>Consistent extraction across languages</li>
+                    <li>Support for global operations</li>
                   </ul>
+                </Column>
+
+                {/* Summary */}
+                <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
+                  <Tile style={{ marginTop: '2rem', padding: '2rem', background: 'var(--cds-layer-02)' }}>
+                    <p style={{ margin: 0, fontSize: '1.125rem', fontStyle: 'italic', textAlign: 'center' }}>
+                      Transform unstructured business documents into actionable intelligence - securely, efficiently, and at scale -
+                      all within your existing IBM Power infrastructure.
+                    </p>
+                  </Tile>
                 </Column>
 
                 {/* Summary */}

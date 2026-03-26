@@ -226,115 +226,115 @@ export default function PIIExtractionPage() {
               )}
               <Grid className="tabs-group-content">
                 <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
-                  <h2 className="landing-page__subheading">Why IBM Power for AI Inference</h2>
+                  <h2 className="landing-page__subheading">Why IBM Power for PII Protection</h2>
                   <p className="landing-page__p" style={{ marginTop: '2rem', marginBottom: '3rem' }}>
-                    Running AI inference on IBM Power offers unique advantages that align with enterprise requirements
-                    for security, efficiency, and operational excellence.
+                    Detecting and protecting Personally Identifiable Information with AI on IBM Power provides
+                    critical advantages for data privacy, regulatory compliance, and risk management.
                   </p>
                 </Column>
 
-                {/* Benefit 1: Data Sovereignty */}
+                {/* Benefit 1: Zero PII Exposure */}
                 <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
                     <Security style={{ width: '80px', height: '80px', flexShrink: 0 }} />
                     <div>
-                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>Data Sovereignty & Security</h3>
+                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>Zero PII Exposure Risk</h3>
                       <p className="landing-page__p">
-                        <strong>Your data never leaves the virtual server.</strong> Unlike cloud-based AI services, all processing stays local.
+                        <strong>Sensitive personal data never leaves your infrastructure.</strong> No cloud transmission means zero external exposure risk.
                       </p>
                     </div>
                   </div>
                 </Column>
                 <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
                   <ul style={{ marginLeft: '1rem', marginTop: '1.5rem' }}>
-                    <li>Compliance with data residency requirements</li>
-                    <li>Adherence to data sovereignty principles</li>
-                    <li>Protection of sensitive business information</li>
-                    <li>Meeting regulatory requirements (GDPR, HIPAA, etc.)</li>
+                    <li>Names, addresses, SSNs stay on-premises</li>
+                    <li>No PII sent to third-party AI services</li>
+                    <li>Eliminates data breach vectors</li>
+                    <li>Complete control over sensitive information</li>
                   </ul>
                 </Column>
 
-                {/* Benefit 2: In-Line Processing */}
+                {/* Benefit 2: Regulatory Compliance */}
                 <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
                     <DataStorage style={{ width: '80px', height: '80px', flexShrink: 0 }} />
                     <div>
-                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>In-Line Processing</h3>
+                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>Built-in Compliance</h3>
                       <p className="landing-page__p">
-                        AI inference integrates directly into existing business processes without data movement.
+                        Meet GDPR, CCPA, HIPAA, and other privacy regulations by keeping PII detection and processing local.
                       </p>
                     </div>
                   </div>
                 </Column>
                 <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
                   <ul style={{ marginLeft: '1rem', marginTop: '1.5rem' }}>
-                    <li>No copying data to cloud services</li>
-                    <li>No moving data to specialized GPU hardware</li>
-                    <li>No data pipelines for external processing</li>
-                    <li>No data synchronization across systems</li>
+                    <li>GDPR Article 32 compliance (data security)</li>
+                    <li>CCPA data minimization requirements</li>
+                    <li>HIPAA PHI protection standards</li>
+                    <li>Data residency and sovereignty compliance</li>
                   </ul>
                 </Column>
 
-                {/* Benefit 3: Resource Efficiency */}
+                {/* Benefit 3: Real-time Protection */}
                 <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
                     <Enterprise style={{ width: '80px', height: '80px', flexShrink: 0 }} />
                     <div>
-                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>Resource Efficiency</h3>
+                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>Real-time PII Detection</h3>
                       <p className="landing-page__p">
-                        AI runs <strong>"in the corner"</strong> of existing Power servers alongside mission-critical applications.
+                        Identify and protect PII instantly as data enters your systems - no batch processing delays.
                       </p>
                     </div>
                   </div>
                 </Column>
                 <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
                   <ul style={{ marginLeft: '1rem', marginTop: '1.5rem' }}>
-                    <li>No dedicated GPU servers needed</li>
-                    <li>No separate AI infrastructure</li>
-                    <li>No additional data center footprint</li>
-                    <li>No complex networking between systems</li>
+                    <li>Immediate detection in incoming documents</li>
+                    <li>Real-time redaction and masking</li>
+                    <li>Instant compliance validation</li>
+                    <li>No waiting for cloud API responses</li>
                   </ul>
                 </Column>
 
-                {/* Benefit 4: Mission-Critical Integration */}
+                {/* Benefit 4: Audit Trail & Accountability */}
                 <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
                     <Globe style={{ width: '80px', height: '80px', flexShrink: 0 }} />
                     <div>
-                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>Mission-Critical Integration</h3>
+                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>Complete Audit Trail</h3>
                       <p className="landing-page__p">
-                        IBM Power is trusted for the world's most critical workloads. AI runs on the same platform.
+                        Full visibility and control over PII detection and handling within your security perimeter.
                       </p>
                     </div>
                   </div>
                 </Column>
                 <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
                   <ul style={{ marginLeft: '1rem', marginTop: '1.5rem' }}>
-                    <li>Enterprise-grade reliability and availability</li>
-                    <li>Consistent security and compliance posture</li>
-                    <li>Simplified operations and management</li>
-                    <li>Reduced complexity in IT architecture</li>
+                    <li>Track all PII detection events</li>
+                    <li>Monitor access to sensitive data</li>
+                    <li>Demonstrate compliance to auditors</li>
+                    <li>Maintain data lineage and provenance</li>
                   </ul>
                 </Column>
 
-                {/* Benefit 5: No GPU Required */}
+                {/* Benefit 5: Cost-Effective Privacy */}
                 <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
                     <Microservices style={{ width: '80px', height: '80px', flexShrink: 0 }} />
                     <div>
-                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>No GPU Required</h3>
+                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>Unlimited PII Scanning</h3>
                       <p className="landing-page__p">
-                        IBM Power's CPU architecture provides sufficient performance for many real-world AI use cases.
+                        Scan unlimited documents for PII without per-document API costs or cloud service fees.
                       </p>
                     </div>
                   </div>
                 </Column>
                 <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
                   <ul style={{ marginLeft: '1rem', marginTop: '1.5rem' }}>
-                    <li>Lower infrastructure costs</li>
-                    <li>Simplified deployment and maintenance</li>
-                    <li>Better resource utilization</li>
-                    <li>Flexibility to scale with existing infrastructure</li>
+                    <li>No per-document scanning charges</li>
+                    <li>Predictable privacy protection costs</li>
+                    <li>Scan entire data repositories</li>
+                    <li>No bandwidth costs for sensitive data</li>
                   </ul>
                 </Column>
 
@@ -342,8 +342,8 @@ export default function PIIExtractionPage() {
                 <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
                   <Tile style={{ marginTop: '2rem', padding: '2rem', background: 'var(--cds-layer-02)' }}>
                     <p style={{ margin: 0, fontSize: '1.125rem', fontStyle: 'italic', textAlign: 'center' }}>
-                      This approach represents a pragmatic path to AI adoption for enterprises that prioritize data control,
-                      operational simplicity, and integration with existing mission-critical systems.
+                      Protect customer privacy and meet regulatory requirements with confidence -
+                      all while maintaining complete control over sensitive personal information within your IBM Power infrastructure.
                     </p>
                   </Tile>
                 </Column>
