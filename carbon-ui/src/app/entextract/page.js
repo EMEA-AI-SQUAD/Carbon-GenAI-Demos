@@ -107,7 +107,8 @@ export default function EntityExtractionPage() {
       }
       setErrorMsg('');
     }
-  }, [activeTab, isComplete, processingTab]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
 
   const onFreeFormChange = (e) =>
     setValues((prev) => ({ ...prev, free_form_text: e.target.value }));
