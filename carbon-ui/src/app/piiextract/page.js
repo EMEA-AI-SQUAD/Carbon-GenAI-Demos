@@ -102,46 +102,56 @@ export default function PIIExtractionPage() {
 
     setUploadedFile(file);
     setErrorMsg('');
-    setPassportEyeProcessing(true);
 
-    try {
-      console.log('🔍 Processing passport with PassportEye...');
-      const base64Image = await fileToBase64(file);
-      const result = await extractPassportWithPassportEye(base64Image, API_URL);
+    // If PassportEye is available, try automatic extraction
+    if (passportEyeAvailable) {
+      setPassportEyeProcessing(true);
 
-      if (!result.success) {
-        setErrorMsg(result.error || 'PassportEye extraction failed');
-        setPassportEyeProcessing(false);
-        return;
-      }
+      try {
+        console.log('🔍 Processing passport with PassportEye...');
+        const base64Image = await fileToBase64(file);
+        const result = await extractPassportWithPassportEye(base64Image, API_URL);
 
-      // Format MRZ data as readable text for the textarea
-      const mrzData = result.mrzData;
-      const formattedText = `PASSPORT INFORMATION (Extracted by PassportEye OCR)
+        if (!result.success) {
+          setErrorMsg(result.error || 'PassportEye extraction failed. You can manually enter the passport details below.');
+          setPassportEyeProcessing(false);
+          return;
+        }
 
-Type: ${mrzData.type || 'P (Passport)'}
+        // Format ONLY the MRZ data that PassportEye actually extracts
+        const mrzData = result.mrzData;
+        const formattedText = `PASSPORT MRZ DATA (Extracted by PassportEye OCR from Machine Readable Zone)
+
+Document Type: ${mrzData.type || 'P'}
 Passport Number: ${mrzData.number || 'Not found'}
 Surname: ${mrzData.surname || 'Not found'}
 Given Names: ${mrzData.names || 'Not found'}
-Nationality: ${mrzData.nationality || 'Not found'}
+Nationality Code: ${mrzData.nationality || 'Not found'}
 Date of Birth: ${mrzData.date_of_birth || 'Not found'}
 Sex: ${mrzData.sex || 'Not found'}
 Expiry Date: ${mrzData.expiration_date || 'Not found'}
 Country Code: ${mrzData.country || 'Not found'}
 ${mrzData.personal_number ? `Personal Number: ${mrzData.personal_number}` : ''}
 
-Extraction completed in ${result.duration}s using PassportEye OCR.`;
+Note: PassportEye extracts data from the MRZ (Machine Readable Zone) only.
+Other details like place of birth, issue date, and issuing authority must be added manually if needed.
 
-      // Update the text area with extracted data
-      setValues((prev) => ({ ...prev, free_form_text: formattedText }));
-      
-      console.log(`✅ PassportEye extraction completed in ${result.duration}s`);
-      
-    } catch (err) {
-      console.error('PassportEye error:', err);
-      setErrorMsg(err?.message || 'PassportEye extraction failed');
-    } finally {
-      setPassportEyeProcessing(false);
+Extraction completed in ${result.duration}s.`;
+
+        // Update the text area with extracted data
+        setValues((prev) => ({ ...prev, free_form_text: formattedText }));
+        
+        console.log(`✅ PassportEye extraction completed in ${result.duration}s`);
+        
+      } catch (err) {
+        console.error('PassportEye error:', err);
+        setErrorMsg(err?.message || 'PassportEye extraction failed. You can manually enter the passport details below.');
+      } finally {
+        setPassportEyeProcessing(false);
+      }
+    } else {
+      // Service offline - allow manual entry
+      setErrorMsg('PassportEye service is offline. Please manually enter the passport details in the text area below.');
     }
   };
 
@@ -813,7 +823,8 @@ Extraction completed in ${result.duration}s using PassportEye OCR.`;
                       color: 'var(--cds-text-secondary)',
                       fontSize: '0.875rem'
                     }}>
-                      Upload a passport image and PassportEye will automatically extract the MRZ data into the text field below.
+                      Upload a passport image. If PassportEye is available, it will automatically extract the MRZ (Machine Readable Zone) data.
+                      Otherwise, you can manually enter the passport details in the text area below.
                     </p>
 
                     <FileUploader
@@ -823,7 +834,7 @@ Extraction completed in ${result.duration}s using PassportEye OCR.`;
                       filenameStatus="edit"
                       accept={['.jpg', '.jpeg', '.png']}
                       multiple={false}
-                      disabled={passportEyeProcessing || !passportEyeAvailable}
+                      disabled={passportEyeProcessing}
                       onChange={handleFileUpload}
                     />
 
