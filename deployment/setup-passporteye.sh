@@ -96,11 +96,26 @@ echo -e "${YELLOW}[5/5] Installing PassportEye and dependencies...${NC}"
 echo "This may take a few minutes..."
 echo ""
 
+# Detect architecture
+ARCH=$(uname -m)
+echo "Detected architecture: ${ARCH}"
+
 pip install --upgrade pip
-pip install PassportEye
-pip install flask
-pip install flask-cors
-pip install pillow
+
+# For ppc64le, use IBM's wheel repository for pre-built packages
+if [[ "${ARCH}" == "ppc64le" ]]; then
+    echo "Using IBM wheel repository for ppc64le architecture..."
+    pip install --prefer-binary numpy opencv-python pillow --extra-index-url=https://wheels.developerfirst.ibm.com/ppc64le/linux
+    pip install PassportEye
+    pip install flask
+    pip install flask-cors
+else
+    # For other architectures, use standard installation
+    pip install PassportEye
+    pip install flask
+    pip install flask-cors
+    pip install pillow
+fi
 
 echo ""
 echo -e "${GREEN}✓ All packages installed${NC}"
