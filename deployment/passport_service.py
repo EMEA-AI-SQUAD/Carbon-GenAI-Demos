@@ -69,11 +69,25 @@ def extract_passport():
             if ',' in image_data:
                 image_data = image_data.split(',')[1]
             
+            # Decode base64
             image_bytes = base64.b64decode(image_data)
+            logger.info(f"Decoded {len(image_bytes)} bytes")
+            
+            # Open image with PIL
             image = Image.open(BytesIO(image_bytes))
+            
+            # Verify image loaded
+            if image is None:
+                raise ValueError("Failed to load image from bytes")
+            
+            # Convert to RGB if needed (PassportEye works best with RGB)
+            if image.mode != 'RGB':
+                logger.info(f"Converting image from {image.mode} to RGB")
+                image = image.convert('RGB')
+            
             logger.info(f"Image decoded: {image.size} pixels, {image.mode} mode")
         except Exception as e:
-            logger.error(f"Image decoding error: {str(e)}")
+            logger.error(f"Image decoding error: {str(e)}", exc_info=True)
             return jsonify({
                 'success': False,
                 'error': f'Invalid image data: {str(e)}'
