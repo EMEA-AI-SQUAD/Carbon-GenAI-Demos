@@ -27,6 +27,8 @@ import {
   Loading,
   Tile,
   Tag,
+  FileUploader,
+  Toggle,
 } from '@carbon/react';
 import {
   Application,
@@ -43,9 +45,10 @@ import React, { useMemo, useState } from 'react';
 import { DEFAULTS, PASSPORT_VERIFICATION, DOCUMENT_SCAN } from "./defaults";
 import { buildMessages } from "./messages";
 import { getExpectedKeys, parseModelJson, reconcileOutput, buildKeyLabelMap } from "./postprocess";
+import { extractPassportWithPassportEye, fileToBase64, checkPassportEyeAvailability } from "./passporteye-extraction";
 import OpenAI from 'openai';
 
-const API_URL = 'http://localhost:3001/v1';
+const API_URL = 'http://p1362-pvm1.p1362.cecc.ihost.com:3001/v1';
 
 const openai_client = new OpenAI({
   baseURL: API_URL,
@@ -64,6 +67,12 @@ export default function PIIExtractionPage() {
   const [activeTab, setActiveTab] = useState(0);
   const [processingTab, setProcessingTab] = useState(null); // Track which demo tab is processing
   const [isComplete, setIsComplete] = useState(false); // Track if LLM processing is complete
+  
+  // PassportEye state
+  const [usePassportEye, setUsePassportEye] = useState(false);
+  const [passportEyeAvailable, setPassportEyeAvailable] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState(null);
+  const [passportEyeProcessing, setPassportEyeProcessing] = useState(false);
 
   const onFreeFormChange = (e) =>
     setValues((prev) => ({ ...prev, free_form_text: e.target.value }));
@@ -82,6 +91,63 @@ export default function PIIExtractionPage() {
 
   const removeEntity = (index) =>
     setValues((prev) => ({ ...prev, entities: prev.entities.filter((_, i) => i !== index) }));
+
+  // Check PassportEye availability on mount
+  React.useEffect(() => {
+    checkPassportEyeAvailability(API_URL).then(setPassportEyeAvailable);
+  }, []);
+
+  // Handle file upload for PassportEye
+  const handleFileUpload = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setUploadedFile(file);
+    setErrorMsg('');
+    
+    // Auto-process if PassportEye is enabled
+    if (usePassportEye) {
+      await processWithPassportEye(file);
+    }
+  };
+
+  // Process passport image with PassportEye
+  const processWithPassportEye = async (file) => {
+    setPassportEyeProcessing(true);
+    setErrorMsg('');
+    setExtractedRows([]);
+    setIsComplete(false);
+    setProcessingTab(activeTab);
+
+    try {
+      console.log('🔍 Processing passport with PassportEye...');
+      const base64Image = await fileToBase64(file || uploadedFile);
+      const result = await extractPassportWithPassportEye(base64Image, API_URL);
+
+      if (!result.success) {
+        setErrorMsg(result.error || 'PassportEye extraction failed');
+        return;
+      }
+
+      // Format results for display
+      const rows = result.rows.map((row, i) => ({
+        id: String(i),
+        label: row.label,
+        value: row.value
+      }));
+
+      setExtractedRows(rows);
+      setIsComplete(true);
+      
+      console.log(`✅ PassportEye extraction completed in ${result.duration}s`);
+      
+    } catch (err) {
+      console.error('PassportEye error:', err);
+      setErrorMsg(err?.message || 'PassportEye extraction failed');
+    } finally {
+      setPassportEyeProcessing(false);
+    }
+  };
 
   async function completion() {
     setIsLoading(true);
@@ -730,16 +796,104 @@ export default function PIIExtractionPage() {
                   </div>
                 </Column>
 
+                {/* PassportEye Fast Extraction Section */}
+                <Column lg={16} md={8} sm={4} className="landing-page__tab-content" style={{ marginTop: '2rem' }}>
+                  <div style={{
+                    background: 'var(--cds-layer-01)',
+                    padding: '1.5rem',
+                    borderRadius: '4px',
+                    border: '1px solid var(--cds-border-subtle)'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+                      <h4 style={{ margin: 0, fontSize: '1.125rem' }}>⚡ Fast Passport Extraction</h4>
+                      {passportEyeAvailable && (
+                        <Tag type="green" size="sm">Available</Tag>
+                      )}
+                      {!passportEyeAvailable && (
+                        <Tag type="gray" size="sm">Service Offline</Tag>
+                      )}
+                    </div>
+                    
+                    <p style={{
+                      marginBottom: '1rem',
+                      color: 'var(--cds-text-secondary)',
+                      fontSize: '0.875rem'
+                    }}>
+                      Upload a passport image for instant MRZ extraction using PassportEye OCR ({'<'} 1 second vs 4-5 minutes with vision models).
+                    </p>
+
+                    <div style={{ marginBottom: '1rem' }}>
+                      <Toggle
+                        id="passporteye-toggle"
+                        labelText="Use PassportEye for fast extraction"
+                        labelA="Disabled"
+                        labelB="Enabled"
+                        toggled={usePassportEye}
+                        onToggle={(checked) => setUsePassportEye(checked)}
+                        disabled={!passportEyeAvailable}
+                      />
+                    </div>
+
+                    {usePassportEye && (
+                      <div style={{ marginTop: '1rem' }}>
+                        <FileUploader
+                          labelTitle="Upload passport image"
+                          labelDescription="Supported formats: JPG, PNG (max 5MB)"
+                          buttonLabel="Choose file"
+                          filenameStatus="edit"
+                          accept={['.jpg', '.jpeg', '.png']}
+                          multiple={false}
+                          disabled={passportEyeProcessing}
+                          onChange={handleFileUpload}
+                        />
+                        
+                        {uploadedFile && (
+                          <div style={{ marginTop: '1rem' }}>
+                            <Button
+                              kind="primary"
+                              size="md"
+                              onClick={() => processWithPassportEye(uploadedFile)}
+                              disabled={passportEyeProcessing}
+                            >
+                              {passportEyeProcessing ? 'Extracting...' : '⚡ Extract with PassportEye'}
+                            </Button>
+                          </div>
+                        )}
+
+                        {passportEyeProcessing && (
+                          <InlineNotification
+                            kind="info"
+                            title="Processing passport"
+                            subtitle="PassportEye is extracting MRZ data from your image..."
+                            hideCloseButton
+                            lowContrast
+                            style={{ marginTop: '1rem' }}
+                          />
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </Column>
+
                 <Column lg={16} md={8} sm={4} className="landing-page__tab-content" style={{ marginTop: '1rem' }}>
-                  <Button
-                    kind="primary"
-                    size="lg"
-                    onClick={()=>completion()}
-                    disabled={isLoading}
-                    style={{ marginBottom: '1rem' }}
-                  >
-                    {isLoading ? 'Processing...' : '🚀 Pre-load Demo Results'}
-                  </Button>
+                  <div style={{
+                    borderTop: '1px solid var(--cds-border-subtle)',
+                    paddingTop: '1.5rem',
+                    marginTop: '1rem'
+                  }}>
+                    <h4 style={{ marginBottom: '1rem', fontSize: '1rem', color: 'var(--cds-text-secondary)' }}>
+                      Or use the traditional text-based extraction:
+                    </h4>
+                    <Button
+                      kind="secondary"
+                      size="lg"
+                      onClick={()=>completion()}
+                      disabled={isLoading || usePassportEye}
+                      style={{ marginBottom: '1rem' }}
+                    >
+                      {isLoading ? 'Processing...' : '🚀 Pre-load Demo Results (Text-based)'}
+                    </Button>
+                  </div>
                   {isLoading && (
                     <InlineNotification
                       kind="info"
