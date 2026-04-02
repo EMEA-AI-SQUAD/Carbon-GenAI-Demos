@@ -45,8 +45,16 @@ if ! command -v tesseract &> /dev/null; then
     echo -e "${YELLOW}Tesseract not found. Attempting to install...${NC}"
     
     # Detect OS and install accordingly
-    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        echo "Detected Linux - installing via apt-get..."
+    if [[ -f /etc/redhat-release ]]; then
+        echo "Detected RHEL/CentOS - installing via yum..."
+        # Check if dnf is available (RHEL 8+)
+        if command -v dnf &> /dev/null; then
+            sudo dnf install -y tesseract
+        else
+            sudo yum install -y tesseract
+        fi
+    elif [[ -f /etc/debian_version ]]; then
+        echo "Detected Debian/Ubuntu - installing via apt-get..."
         sudo apt-get update
         sudo apt-get install -y tesseract-ocr
     elif [[ "$OSTYPE" == "darwin"* ]]; then
@@ -55,6 +63,7 @@ if ! command -v tesseract &> /dev/null; then
     else
         echo -e "${RED}✗ Unsupported OS for automatic Tesseract installation${NC}"
         echo "Please install Tesseract manually:"
+        echo "  RHEL/CentOS: sudo yum install tesseract (or dnf)"
         echo "  Ubuntu/Debian: sudo apt-get install tesseract-ocr"
         echo "  macOS: brew install tesseract"
         echo "  Windows: Download from https://github.com/UB-Mannheim/tesseract/wiki"
