@@ -41,7 +41,7 @@ NC='\033[0m' # No Color
 
 # Step tracking
 CURRENT_STEP=0
-TOTAL_STEPS=14
+TOTAL_STEPS=15
 
 # ============================================================================
 # LOGGING FUNCTIONS
@@ -483,32 +483,30 @@ configure_proxy() {
     fi
     
     # 2. Update web application page
-    local page_file="${SCRIPT_DIR}/${REPO_DIR}/${APP_DIR}/src/app/entextract/page.js"
-    
-    if [ ! -f "$page_file" ]; then
-        print_error "Web page file not found: $page_file"
-        cleanup_on_error
-    fi
-    
-    # Backup page file
-    if [ ! -f "${page_file}.backup" ]; then
-        cp "$page_file" "${page_file}.backup"
-        print_info "Created backup: ${page_file}.backup"
-    fi
-    
-    print_info "Updating web application API URL..."
-    # Replace hardcoded hostname in page.js (port 3001 - proxy port)
-    sed -i "s|http://[^:]*:3001|http://${fqdn}:3001|g" "$page_file"
-    
-    if [ $? -eq 0 ]; then
-        print_success "Web application API URL updated"
-        if grep -q "http://${fqdn}:3001" "$page_file"; then
-            print_success "Hostname verified in web app"
+    # Update all demo pages (entextract, piiextract, convintel)
+    for page in entextract piiextract convintel; do
+        local page_file="${SCRIPT_DIR}/${REPO_DIR}/${APP_DIR}/src/app/${page}/page.js"
+        
+        if [ -f "$page_file" ]; then
+            # Backup page file
+            if [ ! -f "${page_file}.backup" ]; then
+                cp "$page_file" "${page_file}.backup"
+                print_info "Created backup: ${page_file}.backup"
+            fi
+            
+            print_info "Updating ${page} API URL..."
+            # Replace hardcoded hostname in page.js (port 3001 - proxy port)
+            sed -i "s|http://[^:]*:3001|http://${fqdn}:3001|g" "$page_file"
+            
+            if [ $? -eq 0 ]; then
+                print_success "${page} API URL updated"
+            else
+                print_warning "Failed to update ${page} (may not exist yet)"
+            fi
+        else
+            print_info "Skipping ${page} (file not found)"
         fi
-    else
-        print_error "Failed to update web application"
-        cleanup_on_error
-    fi
+    done
     
     print_success "All hostname configurations updated successfully"
 }
@@ -766,6 +764,49 @@ start_llm_server() {
     fi
 }
 
+# Phase 13: Setup PassportEye
+setup_passporteye() {
+    print_step "📸 Setting up PassportEye OCR service..."
+    
+    # Return to script directory
+    cd "$SCRIPT_DIR" || {
+        print_error "Failed to navigate to script directory"
+        cleanup_on_error
+    }
+    
+    # Check if setup script exists
+    local setup_script="${SCRIPT_DIR}/${REPO_DIR}/deployment/setup-passporteye.sh"
+    if [ ! -f "$setup_script" ]; then
+        print_warning "PassportEye setup script not found, skipping..."
+        print_info "PassportEye can be set up later using: ./deployment/setup-passporteye.sh"
+        return 0
+    fi
+    
+    # Make script executable
+    chmod +x "$setup_script"
+    
+    # Run PassportEye setup
+    print_info "Running PassportEye setup script..."
+    if bash "$setup_script" >> "$LOG_FILE" 2>&1; then
+        print_success "PassportEye installed successfully"
+        
+        # Start PassportEye service
+        local service_script="${SCRIPT_DIR}/${REPO_DIR}/deployment/start-passporteye-service.sh"
+        if [ -f "$service_script" ]; then
+            chmod +x "$service_script"
+            print_info "Starting PassportEye service..."
+            if bash "$service_script" >> "$LOG_FILE" 2>&1; then
+                print_success "PassportEye service started on port 5000"
+            else
+                print_warning "Failed to start PassportEye service (can be started manually later)"
+            fi
+        fi
+    else
+        print_warning "PassportEye setup failed (optional feature)"
+        print_info "You can set it up manually later using: ./deployment/setup-passporteye.sh"
+    fi
+}
+
 # ============================================================================
 # SUMMARY
 # ============================================================================
@@ -836,6 +877,7 @@ main() {
     build_llama_cpp
     download_model
     start_llm_server
+    setup_passporteye
     
     # Print summary
     print_summary
