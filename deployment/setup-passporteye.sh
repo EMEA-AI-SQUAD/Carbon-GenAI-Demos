@@ -105,8 +105,12 @@ pip install --upgrade pip
 # For ppc64le, use IBM's wheel repository for pre-built packages
 if [[ "${ARCH}" == "ppc64le" ]]; then
     echo "Using IBM wheel repository for ppc64le architecture..."
-    pip install --prefer-binary numpy scipy opencv-python pillow --extra-index-url=https://wheels.developerfirst.ibm.com/ppc64le/linux
-    pip install PassportEye
+    echo "Installing scientific packages from IBM wheels..."
+    pip install --prefer-binary numpy scipy opencv-python pillow scikit-image --extra-index-url=https://wheels.developerfirst.ibm.com/ppc64le/linux
+    echo "Installing PassportEye (without dependencies to avoid conflicts)..."
+    pip install --no-deps PassportEye
+    echo "Installing additional dependencies..."
+    pip install pytesseract
     pip install flask
     pip install flask-cors
 else
