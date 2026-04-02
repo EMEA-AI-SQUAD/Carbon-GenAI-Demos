@@ -28,7 +28,6 @@ import {
   Tile,
   Tag,
   FileUploader,
-  Toggle,
 } from '@carbon/react';
 import {
   Application,
@@ -69,7 +68,6 @@ export default function PIIExtractionPage() {
   const [isComplete, setIsComplete] = useState(false); // Track if LLM processing is complete
   
   // PassportEye state
-  const [usePassportEye, setUsePassportEye] = useState(false);
   const [passportEyeAvailable, setPassportEyeAvailable] = useState(false);
   const [uploadedFile, setUploadedFile] = useState(null);
   const [passportEyeProcessing, setPassportEyeProcessing] = useState(false);
@@ -97,47 +95,45 @@ export default function PIIExtractionPage() {
     checkPassportEyeAvailability(API_URL).then(setPassportEyeAvailable);
   }, []);
 
-  // Handle file upload for PassportEye
+  // Handle file upload for PassportEye - automatically extract and populate text
   const handleFileUpload = async (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     setUploadedFile(file);
     setErrorMsg('');
-    
-    // Auto-process if PassportEye is enabled
-    if (usePassportEye) {
-      await processWithPassportEye(file);
-    }
-  };
-
-  // Process passport image with PassportEye
-  const processWithPassportEye = async (file) => {
     setPassportEyeProcessing(true);
-    setErrorMsg('');
-    setExtractedRows([]);
-    setIsComplete(false);
-    setProcessingTab(activeTab);
 
     try {
       console.log('🔍 Processing passport with PassportEye...');
-      const base64Image = await fileToBase64(file || uploadedFile);
+      const base64Image = await fileToBase64(file);
       const result = await extractPassportWithPassportEye(base64Image, API_URL);
 
       if (!result.success) {
         setErrorMsg(result.error || 'PassportEye extraction failed');
+        setPassportEyeProcessing(false);
         return;
       }
 
-      // Format results for display
-      const rows = result.rows.map((row, i) => ({
-        id: String(i),
-        label: row.label,
-        value: row.value
-      }));
+      // Format MRZ data as readable text for the textarea
+      const mrzData = result.mrzData;
+      const formattedText = `PASSPORT INFORMATION (Extracted by PassportEye OCR)
 
-      setExtractedRows(rows);
-      setIsComplete(true);
+Type: ${mrzData.type || 'P (Passport)'}
+Passport Number: ${mrzData.number || 'Not found'}
+Surname: ${mrzData.surname || 'Not found'}
+Given Names: ${mrzData.names || 'Not found'}
+Nationality: ${mrzData.nationality || 'Not found'}
+Date of Birth: ${mrzData.date_of_birth || 'Not found'}
+Sex: ${mrzData.sex || 'Not found'}
+Expiry Date: ${mrzData.expiration_date || 'Not found'}
+Country Code: ${mrzData.country || 'Not found'}
+${mrzData.personal_number ? `Personal Number: ${mrzData.personal_number}` : ''}
+
+Extraction completed in ${result.duration}s using PassportEye OCR.`;
+
+      // Update the text area with extracted data
+      setValues((prev) => ({ ...prev, free_form_text: formattedText }));
       
       console.log(`✅ PassportEye extraction completed in ${result.duration}s`);
       
@@ -732,12 +728,12 @@ export default function PIIExtractionPage() {
             <TabPanel>
               <Grid className="tabs-group-content">
                 <Column md={4} lg={7} sm={4} className="entity__tab-content">
-                  <h3 className="landing-page__subheading">ID Document Verification - Future Vision Capability</h3>
+                  <h3 className="landing-page__subheading">ID Document Verification with PassportEye OCR</h3>
                   <p className="landing-page__p">
                     This demo shows automated extraction of personal information from identity documents
-                    for visitor registration, KYC compliance, and pre-meeting verification. Currently using
-                    OCR-extracted text, with plans to integrate IBM Granite Vision models for direct image
-                    processing via cloud APIs.
+                    for visitor registration, KYC compliance, and pre-meeting verification. Upload a passport
+                    image and PassportEye will instantly extract the MRZ data, which Granite 4.0 then structures
+                    into the required fields.
                   </p>
                 </Column>
                 <Column md={4} lg={{ span: 8, offset: 7 }} sm={4}>
@@ -788,15 +784,13 @@ export default function PIIExtractionPage() {
                         fontStyle: 'italic',
                         color: 'var(--cds-text-secondary)'
                       }}>
-                        <strong>Current Solution:</strong> Granite 4.0 extracts structured PII from OCR text, automating visitor registration and KYC verification.
-                        <br/><br/>
-                        <strong>Future Enhancement:</strong> Integration with IBM Granite Vision models via cloud APIs will enable direct passport image processing without OCR pre-processing.
+                        <strong>Solution:</strong> PassportEye OCR extracts MRZ data from passport images in under 1 second, then Granite 4.0 structures the information for visitor registration and KYC verification.
                       </div>
                     </div>
                   </div>
                 </Column>
 
-                {/* PassportEye Fast Extraction Section */}
+                {/* Passport Image Upload Section */}
                 <Column lg={16} md={8} sm={4} className="landing-page__tab-content" style={{ marginTop: '2rem' }}>
                   <div style={{
                     background: 'var(--cds-layer-01)',
@@ -805,9 +799,9 @@ export default function PIIExtractionPage() {
                     border: '1px solid var(--cds-border-subtle)'
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-                      <h4 style={{ margin: 0, fontSize: '1.125rem' }}>⚡ Fast Passport Extraction</h4>
+                      <h4 style={{ margin: 0, fontSize: '1.125rem' }}>📤 Upload Passport Image</h4>
                       {passportEyeAvailable && (
-                        <Tag type="green" size="sm">Available</Tag>
+                        <Tag type="green" size="sm">PassportEye Ready</Tag>
                       )}
                       {!passportEyeAvailable && (
                         <Tag type="gray" size="sm">Service Offline</Tag>
@@ -819,81 +813,43 @@ export default function PIIExtractionPage() {
                       color: 'var(--cds-text-secondary)',
                       fontSize: '0.875rem'
                     }}>
-                      Upload a passport image for instant MRZ extraction using PassportEye OCR ({'<'} 1 second vs 4-5 minutes with vision models).
+                      Upload a passport image and PassportEye will automatically extract the MRZ data into the text field below.
                     </p>
 
-                    <div style={{ marginBottom: '1rem' }}>
-                      <Toggle
-                        id="passporteye-toggle"
-                        labelText="Use PassportEye for fast extraction"
-                        labelA="Disabled"
-                        labelB="Enabled"
-                        toggled={usePassportEye}
-                        onToggle={(checked) => setUsePassportEye(checked)}
-                        disabled={!passportEyeAvailable}
+                    <FileUploader
+                      labelTitle="Choose passport image"
+                      labelDescription="Supported formats: JPG, PNG (max 5MB)"
+                      buttonLabel="Select file"
+                      filenameStatus="edit"
+                      accept={['.jpg', '.jpeg', '.png']}
+                      multiple={false}
+                      disabled={passportEyeProcessing || !passportEyeAvailable}
+                      onChange={handleFileUpload}
+                    />
+
+                    {passportEyeProcessing && (
+                      <InlineNotification
+                        kind="info"
+                        title="Extracting passport data"
+                        subtitle="PassportEye is reading the MRZ from your image..."
+                        hideCloseButton
+                        lowContrast
+                        style={{ marginTop: '1rem' }}
                       />
-                    </div>
-
-                    {usePassportEye && (
-                      <div style={{ marginTop: '1rem' }}>
-                        <FileUploader
-                          labelTitle="Upload passport image"
-                          labelDescription="Supported formats: JPG, PNG (max 5MB)"
-                          buttonLabel="Choose file"
-                          filenameStatus="edit"
-                          accept={['.jpg', '.jpeg', '.png']}
-                          multiple={false}
-                          disabled={passportEyeProcessing}
-                          onChange={handleFileUpload}
-                        />
-                        
-                        {uploadedFile && (
-                          <div style={{ marginTop: '1rem' }}>
-                            <Button
-                              kind="primary"
-                              size="md"
-                              onClick={() => processWithPassportEye(uploadedFile)}
-                              disabled={passportEyeProcessing}
-                            >
-                              {passportEyeProcessing ? 'Extracting...' : '⚡ Extract with PassportEye'}
-                            </Button>
-                          </div>
-                        )}
-
-                        {passportEyeProcessing && (
-                          <InlineNotification
-                            kind="info"
-                            title="Processing passport"
-                            subtitle="PassportEye is extracting MRZ data from your image..."
-                            hideCloseButton
-                            lowContrast
-                            style={{ marginTop: '1rem' }}
-                          />
-                        )}
-                      </div>
                     )}
                   </div>
                 </Column>
 
                 <Column lg={16} md={8} sm={4} className="landing-page__tab-content" style={{ marginTop: '1rem' }}>
-                  <div style={{
-                    borderTop: '1px solid var(--cds-border-subtle)',
-                    paddingTop: '1.5rem',
-                    marginTop: '1rem'
-                  }}>
-                    <h4 style={{ marginBottom: '1rem', fontSize: '1rem', color: 'var(--cds-text-secondary)' }}>
-                      Or use the traditional text-based extraction:
-                    </h4>
-                    <Button
-                      kind="secondary"
-                      size="lg"
-                      onClick={()=>completion()}
-                      disabled={isLoading || usePassportEye}
-                      style={{ marginBottom: '1rem' }}
-                    >
-                      {isLoading ? 'Processing...' : '🚀 Pre-load Demo Results (Text-based)'}
-                    </Button>
-                  </div>
+                  <Button
+                    kind="primary"
+                    size="lg"
+                    onClick={()=>completion()}
+                    disabled={isLoading}
+                    style={{ marginBottom: '1rem' }}
+                  >
+                    {isLoading ? 'Processing...' : '🚀 Pre-load Demo Results'}
+                  </Button>
                   {isLoading && (
                     <InlineNotification
                       kind="info"
