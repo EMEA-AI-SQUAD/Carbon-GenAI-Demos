@@ -273,8 +273,8 @@ Extraction completed in ${result.duration}s.`;
 
       setExtractedRows(rows);
 
-      // For passport tab (activeTab === 1), generate verification status instead of redacted text
-      if (activeTab === 1) {
+      // For passport tab (activeTab === 2), generate verification status instead of redacted text
+      if (activeTab === 2) {
         const verification = verifyPassport(finalObj);
         setVerificationStatus(verification);
         setRedactedText(''); // Clear redacted text for passport tab
@@ -900,9 +900,6 @@ Extraction completed in ${result.duration}s.`;
                       <h4 style={{ margin: 0, fontSize: '1.125rem' }}>📤 Upload Passport Image</h4>
                       {passportEyeAvailable && (
                         <Tag type="green" size="sm">PassportEye Ready</Tag>
-                      )}
-                      {!passportEyeAvailable && (
-                        <Tag type="gray" size="sm">Service Offline</Tag>
                       )}
                     </div>
                     
