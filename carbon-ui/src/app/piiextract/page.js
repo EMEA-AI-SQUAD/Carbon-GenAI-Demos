@@ -447,7 +447,7 @@ Extraction completed in ${result.duration}s.`;
                     <div>
                       <h3 className="landing-page__label" style={{ marginTop: 0 }}>Real-time PII Detection</h3>
                       <p className="landing-page__p">
-                        Identify and protect PII instantly as data enters your systems - no batch processing delays.
+                        Identify and protect PII quickly as data enters your systems - no batch processing delays.
                       </p>
                     </div>
                   </div>
@@ -835,7 +835,7 @@ Extraction completed in ${result.duration}s.`;
                   <p className="landing-page__p">
                     This demo shows automated extraction of personal information from identity documents
                     for visitor registration, KYC compliance, and pre-meeting verification. Upload a passport
-                    image and PassportEye will instantly extract the MRZ data, which Granite 4.0 then structures
+                    image and PassportEye will quickly extract the MRZ data, which Granite 4.0 then structures
                     into the required fields.
                   </p>
                 </Column>
@@ -887,7 +887,7 @@ Extraction completed in ${result.duration}s.`;
                         fontStyle: 'italic',
                         color: 'var(--cds-text-secondary)'
                       }}>
-                        <strong>Solution:</strong> PassportEye OCR extracts MRZ data from passport images in under 1 second, then Granite 4.0 structures the information for visitor registration and KYC verification.
+                        <strong>Solution:</strong> PassportEye OCR quickly extracts MRZ data from passport images (typically 15-20 seconds), then Granite 4.0 structures the information for visitor registration and KYC verification.
                       </div>
                     </div>
                   </div>

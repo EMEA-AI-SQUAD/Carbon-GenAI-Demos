@@ -2,7 +2,7 @@
  * PassportEye OCR Extraction Module
  * 
  * Provides fast passport MRZ extraction using the PassportEye service.
- * This is significantly faster than vision models (< 1 second vs 4-5 minutes).
+ * This is significantly faster than vision models (seconds vs minutes).
  */
 
 /**
@@ -145,7 +145,7 @@ Country Code: ${mrzData.country || 'Not found'}
 ${mrzData.personal_number ? `Personal Number: ${mrzData.personal_number}` : ''}
 
 Extraction Method: PassportEye OCR (Fast)
-Processing Time: < 1 second`;
+Processing Time: Seconds (vs minutes for vision models)`;
 }
 
 // Made with Bob
