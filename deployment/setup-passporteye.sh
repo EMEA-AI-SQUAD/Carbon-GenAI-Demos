@@ -111,6 +111,8 @@ if [[ "${ARCH}" == "ppc64le" ]]; then
     pip install --no-deps PassportEye
     echo "Installing additional dependencies..."
     pip install pytesseract
+    pip install pdfminer.six
+    pip install --prefer-binary scikit-learn matplotlib --extra-index-url=https://wheels.developerfirst.ibm.com/ppc64le/linux
     pip install flask
     pip install flask-cors
 else
