@@ -63,6 +63,7 @@ export default function PIIExtractionPage() {
   const [errorMsg, setErrorMsg] = useState('');
   const [extractedRows, setExtractedRows] = useState([]); // [{ id, label, value }]
   const [redactedText, setRedactedText] = useState('');
+  const [verificationStatus, setVerificationStatus] = useState(null); // For passport verification
   const [activeTab, setActiveTab] = useState(0);
   const [processingTab, setProcessingTab] = useState(null); // Track which demo tab is processing
   const [isComplete, setIsComplete] = useState(false); // Track if LLM processing is complete
@@ -155,6 +156,85 @@ Extraction completed in ${result.duration}s.`;
     }
   };
 
+  // Verify passport data and return status
+  function verifyPassport(extractedData) {
+    const issues = [];
+    const warnings = [];
+    
+    // Check for required fields
+    const requiredFields = ['expiry_date', 'passport_number', 'surname', 'given_names'];
+    const missingFields = requiredFields.filter(field =>
+      !extractedData[field] || extractedData[field] === 'Data not available'
+    );
+    
+    if (missingFields.length > 0) {
+      issues.push(`Missing required fields: ${missingFields.join(', ')}`);
+    }
+    
+    // Check expiry date
+    if (extractedData.expiry_date && extractedData.expiry_date !== 'Data not available') {
+      try {
+        // Parse date in format YYMMDD or YYYY-MM-DD
+        let expiryDate;
+        const dateStr = extractedData.expiry_date.replace(/[^0-9]/g, '');
+        
+        if (dateStr.length === 6) {
+          // YYMMDD format
+          const year = parseInt('20' + dateStr.substring(0, 2));
+          const month = parseInt(dateStr.substring(2, 4)) - 1;
+          const day = parseInt(dateStr.substring(4, 6));
+          expiryDate = new Date(year, month, day);
+        } else if (dateStr.length === 8) {
+          // YYYYMMDD format
+          const year = parseInt(dateStr.substring(0, 4));
+          const month = parseInt(dateStr.substring(4, 6)) - 1;
+          const day = parseInt(dateStr.substring(6, 8));
+          expiryDate = new Date(year, month, day);
+        }
+        
+        if (expiryDate) {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          
+          if (expiryDate < today) {
+            issues.push('Passport has expired');
+          } else {
+            const daysUntilExpiry = Math.floor((expiryDate - today) / (1000 * 60 * 60 * 24));
+            if (daysUntilExpiry <= 180) {
+              warnings.push(`Passport expires in ${daysUntilExpiry} days`);
+            }
+          }
+        }
+      } catch (err) {
+        warnings.push('Could not validate expiry date format');
+      }
+    }
+    
+    // Determine overall status
+    let status = 'ALLOWED';
+    let statusColor = 'green';
+    let statusIcon = '✓';
+    
+    if (issues.length > 0) {
+      status = 'DENIED';
+      statusColor = 'red';
+      statusIcon = '✗';
+    } else if (warnings.length > 0) {
+      status = 'WARNING';
+      statusColor = 'orange';
+      statusIcon = '⚠';
+    }
+    
+    return {
+      status,
+      statusColor,
+      statusIcon,
+      issues,
+      warnings,
+      timestamp: new Date().toISOString()
+    };
+  }
+
   async function completion() {
     setIsLoading(true);
     setErrorMsg('');
@@ -193,20 +273,28 @@ Extraction completed in ${result.duration}s.`;
 
       setExtractedRows(rows);
 
-      // Create redacted version of the text
-      let redacted = values.free_form_text;
-      rows.forEach(row => {
-        if (row.value && row.value !== "Data not available") {
-          // Split comma-separated values and redact each individually
-          const values = row.value.split(',').map(v => v.trim()).filter(v => v);
-          values.forEach(val => {
-            // Replace each PII value with [REDACTED]
-            const regex = new RegExp(val.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-            redacted = redacted.replace(regex, '[REDACTED]');
-          });
-        }
-      });
-      setRedactedText(redacted);
+      // For passport tab (activeTab === 1), generate verification status instead of redacted text
+      if (activeTab === 1) {
+        const verification = verifyPassport(finalObj);
+        setVerificationStatus(verification);
+        setRedactedText(''); // Clear redacted text for passport tab
+      } else {
+        // For other tabs, create redacted version of the text
+        let redacted = values.free_form_text;
+        rows.forEach(row => {
+          if (row.value && row.value !== "Data not available") {
+            // Split comma-separated values and redact each individually
+            const values = row.value.split(',').map(v => v.trim()).filter(v => v);
+            values.forEach(val => {
+              // Replace each PII value with [REDACTED]
+              const regex = new RegExp(val.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+              redacted = redacted.replace(regex, '[REDACTED]');
+            });
+          }
+        });
+        setRedactedText(redacted);
+        setVerificationStatus(null); // Clear verification for non-passport tabs
+      }
       setIsComplete(true);
 
     } catch (err) {
@@ -1059,17 +1147,17 @@ Extraction completed in ${result.duration}s.`;
                       </DataTable>
                     </Column>
 
-                    {/* Redacted OCR Text - Right side */}
-                    {redactedText && (
+                    {/* Verification Status - Right side */}
+                    {verificationStatus && (
                       <Column sm={4} md={5} lg={10} className="landing-page__tab-content">
                         <Tile style={{ padding: '1.5rem', height: '100%' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-                            <h4 style={{ margin: 0, fontSize: '1rem' }}>Redacted OCR Text</h4>
+                            <h4 style={{ margin: 0, fontSize: '1rem' }}>Verification Status</h4>
                             <AILabel size="sm">
                               <AILabelContent>
                                 <div>
                                   <p className="secondary">AI Generated</p>
-                                  <p className="secondary">PII redacted by Granite 4.0</p>
+                                  <p className="secondary">Verified by Granite 4.0</p>
                                 </div>
                               </AILabelContent>
                             </AILabel>
@@ -1077,23 +1165,94 @@ Extraction completed in ${result.duration}s.`;
                           <p style={{
                             fontSize: '0.75rem',
                             color: 'var(--cds-text-secondary)',
-                            marginBottom: '1rem'
+                            marginBottom: '1.5rem'
                           }}>
-                            Safe for logging and audit trails
+                            Privacy-preserving verification result
                           </p>
+                          
+                          {/* Status Badge */}
                           <div style={{
-                            background: 'var(--cds-layer-01)',
-                            padding: '1rem',
+                            background: verificationStatus.statusColor === 'green' ? '#24a148' :
+                                       verificationStatus.statusColor === 'orange' ? '#f1c21b' : '#da1e28',
+                            color: 'white',
+                            padding: '1rem 1.5rem',
                             borderRadius: '4px',
-                            fontFamily: 'monospace',
-                            fontSize: '0.75rem',
-                            whiteSpace: 'pre-wrap',
-                            lineHeight: '1.6',
-                            maxHeight: '500px',
-                            overflow: 'auto'
+                            fontSize: '1.5rem',
+                            fontWeight: 'bold',
+                            textAlign: 'center',
+                            marginBottom: '1.5rem'
                           }}>
-                            {redactedText}
+                            {verificationStatus.statusIcon} {verificationStatus.status}
                           </div>
+                          
+                          {/* Issues */}
+                          {verificationStatus.issues.length > 0 && (
+                            <div style={{ marginBottom: '1rem' }}>
+                              <h5 style={{
+                                color: '#da1e28',
+                                fontSize: '0.875rem',
+                                marginBottom: '0.5rem',
+                                fontWeight: 600
+                              }}>
+                                Issues:
+                              </h5>
+                              <ul style={{
+                                margin: 0,
+                                paddingLeft: '1.5rem',
+                                fontSize: '0.875rem'
+                              }}>
+                                {verificationStatus.issues.map((issue, idx) => (
+                                  <li key={idx} style={{ marginBottom: '0.25rem' }}>{issue}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          
+                          {/* Warnings */}
+                          {verificationStatus.warnings.length > 0 && (
+                            <div style={{ marginBottom: '1rem' }}>
+                              <h5 style={{
+                                color: '#f1c21b',
+                                fontSize: '0.875rem',
+                                marginBottom: '0.5rem',
+                                fontWeight: 600
+                              }}>
+                                Warnings:
+                              </h5>
+                              <ul style={{
+                                margin: 0,
+                                paddingLeft: '1.5rem',
+                                fontSize: '0.875rem'
+                              }}>
+                                {verificationStatus.warnings.map((warning, idx) => (
+                                  <li key={idx} style={{ marginBottom: '0.25rem' }}>{warning}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          
+                          {/* Success message */}
+                          {verificationStatus.status === 'ALLOWED' && (
+                            <div style={{
+                              background: 'var(--cds-layer-01)',
+                              padding: '1rem',
+                              borderRadius: '4px',
+                              fontSize: '0.875rem',
+                              color: 'var(--cds-text-secondary)'
+                            }}>
+                              ✓ All verification checks passed. Passport details remain private while providing verification result.
+                            </div>
+                          )}
+                          
+                          {/* Timestamp */}
+                          <p style={{
+                            fontSize: '0.75rem',
+                            color: 'var(--cds-text-secondary)',
+                            marginTop: '1rem',
+                            marginBottom: 0
+                          }}>
+                            Verified at: {new Date(verificationStatus.timestamp).toLocaleString()}
+                          </p>
                         </Tile>
                       </Column>
                     )}

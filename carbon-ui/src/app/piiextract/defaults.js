@@ -13,30 +13,23 @@ export const DEFAULTS = {
   ]
 };
 
-// Tab 2: ID Document Verification - Passport OCR (Mr. Bean)
+// Tab 2: ID Document Verification - Passport MRZ (Mr. Bean)
 export const PASSPORT_VERIFICATION = {
-  free_form_text: `PASSPORT OCR EXTRACTION RESULT:
+  free_form_text: `Upload a passport image to extract MRZ data automatically, or use the pre-loaded demo data below.
 
-United Kingdom of Great Britain and Northern Ireland
-Passport Passeport
+PASSPORT MRZ DATA (Machine Readable Zone)
 
-Type/Type: P
-Code of issuing state/Code de l'État émetteur: GBR
-Passport No./Passeport No.: 023477812
-Surname/Nom: BEAN
-Given names/Prénoms: MR
-Nationality/Nationalité: BRITISH CITIZEN
-Date of birth/Date de naissance: 6 JAN/JAN 55
-Sex/Sexe: M
-Place of birth/Lieu de naissance: ENFIELD
-Date of issue/Date de délivrance: 20 SEP/SEP 96
-Date of expiry/Date d'expiration: 20 SEP/SEP 06
-Authority/Autorité: UNITED KINGDOM PASSPORT AGENCY
-Observations/Observations: 0
+Document Type: P
+Passport Number: 023477812
+Surname: BEAN
+Given Names: MR
+Nationality Code: GBR
+Date of Birth: 550106
+Sex: M
+Expiry Date: 060920
+Country Code: GBR
 
-Machine Readable Zone (MRZ):
-P<GB<MR<BEAN<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-023477812GBR8111063M0004422<<<<<<<<<<<<06`,
+Note: This data is extracted from the MRZ (Machine Readable Zone) at the bottom of the passport.`,
   entities: [
     { label: "Document Type", definition: "Type of identity document (e.g., P for Passport)" },
     { label: "Passport Number", definition: "The unique passport identification number" },
