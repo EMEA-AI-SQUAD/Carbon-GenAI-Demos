@@ -10,6 +10,7 @@ from passporteye import read_mrz
 import base64
 from io import BytesIO
 from PIL import Image
+import numpy as np
 import logging
 import time
 
@@ -86,6 +87,11 @@ def extract_passport():
                 image = image.convert('RGB')
             
             logger.info(f"Image decoded: {image.size} pixels, {image.mode} mode")
+            
+            # Convert PIL Image to numpy array (PassportEye expects numpy array)
+            image_array = np.array(image)
+            logger.info(f"Converted to numpy array: shape {image_array.shape}")
+            
         except Exception as e:
             logger.error(f"Image decoding error: {str(e)}", exc_info=True)
             return jsonify({
@@ -95,7 +101,7 @@ def extract_passport():
         
         # Extract MRZ using PassportEye
         logger.info("Extracting MRZ with PassportEye...")
-        mrz = read_mrz(image)
+        mrz = read_mrz(image_array)
         
         if mrz:
             # Convert MRZ data to dictionary
