@@ -48,6 +48,7 @@ import { extractPassportWithPassportEye, fileToBase64, checkPassportEyeAvailabil
 import OpenAI from 'openai';
 
 const API_URL = 'http://p1362-pvm1.p1362.cecc.ihost.com:3001/v1';
+const PROXY_URL = 'http://p1362-pvm1.p1362.cecc.ihost.com:3001'; // For PassportEye (no /v1)
 
 const openai_client = new OpenAI({
   baseURL: API_URL,
@@ -93,7 +94,7 @@ export default function PIIExtractionPage() {
 
   // Check PassportEye availability on mount
   React.useEffect(() => {
-    checkPassportEyeAvailability(API_URL).then(setPassportEyeAvailable);
+    checkPassportEyeAvailability(PROXY_URL).then(setPassportEyeAvailable);
   }, []);
 
   // Handle file upload for PassportEye - automatically extract and populate text
@@ -110,10 +111,10 @@ export default function PIIExtractionPage() {
 
       try {
         console.log('🔍 Processing passport with PassportEye...');
-        console.log('API_URL:', API_URL);
+        console.log('PROXY_URL:', PROXY_URL);
         const base64Image = await fileToBase64(file);
         console.log('Base64 image length:', base64Image.length);
-        const result = await extractPassportWithPassportEye(base64Image, API_URL);
+        const result = await extractPassportWithPassportEye(base64Image, PROXY_URL);
         console.log('PassportEye result:', result);
 
         if (!result.success) {

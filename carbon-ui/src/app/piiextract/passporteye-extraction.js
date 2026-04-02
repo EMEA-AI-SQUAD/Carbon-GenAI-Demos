@@ -36,20 +36,20 @@ export async function extractPassportWithPassportEye(imageBase64, proxyUrl = 'ht
     const duration = ((Date.now() - startTime) / 1000).toFixed(2);
     
     console.log(`✅ PassportEye extraction completed in ${duration}s`);
-    console.log('Raw MRZ data:', result);
+    console.log('Raw response:', result);
 
-    // Check if MRZ was found
-    if (!result.mrz_data) {
+    // Check if extraction was successful
+    if (!result.success || !result.data) {
       return {
         success: false,
-        error: 'No MRZ data found in passport image',
+        error: result.error || 'No MRZ data found in passport image',
         duration,
         rows: []
       };
     }
 
     // Format the MRZ data for display
-    const mrzData = result.mrz_data;
+    const mrzData = result.data;
     const rows = [
       { label: 'Document Type', value: mrzData.type || 'P (Passport)' },
       { label: 'Passport Number', value: mrzData.number || 'Not found' },
