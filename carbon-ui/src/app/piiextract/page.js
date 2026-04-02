@@ -110,10 +110,14 @@ export default function PIIExtractionPage() {
 
       try {
         console.log('🔍 Processing passport with PassportEye...');
+        console.log('API_URL:', API_URL);
         const base64Image = await fileToBase64(file);
+        console.log('Base64 image length:', base64Image.length);
         const result = await extractPassportWithPassportEye(base64Image, API_URL);
+        console.log('PassportEye result:', result);
 
         if (!result.success) {
+          console.error('PassportEye extraction failed:', result.error);
           setErrorMsg(result.error || 'PassportEye extraction failed. You can manually enter the passport details below.');
           setPassportEyeProcessing(false);
           return;

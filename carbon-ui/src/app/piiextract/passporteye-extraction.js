@@ -112,11 +112,13 @@ export async function checkPassportEyeAvailability(proxyUrl = 'http://p1362-pvm1
   try {
     const response = await fetch(`${proxyUrl}/passporteye/health`, {
       method: 'GET',
-      signal: AbortSignal.timeout(2000) // 2 second timeout
+      signal: AbortSignal.timeout(5000) // 5 second timeout
     });
-    return response.ok;
+    const isAvailable = response.ok;
+    console.log(`PassportEye availability check: ${isAvailable ? '✅ Available' : '❌ Not available'}`);
+    return isAvailable;
   } catch (error) {
-    console.warn('PassportEye service not available:', error.message);
+    console.error('PassportEye service check failed:', error.message);
     return false;
   }
 }
