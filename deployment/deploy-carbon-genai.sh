@@ -554,9 +554,9 @@ start_proxy_server() {
     fi
 }
 
-# Phase 8: Start Dev Server
+# Phase 8: Build and Start Production Server
 start_dev_server() {
-    print_step "🚀 Starting development server..."
+    print_step "🏗️  Building Next.js application..."
     
     # Ensure we're in the app directory
     cd "${SCRIPT_DIR}/${REPO_DIR}/${APP_DIR}" || {
@@ -564,23 +564,36 @@ start_dev_server() {
         cleanup_on_error
     }
     
-    # Start dev server in background
-    log_message "INFO" "Starting dev server with: nohup yarn dev"
-    nohup yarn dev >> "$LOG_FILE" 2>&1 &
+    # Build the application first to avoid on-demand compilation
+    log_message "INFO" "Building application with: yarn build"
+    print_info "This may take a few minutes..."
+    if yarn build >> "$LOG_FILE" 2>&1; then
+        print_success "Application built successfully"
+        log_message "INFO" "Next.js build completed"
+    else
+        print_error "Build failed. Check log file: $LOG_FILE"
+        cleanup_on_error
+    fi
+    
+    print_step "🚀 Starting production server..."
+    
+    # Start production server in background
+    log_message "INFO" "Starting production server with: nohup yarn start"
+    nohup yarn start >> "$LOG_FILE" 2>&1 &
     local server_pid=$!
     
     # Save PID
     echo "$server_pid" > "$PID_FILE"
-    print_success "Dev server started (PID: $server_pid)"
+    print_success "Production server started (PID: $server_pid)"
     
     # Wait a moment and verify it's still running
     sleep 3
     if kill -0 "$server_pid" 2>/dev/null; then
-        print_success "Dev server is running"
-        log_message "INFO" "Dev server verified running with PID: $server_pid"
+        print_success "Production server is running"
+        log_message "INFO" "Production server verified running with PID: $server_pid"
     else
-        print_error "Dev server failed to start"
-        log_message "ERROR" "Dev server process died immediately"
+        print_error "Production server failed to start"
+        log_message "ERROR" "Production server process died immediately"
         cleanup_on_error
     fi
 }
