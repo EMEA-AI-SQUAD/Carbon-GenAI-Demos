@@ -213,24 +213,24 @@ export default function ConversationIntelligencePage() {
                   </p>
                 </Column>
 
-                {/* Benefit 1: Real-time Analysis */}
+                {/* Benefit 1: On-Premises Processing */}
                 <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
                     <MachineLearningModel style={{ width: '80px', height: '80px', flexShrink: 0 }} />
                     <div>
-                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>Real-time Conversation Analysis</h3>
+                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>On-Premises Conversation Analysis</h3>
                       <p className="landing-page__p">
-                        <strong>Analyze conversations as they happen.</strong> Extract insights from customer interactions in real-time without cloud latency.
+                        <strong>Process conversations within your infrastructure.</strong> Extract insights from customer interactions without sending data to external cloud services.
                       </p>
                     </div>
                   </div>
                 </Column>
                 <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
                   <ul style={{ marginLeft: '1rem', marginTop: '1.5rem' }}>
-                    <li>Immediate sentiment analysis during calls</li>
-                    <li>Live agent coaching and guidance</li>
-                    <li>Instant escalation detection</li>
-                    <li>Real-time compliance monitoring</li>
+                    <li>Sentiment analysis during or after calls</li>
+                    <li>Agent coaching and guidance capabilities</li>
+                    <li>Escalation detection and alerts</li>
+                    <li>Compliance monitoring and reporting</li>
                   </ul>
                 </Column>
 
