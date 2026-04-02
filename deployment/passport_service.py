@@ -13,6 +13,8 @@ from PIL import Image
 import numpy as np
 import logging
 import time
+import tempfile
+import os
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -88,9 +90,11 @@ def extract_passport():
             
             logger.info(f"Image decoded: {image.size} pixels, {image.mode} mode")
             
-            # Convert PIL Image to numpy array (PassportEye expects numpy array)
-            image_array = np.array(image)
-            logger.info(f"Converted to numpy array: shape {image_array.shape}")
+            # Save image to temporary file (PassportEye works best with file paths)
+            with tempfile.NamedTemporaryFile(suffix='.jpg', delete=False) as tmp_file:
+                temp_path = tmp_file.name
+                image.save(temp_path, 'JPEG')
+                logger.info(f"Saved temporary image: {temp_path}")
             
         except Exception as e:
             logger.error(f"Image decoding error: {str(e)}", exc_info=True)
@@ -101,7 +105,15 @@ def extract_passport():
         
         # Extract MRZ using PassportEye
         logger.info("Extracting MRZ with PassportEye...")
-        mrz = read_mrz(image_array)
+        try:
+            mrz = read_mrz(temp_path)
+        finally:
+            # Clean up temporary file
+            try:
+                os.unlink(temp_path)
+                logger.info(f"Cleaned up temporary file: {temp_path}")
+            except:
+                pass
         
         if mrz:
             # Convert MRZ data to dictionary
