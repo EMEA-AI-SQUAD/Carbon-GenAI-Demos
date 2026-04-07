@@ -185,32 +185,40 @@ The deployment follows these phases:
 
 ## File Structure
 
-After deployment, your directory will contain:
+After deployment, your directory structure will be:
 
 ```
-.
-├── deploy-carbon-genai.sh          # Main deployment script
-├── stop-server.sh                  # Stop all servers
-├── check-status.sh                 # Check deployment status
-├── README.md                       # This file
-├── deployment-plan.md              # Detailed implementation plan
-├── git-commit.ps1                  # PowerShell Git helper
+~/                                  # Home directory (working directory)
 ├── carbon.venv/                    # Web app Python virtual environment
 ├── llama.cpp.venv/                 # LLM Python virtual environment
 ├── Carbon-GenAI-Demos/             # Cloned repository
-│   └── carbon-ui/                  # Application directory
-│       └── src/
-│           ├── llama-proxy/        # Proxy server (configured)
-│           │   └── server_final.js.backup
-│           └── app/entextract/
-│               └── page.js.backup  # Web app (configured)
+│   ├── carbon-ui/                  # Application directory
+│   │   └── src/
+│   │       ├── llama-proxy/        # Proxy server (configured)
+│   │       │   └── server_final.js.backup
+│   │       └── app/entextract/
+│   │           └── page.js.backup  # Web app (configured)
+│   └── deployment/                 # Deployment scripts (in repo)
 ├── llama.cpp/                      # llama.cpp installation
 │   └── build/bin/llama-server      # LLM server binary
-├── carbon-deployment-*.log         # Deployment log files
 ├── carbon-dev-server.pid           # Web server process ID
 ├── proxy-server.pid                # Proxy server process ID
-└── llama-server.pid                # LLM server process ID
+├── llama-server.pid                # LLM server process ID
+└── deployment/                     # Deployment directory
+    ├── deploy-carbon-genai.sh      # Main deployment script
+    ├── stop-server.sh              # Stop all servers
+    ├── check-status.sh             # Check deployment status
+    ├── README.md                   # This file
+    ├── carbon-deployment-*.log     # Deployment log files
+    └── other deployment scripts...
 ```
+
+**Key Points:**
+- Deployment scripts are in `~/deployment/`
+- Repository is cloned to `~/Carbon-GenAI-Demos/`
+- Virtual environments are in home directory (`~/carbon.venv`, `~/llama.cpp.venv`)
+- Log files are kept in `~/deployment/`
+- PID files are in home directory for easy access
 
 ## Logging
 
@@ -222,7 +230,7 @@ The script provides clean, user-friendly output:
 - Final deployment summary
 
 ### Log Files
-Detailed logs are saved to: `carbon-deployment-YYYYMMDD-HHMMSS.log`
+Detailed logs are saved to: `~/deployment/carbon-deployment-YYYYMMDD-HHMMSS.log`
 
 Log files contain:
 - Timestamps for all operations
@@ -233,14 +241,14 @@ Log files contain:
 
 To view logs in real-time:
 ```bash
-tail -f carbon-deployment-*.log
+tail -f ~/deployment/carbon-deployment-*.log
 ```
 
 ## Management Commands
 
 ### Check Deployment Status
 ```bash
-./check-status.sh
+~/deployment/check-status.sh
 ```
 
 Shows:
@@ -254,7 +262,7 @@ Shows:
 
 ### Stop All Servers
 ```bash
-./stop-server.sh
+~/deployment/stop-server.sh
 ```
 
 Gracefully stops all three servers:
@@ -264,43 +272,44 @@ Gracefully stops all three servers:
 
 ### Manual Server Stop
 ```bash
-# Stop individual servers
+# Stop individual servers (from home directory)
+cd ~
 kill $(cat carbon-dev-server.pid)  # Web server
 kill $(cat proxy-server.pid)       # Proxy server
 kill $(cat llama-server.pid)        # LLM server
 
 # Or stop all at once
-kill $(cat *.pid)
+kill $(cat ~/carbon-dev-server.pid ~/proxy-server.pid ~/llama-server.pid)
 ```
 
 ### View Server Logs
 ```bash
 # View latest deployment log
-tail -f carbon-deployment-*.log
+tail -f ~/deployment/carbon-deployment-*.log
 
 # View specific log
-tail -f carbon-deployment-20260303-162800.log
+tail -f ~/deployment/carbon-deployment-20260303-162800.log
 ```
 
 ### Restart Servers Manually
 
 **Web Dev Server:**
 ```bash
-cd Carbon-GenAI-Demos/carbon-ui
-source ../../carbon.venv/bin/activate
+cd ~/Carbon-GenAI-Demos/carbon-ui
+source ~/carbon.venv/bin/activate
 yarn dev
 ```
 
 **Proxy Server:**
 ```bash
-cd Carbon-GenAI-Demos/carbon-ui/src/llama-proxy
+cd ~/Carbon-GenAI-Demos/carbon-ui/src/llama-proxy
 node server_final.js
 ```
 
 **LLM Server:**
 ```bash
-cd llama.cpp
-source ../llama.cpp.venv/bin/activate
+cd ~/llama.cpp
+source ~/llama.cpp.venv/bin/activate
 ./build/bin/llama-server -m /tmp/models/granite-4.0-micro-Q4_K_M.gguf --host 0.0.0.0
 ```
 
@@ -333,8 +342,9 @@ sudo dnf -y update
 python3.12 --version
 
 # Remove existing venv and retry
-rm -rf carbon.venv
-./deploy-carbon-genai.sh
+rm -rf ~/carbon.venv
+cd ~
+./deployment/deploy-carbon-genai.sh
 ```
 
 ### Repository Clone Fails
@@ -347,10 +357,12 @@ rm -rf carbon.venv
 ping -c 3 github.com
 
 # Try cloning manually
+cd ~
 git clone https://github.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos
 
 # Re-run deployment
-./deploy-carbon-genai.sh
+cd ~
+./deployment/deploy-carbon-genai.sh
 ```
 
 ### Node Dependencies Installation Fails
@@ -366,10 +378,10 @@ npm cache clean --force
 yarn cache clean
 
 # Remove node_modules and retry
-cd Carbon-GenAI-Demos/carbon-ui
+cd ~/Carbon-GenAI-Demos/carbon-ui
 rm -rf node_modules
-cd ../..
-./deploy-carbon-genai.sh
+cd ~
+./deployment/deploy-carbon-genai.sh
 ```
 
 ### Dev Server Won't Start
@@ -379,11 +391,11 @@ cd ../..
 **Solution**:
 ```bash
 # Check the logs for errors
-tail -100 carbon-deployment-*.log
+tail -100 ~/deployment/carbon-deployment-*.log
 
 # Try starting manually to see errors
-cd Carbon-GenAI-Demos/carbon-ui
-source ../../carbon.venv/bin/activate
+cd ~/Carbon-GenAI-Demos/carbon-ui
+source ~/carbon.venv/bin/activate
 yarn dev
 ```
 
@@ -400,7 +412,7 @@ sudo lsof -i :3000
 kill -9 <PID>
 
 # Restart server
-cd Carbon-GenAI-Demos/carbon-ui
+cd ~/Carbon-GenAI-Demos/carbon-ui
 yarn dev
 ```
 
@@ -414,7 +426,7 @@ yarn dev
 df -h
 
 # Clean up old logs
-rm -f carbon-deployment-*.log
+rm -f ~/deployment/carbon-deployment-*.log
 
 # Clean package caches
 sudo dnf clean all
@@ -422,7 +434,8 @@ npm cache clean --force
 yarn cache clean
 
 # Re-run deployment
-./deploy-carbon-genai.sh
+cd ~
+./deployment/deploy-carbon-genai.sh
 ```
 
 ## Manual Deployment Steps
@@ -436,21 +449,23 @@ sudo dnf -y update
 # 2. Install dependencies
 sudo dnf install -y python3.12 python3.12-pip python3.12-devel git gcc gcc-c++ nodejs
 
-# 3. Create Python virtual environment
+# 3. Create Python virtual environment in home directory
+cd ~
 python3.12 -m venv carbon.venv
 source carbon.venv/bin/activate
 
 # 4. Upgrade pip
 pip install --upgrade pip
 
-# 5. Clone repository
+# 5. Clone repository to home directory
+cd ~
 git clone https://github.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos
 
 # 6. Install Yarn
 sudo npm install --global yarn
 
 # 7. Install Node dependencies
-cd Carbon-GenAI-Demos/carbon-ui
+cd ~/Carbon-GenAI-Demos/carbon-ui
 yarn
 yarn add @carbon/react@1.33.0
 yarn add sass@1.63.6
@@ -503,11 +518,15 @@ To completely remove the deployment:
 
 ```bash
 # Stop all servers
-./stop-server.sh
+~/deployment/stop-server.sh
 
-# Remove all files
+# Remove all files from home directory
+cd ~
 rm -rf carbon.venv llama.cpp.venv Carbon-GenAI-Demos llama.cpp \
-       carbon-deployment-*.log *.pid /tmp/models
+       carbon-dev-server.pid proxy-server.pid llama-server.pid /tmp/models
+
+# Optionally remove deployment directory
+rm -rf ~/deployment
 ```
 
 **Note**: This will remove:
@@ -521,8 +540,8 @@ rm -rf carbon.venv llama.cpp.venv Carbon-GenAI-Demos llama.cpp \
 
 For issues or questions:
 
-1. Check the deployment logs: `tail -f carbon-deployment-*.log`
-2. Run status check: `./check-status.sh`
+1. Check the deployment logs: `tail -f ~/deployment/carbon-deployment-*.log`
+2. Run status check: `~/deployment/check-status.sh`
 3. Review the troubleshooting section above
 4. Check the original repository: https://github.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos
 

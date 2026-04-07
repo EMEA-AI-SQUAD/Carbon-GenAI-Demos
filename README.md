@@ -245,10 +245,15 @@ Unstructured data discovery for GDPR compliance audits
 ### One-Command Deployment (Created by Bob)
 
 ```bash
-# Download and run the automated deployment script
+# Create deployment directory and download script
+mkdir -p ~/deployment
+cd ~/deployment
 curl -O https://raw.githubusercontent.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos/main/deployment/deploy-carbon-genai.sh
 chmod +x deploy-carbon-genai.sh
-./deploy-carbon-genai.sh
+
+# Run from home directory (script will work from there)
+cd ~
+./deployment/deploy-carbon-genai.sh
 ```
 
 The script will automatically:
@@ -539,21 +544,21 @@ tail -f deployment/carbon-deployment-*.log | grep -E "(ERROR|WARNING|INFO)"
 
 **Web Server**:
 ```bash
-cd Carbon-GenAI-Demos/carbon-ui
-source ../../carbon.venv/bin/activate
+cd ~/Carbon-GenAI-Demos/carbon-ui
+source ~/carbon.venv/bin/activate
 yarn dev
 ```
 
 **Proxy Server** (Henrik's implementation):
 ```bash
-cd Carbon-GenAI-Demos/carbon-ui/src/llama-proxy
+cd ~/Carbon-GenAI-Demos/carbon-ui/src/llama-proxy
 node server_final.js
 ```
 
 **LLM Server**:
 ```bash
-cd llama.cpp
-source ../llama.cpp.venv/bin/activate
+cd ~/llama.cpp
+source ~/llama.cpp.venv/bin/activate
 ./build/bin/llama-server -m /tmp/models/granite-4.0-micro-Q4_K_M.gguf --host 0.0.0.0
 ```
 
@@ -575,9 +580,10 @@ source ../llama.cpp.venv/bin/activate
 ### Local Development Setup
 
 ```bash
-# Clone repository
+# Clone repository to home directory
+cd ~
 git clone https://github.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos.git
-cd Carbon-GenAI-Demos/carbon-ui
+cd ~/Carbon-GenAI-Demos/carbon-ui
 
 # Install dependencies
 yarn install
@@ -598,7 +604,7 @@ yarn dev
 ### Building for Production
 
 ```bash
-cd carbon-ui
+cd ~/Carbon-GenAI-Demos/carbon-ui
 yarn build
 yarn start
 ```
@@ -620,10 +626,10 @@ kill -9 <PID>
 ps aux | grep llama-server
 
 # Check logs
-tail -100 deployment/carbon-deployment-*.log
+tail -100 ~/deployment/carbon-deployment-*.log
 
 # Restart LLM server
-cd llama.cpp
+cd ~/llama.cpp
 ./build/bin/llama-server -m /tmp/models/granite-4.0-micro-Q4_K_M.gguf --host 0.0.0.0
 ```
 
@@ -635,7 +641,7 @@ uname -m                 # Verify ppc64le
 ping -c 3 github.com     # Verify internet
 
 # View detailed logs
-tail -200 deployment/carbon-deployment-*.log
+tail -200 ~/deployment/carbon-deployment-*.log
 ```
 
 See [Deployment Guide](deployment/README.md) for comprehensive troubleshooting.

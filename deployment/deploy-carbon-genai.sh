@@ -13,11 +13,13 @@ set -o pipefail
 # GLOBAL VARIABLES
 # ============================================================================
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-LOG_FILE="${SCRIPT_DIR}/carbon-deployment-$(date +%Y%m%d-%H%M%S).log"
-PID_FILE="${SCRIPT_DIR}/carbon-dev-server.pid"
-PROXY_PID_FILE="${SCRIPT_DIR}/proxy-server.pid"
-LLM_PID_FILE="${SCRIPT_DIR}/llama-server.pid"
+# Work from home directory, not from deployment subdirectory
+WORK_DIR="$HOME"
+DEPLOYMENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LOG_FILE="${DEPLOYMENT_DIR}/carbon-deployment-$(date +%Y%m%d-%H%M%S).log"
+PID_FILE="${WORK_DIR}/carbon-dev-server.pid"
+PROXY_PID_FILE="${WORK_DIR}/proxy-server.pid"
+LLM_PID_FILE="${WORK_DIR}/llama-server.pid"
 VENV_NAME="carbon.venv"
 LLM_VENV_NAME="llama.cpp.venv"
 REPO_URL="https://github.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos"
@@ -56,7 +58,7 @@ Carbon GenAI Demo Deployment Log
 Start Time: $(date '+%Y-%m-%d %H:%M:%S')
 Hostname: $(hostname)
 User: $(whoami)
-Working Directory: ${SCRIPT_DIR}
+Working Directory: ${WORK_DIR}
 ================================================================================
 
 EOF
@@ -236,7 +238,7 @@ preflight_checks() {
     print_success "Internet connectivity verified"
     
     # Check disk space (require at least 5GB free)
-    local free_space=$(df -BG "$SCRIPT_DIR" | awk 'NR==2 {print $4}' | sed 's/G//')
+    local free_space=$(df -BG "$WORK_DIR" | awk 'NR==2 {print $4}' | sed 's/G//')
     if [ "$free_space" -lt 5 ]; then
         print_warning "Low disk space: ${free_space}GB available (5GB recommended)"
     else
@@ -310,7 +312,7 @@ setup_python_env() {
     
     # Create virtual environment
     if run_command "python3.12 -m venv $VENV_NAME" "Virtual environment created"; then
-        print_info "Virtual environment: ${SCRIPT_DIR}/${VENV_NAME}"
+        print_info "Virtual environment: ${WORK_DIR}/${VENV_NAME}"
     else
         print_error "Failed to create virtual environment"
         cleanup_on_error
@@ -347,7 +349,7 @@ clone_repository() {
     fi
     
     if run_command "git clone $REPO_URL" "Repository cloned successfully"; then
-        print_info "Repository: ${SCRIPT_DIR}/${REPO_DIR}"
+        print_info "Repository: ${WORK_DIR}/${REPO_DIR}"
         
         # Verify clone
         if [ -d "$REPO_DIR/$APP_DIR" ]; then
@@ -413,7 +415,7 @@ build_application() {
     print_step "🏗️  Building application..."
     
     # Ensure we're in the app directory
-    cd "${SCRIPT_DIR}/${REPO_DIR}/${APP_DIR}" || {
+    cd "${WORK_DIR}/${REPO_DIR}/${APP_DIR}" || {
         print_error "Failed to navigate to app directory"
         cleanup_on_error
     }
@@ -455,7 +457,7 @@ configure_proxy() {
     print_info "Server FQDN: $fqdn"
     
     # 1. Update proxy server configuration
-    local proxy_file="${SCRIPT_DIR}/${REPO_DIR}/${APP_DIR}/src/llama-proxy/server_final.js"
+    local proxy_file="${WORK_DIR}/${REPO_DIR}/${APP_DIR}/src/llama-proxy/server_final.js"
     
     if [ ! -f "$proxy_file" ]; then
         print_error "Proxy configuration file not found: $proxy_file"
@@ -485,7 +487,7 @@ configure_proxy() {
     # 2. Update web application page
     # Update all demo pages (entextract, piiextract, convintel)
     for page in entextract piiextract convintel; do
-        local page_file="${SCRIPT_DIR}/${REPO_DIR}/${APP_DIR}/src/app/${page}/page.js"
+        local page_file="${WORK_DIR}/${REPO_DIR}/${APP_DIR}/src/app/${page}/page.js"
         
         if [ -f "$page_file" ]; then
             # Backup page file
@@ -519,7 +521,7 @@ start_proxy_server() {
     print_step "🔌 Starting proxy server..."
     
     # Navigate to proxy directory
-    local proxy_dir="${SCRIPT_DIR}/${REPO_DIR}/${APP_DIR}/src/llama-proxy"
+    local proxy_dir="${WORK_DIR}/${REPO_DIR}/${APP_DIR}/src/llama-proxy"
     cd "$proxy_dir" || {
         print_error "Failed to navigate to proxy directory"
         cleanup_on_error
@@ -538,7 +540,7 @@ start_proxy_server() {
     local proxy_pid=$!
     
     # Save PID
-    local proxy_pid_file="${SCRIPT_DIR}/proxy-server.pid"
+    local proxy_pid_file="${WORK_DIR}/proxy-server.pid"
     echo "$proxy_pid" > "$proxy_pid_file"
     print_success "Proxy server started (PID: $proxy_pid)"
     
@@ -559,7 +561,7 @@ start_dev_server() {
     print_step "🏗️  Building Next.js application..."
     
     # Ensure we're in the app directory
-    cd "${SCRIPT_DIR}/${REPO_DIR}/${APP_DIR}" || {
+    cd "${WORK_DIR}/${REPO_DIR}/${APP_DIR}" || {
         print_error "Failed to navigate to app directory"
         cleanup_on_error
     }
@@ -602,15 +604,15 @@ start_dev_server() {
 setup_llm_env() {
     print_step "🤖 Setting up LLM environment..."
     
-    # Return to script directory
-    cd "$SCRIPT_DIR" || {
-        print_error "Failed to navigate to script directory"
+    # Return to working directory
+    cd "$WORK_DIR" || {
+        print_error "Failed to navigate to working directory"
         cleanup_on_error
     }
     
     # Create LLM virtual environment
     if run_command "python3.12 -m venv $LLM_VENV_NAME" "LLM virtual environment created"; then
-        print_info "LLM virtual environment: ${SCRIPT_DIR}/${LLM_VENV_NAME}"
+        print_info "LLM virtual environment: ${WORK_DIR}/${LLM_VENV_NAME}"
     else
         print_error "Failed to create LLM virtual environment"
         cleanup_on_error
@@ -649,9 +651,9 @@ setup_llm_env() {
 build_llama_cpp() {
     print_step "🔨 Building llama.cpp..."
     
-    # Return to script directory
-    cd "$SCRIPT_DIR" || {
-        print_error "Failed to navigate to script directory"
+    # Return to working directory
+    cd "$WORK_DIR" || {
+        print_error "Failed to navigate to working directory"
         cleanup_on_error
     }
     
@@ -663,7 +665,7 @@ build_llama_cpp() {
     
     # Clone llama.cpp
     if run_command "git clone $LLAMA_REPO_URL" "llama.cpp repository cloned"; then
-        print_info "Repository: ${SCRIPT_DIR}/${LLAMA_DIR}"
+        print_info "Repository: ${WORK_DIR}/${LLAMA_DIR}"
     else
         print_error "Failed to clone llama.cpp repository"
         cleanup_on_error
@@ -684,8 +686,8 @@ build_llama_cpp() {
     fi
     
     # Get OpenBLAS library path
-    local openblas_lib="${SCRIPT_DIR}/${LLM_VENV_NAME}/lib/python3.12/site-packages/openblas/lib/libopenblas.so"
-    local openblas_inc="${SCRIPT_DIR}/${LLM_VENV_NAME}/lib/python3.12/site-packages/openblas/include"
+    local openblas_lib="${WORK_DIR}/${LLM_VENV_NAME}/lib/python3.12/site-packages/openblas/lib/libopenblas.so"
+    local openblas_inc="${WORK_DIR}/${LLM_VENV_NAME}/lib/python3.12/site-packages/openblas/include"
     
     # Configure build
     print_info "Configuring llama.cpp build..."
@@ -751,7 +753,7 @@ start_llm_server() {
     print_step "🚀 Starting LLM server..."
     
     # Navigate to llama.cpp directory
-    cd "${SCRIPT_DIR}/${LLAMA_DIR}" || {
+    cd "${WORK_DIR}/${LLAMA_DIR}" || {
         print_error "Failed to navigate to llama.cpp directory"
         cleanup_on_error
     }
@@ -781,14 +783,14 @@ start_llm_server() {
 setup_passporteye() {
     print_step "📸 Setting up PassportEye OCR service..."
     
-    # Return to script directory
-    cd "$SCRIPT_DIR" || {
-        print_error "Failed to navigate to script directory"
+    # Return to working directory
+    cd "$WORK_DIR" || {
+        print_error "Failed to navigate to working directory"
         cleanup_on_error
     }
     
     # Check if setup script exists
-    local setup_script="${SCRIPT_DIR}/${REPO_DIR}/deployment/setup-passporteye.sh"
+    local setup_script="${WORK_DIR}/${REPO_DIR}/deployment/setup-passporteye.sh"
     if [ ! -f "$setup_script" ]; then
         print_warning "PassportEye setup script not found, skipping..."
         print_info "PassportEye can be set up later using: ./deployment/setup-passporteye.sh"
@@ -804,7 +806,7 @@ setup_passporteye() {
         print_success "PassportEye installed successfully"
         
         # Start PassportEye service
-        local service_script="${SCRIPT_DIR}/${REPO_DIR}/deployment/start-passporteye-service.sh"
+        local service_script="${WORK_DIR}/${REPO_DIR}/deployment/start-passporteye-service.sh"
         if [ -f "$service_script" ]; then
             chmod +x "$service_script"
             print_info "Starting PassportEye service..."
@@ -830,9 +832,9 @@ print_summary() {
     echo ""
     echo -e "${GREEN}${BOLD}✅ Deployment Summary${NC}"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo -e "${BOLD}📁 Installation Directory:${NC} ${SCRIPT_DIR}/${REPO_DIR}"
-    echo -e "${BOLD}🐍 Web App Virtual Env:${NC} ${SCRIPT_DIR}/${VENV_NAME}"
-    echo -e "${BOLD}🤖 LLM Virtual Env:${NC} ${SCRIPT_DIR}/${LLM_VENV_NAME}"
+    echo -e "${BOLD}📁 Installation Directory:${NC} ${WORK_DIR}/${REPO_DIR}"
+    echo -e "${BOLD}🐍 Web App Virtual Env:${NC} ${WORK_DIR}/${VENV_NAME}"
+    echo -e "${BOLD}🤖 LLM Virtual Env:${NC} ${WORK_DIR}/${LLM_VENV_NAME}"
     echo -e "${BOLD}🌐 Web Dev Server:${NC} http://$(hostname -f):3000"
     echo -e "${BOLD}🔌 Proxy Server:${NC} http://$(hostname -f):3001"
     echo -e "${BOLD}🤖 LLM Server:${NC} http://localhost:8080"
@@ -874,6 +876,13 @@ main() {
     # Initialize log
     init_log
     log_message "INFO" "Starting deployment process"
+    
+    # Change to working directory (home directory)
+    cd "$WORK_DIR" || {
+        print_error "Failed to navigate to working directory: $WORK_DIR"
+        exit 1
+    }
+    log_message "INFO" "Working directory: $WORK_DIR"
     
     # Execute deployment phases
     preflight_checks
