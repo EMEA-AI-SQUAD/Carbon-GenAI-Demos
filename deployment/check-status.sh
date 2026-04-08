@@ -8,9 +8,10 @@
 ################################################################################
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PID_FILE="${SCRIPT_DIR}/carbon-dev-server.pid"
-PROXY_PID_FILE="${SCRIPT_DIR}/proxy-server.pid"
-LLM_PID_FILE="${SCRIPT_DIR}/llama-server.pid"
+HOME_DIR="$HOME"
+PID_FILE="${HOME_DIR}/carbon-dev-server.pid"
+PROXY_PID_FILE="${HOME_DIR}/proxy-server.pid"
+LLM_PID_FILE="${HOME_DIR}/llama-server.pid"
 VENV_NAME="carbon.venv"
 LLM_VENV_NAME="llama.cpp.venv"
 REPO_DIR="Carbon-GenAI-Demos"
@@ -33,10 +34,10 @@ echo ""
 
 # Check Web App Python Virtual Environment
 echo -e "${BOLD}🐍 Web App Python Virtual Environment${NC}"
-if [ -d "${SCRIPT_DIR}/${VENV_NAME}" ]; then
+if [ -d "${HOME_DIR}/${VENV_NAME}" ]; then
     echo -e "   ${GREEN}✓${NC} Virtual environment exists: ${VENV_NAME}"
-    if [ -f "${SCRIPT_DIR}/${VENV_NAME}/bin/python" ]; then
-        local python_version=$("${SCRIPT_DIR}/${VENV_NAME}/bin/python" --version 2>&1)
+    if [ -f "${HOME_DIR}/${VENV_NAME}/bin/python" ]; then
+        python_version=$("${HOME_DIR}/${VENV_NAME}/bin/python" --version 2>&1)
         echo -e "   ${BLUE}ℹ${NC} Python version: $python_version"
     fi
 else
@@ -46,10 +47,10 @@ echo ""
 
 # Check LLM Python Virtual Environment
 echo -e "${BOLD}🤖 LLM Python Virtual Environment${NC}"
-if [ -d "${SCRIPT_DIR}/${LLM_VENV_NAME}" ]; then
+if [ -d "${HOME_DIR}/${LLM_VENV_NAME}" ]; then
     echo -e "   ${GREEN}✓${NC} Virtual environment exists: ${LLM_VENV_NAME}"
-    if [ -f "${SCRIPT_DIR}/${LLM_VENV_NAME}/bin/python" ]; then
-        local python_version=$("${SCRIPT_DIR}/${LLM_VENV_NAME}/bin/python" --version 2>&1)
+    if [ -f "${HOME_DIR}/${LLM_VENV_NAME}/bin/python" ]; then
+        python_version=$("${HOME_DIR}/${LLM_VENV_NAME}/bin/python" --version 2>&1)
         echo -e "   ${BLUE}ℹ${NC} Python version: $python_version"
     fi
 else
@@ -59,22 +60,22 @@ echo ""
 
 # Check Repository
 echo -e "${BOLD}📁 Repository${NC}"
-if [ -d "${SCRIPT_DIR}/${REPO_DIR}" ]; then
+if [ -d "${HOME_DIR}/${REPO_DIR}" ]; then
     echo -e "   ${GREEN}✓${NC} Repository cloned: ${REPO_DIR}"
-    if [ -d "${SCRIPT_DIR}/${REPO_DIR}/${APP_DIR}" ]; then
+    if [ -d "${HOME_DIR}/${REPO_DIR}/${APP_DIR}" ]; then
         echo -e "   ${GREEN}✓${NC} Application directory exists: ${APP_DIR}"
         
         # Check if node_modules exists
-        if [ -d "${SCRIPT_DIR}/${REPO_DIR}/${APP_DIR}/node_modules" ]; then
+        if [ -d "${HOME_DIR}/${REPO_DIR}/${APP_DIR}/node_modules" ]; then
             echo -e "   ${GREEN}✓${NC} Node dependencies installed"
         else
             echo -e "   ${YELLOW}⚠${NC} Node dependencies not found"
         fi
         
         # Check if build directory exists
-        if [ -d "${SCRIPT_DIR}/${REPO_DIR}/${APP_DIR}/build" ] || \
-           [ -d "${SCRIPT_DIR}/${REPO_DIR}/${APP_DIR}/dist" ] || \
-           [ -d "${SCRIPT_DIR}/${REPO_DIR}/${APP_DIR}/.next" ]; then
+        if [ -d "${HOME_DIR}/${REPO_DIR}/${APP_DIR}/build" ] || \
+           [ -d "${HOME_DIR}/${REPO_DIR}/${APP_DIR}/dist" ] || \
+           [ -d "${HOME_DIR}/${REPO_DIR}/${APP_DIR}/.next" ]; then
             echo -e "   ${GREEN}✓${NC} Application built"
         else
             echo -e "   ${YELLOW}⚠${NC} Build artifacts not found"
@@ -96,13 +97,13 @@ if [ -f "$PID_FILE" ]; then
         
         # Get process info
         if command -v ps >/dev/null 2>&1; then
-            local process_info=$(ps -p "$PID" -o comm= 2>/dev/null)
+            process_info=$(ps -p "$PID" -o comm= 2>/dev/null)
             if [ -n "$process_info" ]; then
                 echo -e "   ${BLUE}ℹ${NC} Process: $process_info"
             fi
             
             # Get CPU and memory usage
-            local cpu_mem=$(ps -p "$PID" -o %cpu,%mem 2>/dev/null | tail -n 1)
+            cpu_mem=$(ps -p "$PID" -o %cpu,%mem 2>/dev/null | tail -n 1)
             if [ -n "$cpu_mem" ]; then
                 echo -e "   ${BLUE}ℹ${NC} Resource usage: CPU/MEM: $cpu_mem"
             fi
@@ -110,12 +111,12 @@ if [ -f "$PID_FILE" ]; then
         
         # Check if port is listening
         if command -v netstat >/dev/null 2>&1; then
-            local listening_ports=$(netstat -tlnp 2>/dev/null | grep "$PID" | awk '{print $4}' | awk -F: '{print $NF}' | sort -u)
+            listening_ports=$(netstat -tlnp 2>/dev/null | grep "$PID" | awk '{print $4}' | awk -F: '{print $NF}' | sort -u)
             if [ -n "$listening_ports" ]; then
                 echo -e "   ${BLUE}ℹ${NC} Listening on port(s): $listening_ports"
             fi
         elif command -v ss >/dev/null 2>&1; then
-            local listening_ports=$(ss -tlnp 2>/dev/null | grep "pid=$PID" | awk '{print $4}' | awk -F: '{print $NF}' | sort -u)
+            listening_ports=$(ss -tlnp 2>/dev/null | grep "pid=$PID" | awk '{print $4}' | awk -F: '{print $NF}' | sort -u)
             if [ -n "$listening_ports" ]; then
                 echo -e "   ${BLUE}ℹ${NC} Listening on port(s): $listening_ports"
             fi
@@ -123,7 +124,7 @@ if [ -f "$PID_FILE" ]; then
         
         # Calculate uptime
         if command -v ps >/dev/null 2>&1; then
-            local start_time=$(ps -p "$PID" -o lstart= 2>/dev/null)
+            start_time=$(ps -p "$PID" -o lstart= 2>/dev/null)
             if [ -n "$start_time" ]; then
                 echo -e "   ${BLUE}ℹ${NC} Started: $start_time"
             fi
@@ -146,13 +147,13 @@ if [ -f "$LLM_PID_FILE" ]; then
         
         # Get process info
         if command -v ps >/dev/null 2>&1; then
-            local process_info=$(ps -p "$LLM_PID" -o comm= 2>/dev/null)
+            process_info=$(ps -p "$LLM_PID" -o comm= 2>/dev/null)
             if [ -n "$process_info" ]; then
                 echo -e "   ${BLUE}ℹ${NC} Process: $process_info"
             fi
             
             # Get CPU and memory usage
-            local cpu_mem=$(ps -p "$LLM_PID" -o %cpu,%mem 2>/dev/null | tail -n 1)
+            cpu_mem=$(ps -p "$LLM_PID" -o %cpu,%mem 2>/dev/null | tail -n 1)
             if [ -n "$cpu_mem" ]; then
                 echo -e "   ${BLUE}ℹ${NC} Resource usage: CPU/MEM: $cpu_mem"
             fi
@@ -160,12 +161,12 @@ if [ -f "$LLM_PID_FILE" ]; then
         
         # Check if port is listening (default llama.cpp port is 8080)
         if command -v netstat >/dev/null 2>&1; then
-            local listening_ports=$(netstat -tlnp 2>/dev/null | grep "$LLM_PID" | awk '{print $4}' | awk -F: '{print $NF}' | sort -u)
+            listening_ports=$(netstat -tlnp 2>/dev/null | grep "$LLM_PID" | awk '{print $4}' | awk -F: '{print $NF}' | sort -u)
             if [ -n "$listening_ports" ]; then
                 echo -e "   ${BLUE}ℹ${NC} Listening on port(s): $listening_ports"
             fi
         elif command -v ss >/dev/null 2>&1; then
-            local listening_ports=$(ss -tlnp 2>/dev/null | grep "pid=$LLM_PID" | awk '{print $4}' | awk -F: '{print $NF}' | sort -u)
+            listening_ports=$(ss -tlnp 2>/dev/null | grep "pid=$LLM_PID" | awk '{print $4}' | awk -F: '{print $NF}' | sort -u)
             if [ -n "$listening_ports" ]; then
                 echo -e "   ${BLUE}ℹ${NC} Listening on port(s): $listening_ports"
             fi
@@ -173,7 +174,7 @@ if [ -f "$LLM_PID_FILE" ]; then
         
         # Calculate uptime
         if command -v ps >/dev/null 2>&1; then
-            local start_time=$(ps -p "$LLM_PID" -o lstart= 2>/dev/null)
+            start_time=$(ps -p "$LLM_PID" -o lstart= 2>/dev/null)
             if [ -n "$start_time" ]; then
                 echo -e "   ${BLUE}ℹ${NC} Started: $start_time"
             fi
@@ -189,9 +190,9 @@ echo ""
 
 # Check llama.cpp Installation
 echo -e "${BOLD}🔨 llama.cpp Installation${NC}"
-if [ -d "${SCRIPT_DIR}/${LLAMA_DIR}" ]; then
+if [ -d "${HOME_DIR}/${LLAMA_DIR}" ]; then
     echo -e "   ${GREEN}✓${NC} llama.cpp directory exists"
-    if [ -f "${SCRIPT_DIR}/${LLAMA_DIR}/build/bin/llama-server" ]; then
+    if [ -f "${HOME_DIR}/${LLAMA_DIR}/build/bin/llama-server" ]; then
         echo -e "   ${GREEN}✓${NC} llama-server binary found"
     else
         echo -e "   ${RED}✗${NC} llama-server binary not found"
@@ -205,7 +206,7 @@ echo ""
 echo -e "${BOLD}📦 LLM Model${NC}"
 if [ -f "/tmp/models/granite-4.0-micro-Q4_K_M.gguf" ]; then
     echo -e "   ${GREEN}✓${NC} Model file exists"
-    local model_size=$(du -h "/tmp/models/granite-4.0-micro-Q4_K_M.gguf" | cut -f1)
+    model_size=$(du -h "/tmp/models/granite-4.0-micro-Q4_K_M.gguf" | cut -f1)
     echo -e "   ${BLUE}ℹ${NC} Model size: $model_size"
 else
     echo -e "   ${RED}✗${NC} Model file not found"

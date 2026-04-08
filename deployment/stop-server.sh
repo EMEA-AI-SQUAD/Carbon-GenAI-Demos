@@ -8,9 +8,10 @@
 ################################################################################
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PID_FILE="${SCRIPT_DIR}/carbon-dev-server.pid"
-PROXY_PID_FILE="${SCRIPT_DIR}/proxy-server.pid"
-LLM_PID_FILE="${SCRIPT_DIR}/llama-server.pid"
+HOME_DIR="$HOME"
+PID_FILE="${HOME_DIR}/carbon-dev-server.pid"
+PROXY_PID_FILE="${HOME_DIR}/proxy-server.pid"
+LLM_PID_FILE="${HOME_DIR}/llama-server.pid"
 
 # Color codes
 RED='\033[0;31m'
