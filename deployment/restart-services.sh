@@ -81,16 +81,29 @@ if [ ! -f "server_final.js" ]; then
     exit 1
 fi
 
+# Check if node_modules exist in proxy directory
+if [ ! -d "node_modules" ]; then
+    echo -e "${YELLOW}⚠${NC} Installing proxy dependencies..."
+    npm install
+fi
+
 echo -e "${BLUE}ℹ${NC} Starting proxy server..."
-nohup node server_final.js > /dev/null 2>&1 &
+# Create a log file for proxy output
+PROXY_LOG="${HOME_DIR}/proxy-server.log"
+nohup node server_final.js > "$PROXY_LOG" 2>&1 &
 PROXY_PID=$!
 echo "$PROXY_PID" > "$PROXY_PID_FILE"
 
 sleep 5
 if kill -0 "$PROXY_PID" 2>/dev/null; then
     echo -e "${GREEN}✓${NC} Proxy server started (PID: $PROXY_PID)"
+    echo -e "${BLUE}ℹ${NC} Proxy logs: $PROXY_LOG"
 else
     echo -e "${RED}✗${NC} Proxy server failed to start"
+    if [ -f "$PROXY_LOG" ]; then
+        echo -e "${YELLOW}⚠${NC} Last few lines from proxy log:"
+        tail -5 "$PROXY_LOG"
+    fi
     echo -e "${YELLOW}⚠${NC} Try starting manually: cd ~/Carbon-GenAI-Demos/carbon-ui/src/llama-proxy && node server_final.js"
     exit 1
 fi
