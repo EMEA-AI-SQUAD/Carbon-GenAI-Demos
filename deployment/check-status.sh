@@ -188,6 +188,52 @@ else
 fi
 echo ""
 
+# Check PassportEye Service
+echo -e "${BOLD}📸 PassportEye Service${NC}"
+if [ -f "$HOME_DIR/passporteye-server.pid" ]; then
+    PASSPORT_PID=$(cat "$HOME_DIR/passporteye-server.pid")
+    if kill -0 "$PASSPORT_PID" 2>/dev/null; then
+        echo -e "   ${GREEN}✓${NC} PassportEye service is running (PID: $PASSPORT_PID)"
+        
+        # Get process info
+        if command -v ps >/dev/null 2>&1; then
+            process_info=$(ps -p "$PASSPORT_PID" -o comm= 2>/dev/null)
+            if [ -n "$process_info" ]; then
+                echo -e "   ${BLUE}ℹ${NC} Process: $process_info"
+            fi
+            
+            # Get CPU and memory usage
+            cpu_mem=$(ps -p "$PASSPORT_PID" -o %cpu,%mem 2>/dev/null | tail -n 1)
+            if [ -n "$cpu_mem" ]; then
+                echo -e "   ${BLUE}ℹ${NC} Resource usage: CPU/MEM: $cpu_mem"
+            fi
+        fi
+        
+        # Check if port 5000 is listening
+        if command -v netstat >/dev/null 2>&1; then
+            listening_ports=$(netstat -tlnp 2>/dev/null | grep "$PASSPORT_PID" | awk '{print $4}' | awk -F: '{print $NF}' | sort -u)
+            if [ -n "$listening_ports" ]; then
+                echo -e "   ${BLUE}ℹ${NC} Listening on port(s): $listening_ports"
+            fi
+        elif command -v ss >/dev/null 2>&1; then
+            listening_ports=$(ss -tlnp 2>/dev/null | grep "pid=$PASSPORT_PID" | awk '{print $4}' | awk -F: '{print $NF}' | sort -u)
+            if [ -n "$listening_ports" ]; then
+                echo -e "   ${BLUE}ℹ${NC} Listening on port(s): $listening_ports"
+            fi
+        fi
+    else
+        echo -e "   ${RED}✗${NC} PassportEye service not running (stale PID file)"
+        echo -e "   ${BLUE}ℹ${NC} PID file exists but process $PASSPORT_PID is not running"
+    fi
+elif [ -d "${HOME_DIR}/.passporteye-venv" ]; then
+    echo -e "   ${YELLOW}⚠${NC} PassportEye installed but service not started"
+    echo -e "   ${BLUE}ℹ${NC} Start with: ./deployment/start-passporteye-service.sh"
+else
+    echo -e "   ${YELLOW}⚠${NC} PassportEye not installed (optional service)"
+    echo -e "   ${BLUE}ℹ${NC} Install with: ./deployment/setup-passporteye.sh"
+fi
+echo ""
+
 # Check llama.cpp Installation
 echo -e "${BOLD}🔨 llama.cpp Installation${NC}"
 if [ -d "${HOME_DIR}/${LLAMA_DIR}" ]; then

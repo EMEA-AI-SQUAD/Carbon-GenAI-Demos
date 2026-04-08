@@ -35,9 +35,45 @@ echo ""
 # Step 1: Stop all services
 echo -e "${BOLD}Step 1: Stopping all services...${NC}"
 ./stop-server.sh
+
+# Stop PassportEye service if running
+if pgrep -f "passport_service.py" > /dev/null; then
+    echo -e "${BLUE}ℹ${NC} Stopping PassportEye service..."
+    pkill -f "passport_service.py"
+    sleep 2
+fi
 echo ""
 
-# Step 2: Start LLM Server
+# Step 2: Start PassportEye Service (Optional)
+echo -e "${BOLD}Step 2: Starting PassportEye Service (Optional)...${NC}"
+if [ -d "${HOME_DIR}/.passporteye-venv" ]; then
+    echo -e "${BLUE}ℹ${NC} PassportEye is installed, starting service..."
+    cd "${HOME_DIR}/${REPO_DIR}"
+    
+    # Activate venv and start service
+    source .passporteye-venv/bin/activate
+    PASSPORT_LOG="${HOME_DIR}/passporteye-service.log"
+    nohup python3 deployment/passport_service.py > "$PASSPORT_LOG" 2>&1 &
+    PASSPORT_PID=$!
+    echo "$PASSPORT_PID" > "${HOME_DIR}/passporteye-server.pid"
+    
+    sleep 3
+    if curl -s http://localhost:5000/health > /dev/null 2>&1; then
+        echo -e "${GREEN}✓${NC} PassportEye service started (PID: $PASSPORT_PID, port 5000)"
+        echo -e "${BLUE}ℹ${NC} PassportEye logs: $PASSPORT_LOG"
+    else
+        echo -e "${YELLOW}⚠${NC} PassportEye service may not have started properly"
+        echo -e "${BLUE}ℹ${NC} Check logs: tail -f $PASSPORT_LOG"
+        echo -e "${BLUE}ℹ${NC} Demo will use LLM fallback for passport extraction"
+    fi
+else
+    echo -e "${YELLOW}⚠${NC} PassportEye not installed (optional service)"
+    echo -e "${BLUE}ℹ${NC} Install with: ./deployment/setup-passporteye.sh"
+    echo -e "${BLUE}ℹ${NC} Demo will use LLM fallback for passport extraction"
+fi
+echo ""
+
+# Step 3: Start LLM Server
 echo -e "${BOLD}Step 2: Starting LLM Server...${NC}"
 cd "${HOME_DIR}/${LLAMA_DIR}" || {
     echo -e "${RED}✗${NC} Failed to navigate to llama.cpp directory"
@@ -69,7 +105,7 @@ else
 fi
 echo ""
 
-# Step 3: Start Proxy Server
+# Step 4: Start Proxy Server
 echo -e "${BOLD}Step 3: Starting Proxy Server...${NC}"
 cd "${HOME_DIR}/${REPO_DIR}/${APP_DIR}/src/llama-proxy" || {
     echo -e "${RED}✗${NC} Failed to navigate to proxy directory"
@@ -120,7 +156,7 @@ else
 fi
 echo ""
 
-# Step 4: Start Web Server
+# Step 5: Start Web Server
 echo -e "${BOLD}Step 4: Starting Web Server...${NC}"
 cd "${HOME_DIR}/${REPO_DIR}/${APP_DIR}" || {
     echo -e "${RED}✗${NC} Failed to navigate to app directory"
@@ -157,6 +193,11 @@ echo -e "${BOLD}${GREEN}✓ All services started successfully!${NC}"
 echo -e "${BOLD}${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 echo -e "${BOLD}Service Status:${NC}"
+if [ -n "$PASSPORT_PID" ] && kill -0 "$PASSPORT_PID" 2>/dev/null; then
+    echo -e "  PassportEye:  PID $PASSPORT_PID (port 5000) ${GREEN}✓${NC}"
+else
+    echo -e "  PassportEye:  Not running (using LLM fallback) ${YELLOW}⚠${NC}"
+fi
 echo -e "  LLM Server:   PID $LLM_PID (port 8080)"
 echo -e "  Proxy Server: PID $PROXY_PID (port 3001)"
 echo -e "  Web Server:   PID $WEB_PID (port 3000)"

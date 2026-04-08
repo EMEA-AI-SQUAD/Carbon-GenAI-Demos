@@ -12,6 +12,7 @@ HOME_DIR="$HOME"
 PID_FILE="${HOME_DIR}/carbon-dev-server.pid"
 PROXY_PID_FILE="${HOME_DIR}/proxy-server.pid"
 LLM_PID_FILE="${HOME_DIR}/llama-server.pid"
+PASSPORT_PID_FILE="${HOME_DIR}/passporteye-server.pid"
 
 # Color codes
 RED='\033[0;31m'
@@ -96,10 +97,17 @@ stop_server "$LLM_PID_FILE" "LLM Server"
 llm_result=$?
 
 echo ""
+
+# Stop PassportEye service
+echo -e "${BOLD}PassportEye Service${NC}"
+stop_server "$PASSPORT_PID_FILE" "PassportEye Service"
+passport_result=$?
+
+echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 # Exit with appropriate code
-if [ $web_result -eq 0 ] || [ $proxy_result -eq 0 ] || [ $llm_result -eq 0 ]; then
+if [ $web_result -eq 0 ] || [ $proxy_result -eq 0 ] || [ $llm_result -eq 0 ] || [ $passport_result -eq 0 ]; then
     echo -e "${GREEN}✓${NC} At least one server was stopped"
     exit 0
 else
