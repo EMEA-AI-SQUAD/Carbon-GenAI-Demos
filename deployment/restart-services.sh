@@ -84,7 +84,13 @@ fi
 # Check if node_modules exist in proxy directory
 if [ ! -d "node_modules" ]; then
     echo -e "${YELLOW}⚠${NC} Installing proxy dependencies..."
-    npm install
+    npm install --legacy-peer-deps > /dev/null 2>&1
+    
+    # Update FQDN after npm install (in case it restored original file)
+    echo -e "${BLUE}ℹ${NC} Updating FQDN in proxy configuration..."
+    cd "${HOME_DIR}/${REPO_DIR}/deployment"
+    ./update-fqdn.sh > /dev/null 2>&1
+    cd "${HOME_DIR}/${REPO_DIR}/${APP_DIR}/src/llama-proxy"
 fi
 
 echo -e "${BLUE}ℹ${NC} Starting proxy server..."
@@ -94,9 +100,14 @@ nohup node server_final.js > "$PROXY_LOG" 2>&1 &
 PROXY_PID=$!
 echo "$PROXY_PID" > "$PROXY_PID_FILE"
 
-sleep 5
-if kill -0 "$PROXY_PID" 2>/dev/null; then
-    echo -e "${GREEN}✓${NC} Proxy server started (PID: $PROXY_PID)"
+# Wait and check if port 3001 is listening instead of checking PID
+sleep 3
+if netstat -tln 2>/dev/null | grep -q ":3001 " || ss -tln 2>/dev/null | grep -q ":3001 "; then
+    echo -e "${GREEN}✓${NC} Proxy server started and listening on port 3001"
+    echo -e "${BLUE}ℹ${NC} Proxy PID: $PROXY_PID"
+    echo -e "${BLUE}ℹ${NC} Proxy logs: $PROXY_LOG"
+elif kill -0 "$PROXY_PID" 2>/dev/null; then
+    echo -e "${GREEN}✓${NC} Proxy server process running (PID: $PROXY_PID)"
     echo -e "${BLUE}ℹ${NC} Proxy logs: $PROXY_LOG"
 else
     echo -e "${RED}✗${NC} Proxy server failed to start"
