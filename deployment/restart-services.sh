@@ -86,11 +86,12 @@ nohup node server_final.js > /dev/null 2>&1 &
 PROXY_PID=$!
 echo "$PROXY_PID" > "$PROXY_PID_FILE"
 
-sleep 3
+sleep 5
 if kill -0 "$PROXY_PID" 2>/dev/null; then
     echo -e "${GREEN}✓${NC} Proxy server started (PID: $PROXY_PID)"
 else
     echo -e "${RED}✗${NC} Proxy server failed to start"
+    echo -e "${YELLOW}⚠${NC} Try starting manually: cd ~/Carbon-GenAI-Demos/carbon-ui/src/llama-proxy && node server_final.js"
     exit 1
 fi
 echo ""
@@ -116,11 +117,12 @@ nohup yarn start > /dev/null 2>&1 &
 WEB_PID=$!
 echo "$WEB_PID" > "$PID_FILE"
 
-sleep 3
+sleep 5
 if kill -0 "$WEB_PID" 2>/dev/null; then
     echo -e "${GREEN}✓${NC} Web server started (PID: $WEB_PID)"
 else
     echo -e "${RED}✗${NC} Web server failed to start"
+    echo -e "${YELLOW}⚠${NC} Try starting manually: cd ~/Carbon-GenAI-Demos/carbon-ui && yarn start"
     exit 1
 fi
 echo ""
