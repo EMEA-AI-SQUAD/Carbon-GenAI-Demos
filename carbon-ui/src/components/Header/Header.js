@@ -38,6 +38,15 @@ const TutorialHeader = () => (
               <Link href="/convintel" passHref legacyBehavior>
                   <HeaderMenuItem>Conversation Intelligence</HeaderMenuItem>
               </Link>
+              <Link href="/briefbuilder" passHref legacyBehavior>
+                  <HeaderMenuItem>Brief Builder</HeaderMenuItem>
+              </Link>
+              <Link href="/rfpassistant" passHref legacyBehavior>
+                  <HeaderMenuItem>RFP Assistant</HeaderMenuItem>
+              </Link>
+              <Link href="/talentacquisition" passHref legacyBehavior>
+                  <HeaderMenuItem>Talent Acquisition</HeaderMenuItem>
+              </Link>
               <Link href="/carbon" passHref legacyBehavior>
                   <HeaderMenuItem>Carbon Design System</HeaderMenuItem>
               </Link>
@@ -56,6 +65,15 @@ const TutorialHeader = () => (
               </Link>
               <Link href="/convintel" passHref legacyBehavior>
                   <HeaderMenuItem>Conversation Intelligence</HeaderMenuItem>
+              </Link>
+              <Link href="/briefbuilder" passHref legacyBehavior>
+                  <HeaderMenuItem>Brief Builder</HeaderMenuItem>
+              </Link>
+              <Link href="/rfpassistant" passHref legacyBehavior>
+                  <HeaderMenuItem>RFP Assistant</HeaderMenuItem>
+              </Link>
+              <Link href="/talentacquisition" passHref legacyBehavior>
+                  <HeaderMenuItem>Talent Acquisition</HeaderMenuItem>
               </Link>
               <Link href="/carbon" passHref legacyBehavior>
                   <HeaderMenuItem>Carbon Design System</HeaderMenuItem>
