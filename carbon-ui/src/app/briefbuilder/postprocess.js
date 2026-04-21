@@ -26,21 +26,33 @@ export function reconcileOutput(modelObj, expectedKeys, opts = {}) {
 
   const out = {};
 
+  // Helper function to convert any value to a readable string
+  const valueToString = (raw) => {
+    if (raw === undefined || raw === null) return fill;
+    if (typeof raw === "string") {
+      return raw.trim() === "" ? fill : raw;
+    }
+    if (Array.isArray(raw)) {
+      // Convert arrays to bullet points
+      return raw.map((item, idx) => `${idx + 1}. ${valueToString(item)}`).join('\n');
+    }
+    if (typeof raw === "object") {
+      // Convert objects to formatted text
+      return Object.entries(raw)
+        .map(([k, v]) => `${k}: ${valueToString(v)}`)
+        .join('\n');
+    }
+    return String(raw);
+  };
+
   for (const key of expectedKeys) {
-    const raw = modelObj[key];
-    const val =
-      raw === undefined || raw === null || (typeof raw === "string" && raw.trim() === "")
-        ? fill
-        : typeof raw === "string"
-          ? raw
-          : String(raw);
-    out[key] = val;
+    out[key] = valueToString(modelObj[key]);
   }
 
   if (!discardExtras) {
     for (const [k, v] of Object.entries(modelObj)) {
       if (!expectedKeys.includes(k)) {
-        out[k] = typeof v === "string" ? v : v == null ? fill : String(v);
+        out[k] = valueToString(v);
       }
     }
   }

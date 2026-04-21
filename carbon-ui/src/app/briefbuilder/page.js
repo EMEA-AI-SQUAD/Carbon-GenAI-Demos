@@ -705,57 +705,40 @@ export default function BriefBuilderPage() {
             </Column>
           ) : (
             <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
-              <DataTable
-                rows={extractedRows}
-                headers={[
-                  { key: 'label', header: 'Brief Section' },
-                  { key: 'value', header: 'Generated Content' },
-                ]}
-                isSortable
-                size="md"
-              >
-                {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
-                  <TableContainer
-                    title={
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <span>{tableTitle}</span>
-                        <AILabel size="sm">
-                          <AILabelContent>
-                            <div>
-                              <p className="secondary">AI Generated</p>
-                              <p className="secondary">Content by Granite 4.0</p>
-                            </div>
-                          </AILabelContent>
-                        </AILabel>
+              <div style={{ marginBottom: '2rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                  <h3 style={{ margin: 0 }}>{tableTitle}</h3>
+                  <AILabel size="sm">
+                    <AILabelContent>
+                      <div>
+                        <p className="secondary">AI Generated</p>
+                        <p className="secondary">Content by Granite 4.0</p>
                       </div>
-                    }
-                    description={tableDescription}
-                  >
-                    <Table {...getTableProps()}>
-                      <TableHead>
-                        <TableRow>
-                          {headers.map((header) => (
-                            <TableHeader key={header.key} {...getHeaderProps({ header })}>
-                              {header.header}
-                            </TableHeader>
-                          ))}
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {rows.map((row) => (
-                          <TableRow key={row.id} {...getRowProps({ row })}>
-                            {row.cells.map((cell) => (
-                              <TableCell key={cell.id} style={{ whiteSpace: 'pre-wrap' }}>
-                                {cell.value}
-                              </TableCell>
-                            ))}
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                )}
-              </DataTable>
+                    </AILabelContent>
+                  </AILabel>
+                </div>
+                <p style={{ marginBottom: '1rem', color: 'var(--cds-text-secondary)' }}>
+                  {tableDescription}
+                </p>
+                <TextArea
+                  labelText=""
+                  value={extractedRows.map(row => `${row.label}\n${row.value}\n`).join('\n')}
+                  rows={20}
+                  readOnly
+                  style={{ fontFamily: 'monospace', fontSize: '0.875rem' }}
+                />
+                <Button
+                  kind="tertiary"
+                  size="sm"
+                  style={{ marginTop: '1rem' }}
+                  onClick={() => {
+                    const briefText = extractedRows.map(row => `${row.label}\n${row.value}\n`).join('\n');
+                    navigator.clipboard.writeText(briefText);
+                  }}
+                >
+                  Copy Brief to Clipboard
+                </Button>
+              </div>
             </Column>
           )}
         </Grid>
