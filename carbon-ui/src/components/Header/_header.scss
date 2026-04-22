@@ -11,6 +11,13 @@
   background-color: colors.$gray-20;
 }
 
+// Prevent header name from wrapping to keep "IBM" aligned
+.cds--header__name {
+  white-space: nowrap;
+  min-width: fit-content;
+  flex-shrink: 0;
+}
+
 @media (max-width: 320px) {
   .action-icons {
     display: none;
