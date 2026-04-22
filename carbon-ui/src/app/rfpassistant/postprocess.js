@@ -26,6 +26,17 @@ export function reconcileOutput(modelObj, expectedKeys, opts = {}) {
 
   const out = {};
 
+  // Helper function to convert snake_case or camelCase to Title Case
+  const toTitleCase = (str) => {
+    return str
+      .replace(/_/g, ' ')  // Replace underscores with spaces
+      .replace(/([A-Z])/g, ' $1')  // Add space before capital letters
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ')
+      .trim();
+  };
+
   // Helper function to convert any value to a readable string
   const valueToString = (raw) => {
     if (raw === undefined || raw === null) return fill;
@@ -37,9 +48,9 @@ export function reconcileOutput(modelObj, expectedKeys, opts = {}) {
       return raw.map((item, idx) => `${idx + 1}. ${valueToString(item)}`).join('\n');
     }
     if (typeof raw === "object") {
-      // Convert objects to formatted text
+      // Convert objects to formatted text with title-cased keys
       return Object.entries(raw)
-        .map(([k, v]) => `${k}: ${valueToString(v)}`)
+        .map(([k, v]) => `${toTitleCase(k)}: ${valueToString(v)}`)
         .join('\n');
     }
     return String(raw);
