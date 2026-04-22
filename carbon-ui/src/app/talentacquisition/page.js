@@ -304,6 +304,7 @@ export default function TalentAcquisitionPage() {
 
             {renderTalentTab({
               title: 'Job Requisition / Job Description Generation',
+              useTextArea: true,
               intro:
                 'This demo turns a hiring request into a polished job description. It is especially useful when recruiters and hiring managers want consistent structure, stronger inclusive language, and expanded role details.',
               useCaseTitle: '📄 Use Case: Requisition to Job Description Generation',
@@ -354,6 +355,7 @@ export default function TalentAcquisitionPage() {
 
             {renderTalentTab({
               title: 'Candidate Shortlist / Interview Pack',
+              useTextArea: true,
               intro:
                 'This demo helps hiring teams move from candidate review to interview preparation by creating shortlist guidance, interview focus areas, and targeted question prompts.',
               useCaseTitle: '🎯 Use Case: Shortlisting and Interview Preparation',
@@ -505,6 +507,7 @@ export default function TalentAcquisitionPage() {
 
   function renderTalentTab({
     title,
+    useTextArea = false,
     intro,
     useCaseTitle,
     steps,

@@ -330,6 +330,7 @@ export default function RFPAssistantPage() {
 
             {renderRfpTab({
               title: 'Proposal Drafting',
+              useTextArea: true,
               intro:
                 'This demo creates a polished proposal draft framework aligned to a buyer challenge, required scope, and supplier strengths. It gives bid teams a usable first draft rather than a blank page.',
               useCaseTitle: '📝 Use Case: Proposal First Draft Generation',
@@ -355,6 +356,7 @@ export default function RFPAssistantPage() {
 
             {renderRfpTab({
               title: 'Executive Summary & Compliance Matrix',
+              useTextArea: true,
               intro:
                 'This demo focuses on two high-value bid tasks: generating a strong executive summary and producing concise compliance-style responses aligned to mandatory requirements.',
               useCaseTitle: '📋 Use Case: Executive Positioning and Compliance Response',
@@ -506,6 +508,7 @@ export default function RFPAssistantPage() {
 
   function renderRfpTab({
     title,
+    useTextArea = false,
     intro,
     useCaseTitle,
     steps,
@@ -694,6 +697,43 @@ export default function RFPAssistantPage() {
                   }}>
                   {emptyText}
                 </p>
+              </div>
+            </Column>
+          ) : useTextArea ? (
+            <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
+              <div style={{ marginBottom: '2rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                  <h3 style={{ margin: 0 }}>{tableTitle}</h3>
+                  <AILabel size="sm">
+                    <AILabelContent>
+                      <div>
+                        <p className="secondary">AI Generated</p>
+                        <p className="secondary">Content by Granite 4.0</p>
+                      </div>
+                    </AILabelContent>
+                  </AILabel>
+                </div>
+                <p style={{ marginBottom: '1rem', color: 'var(--cds-text-secondary)' }}>
+                  {tableDescription}
+                </p>
+                <TextArea
+                  labelText=""
+                  value={extractedRows.map(row => `${row.label}\n${row.value}\n`).join('\n')}
+                  rows={20}
+                  readOnly
+                  style={{ fontFamily: 'monospace', fontSize: '0.875rem' }}
+                />
+                <Button
+                  kind="tertiary"
+                  size="sm"
+                  style={{ marginTop: '1rem' }}
+                  onClick={() => {
+                    const proposalText = extractedRows.map(row => `${row.label}\n${row.value}\n`).join('\n');
+                    navigator.clipboard.writeText(proposalText);
+                  }}
+                >
+                  Copy to Clipboard
+                </Button>
               </div>
             </Column>
           ) : (
