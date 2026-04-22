@@ -82,7 +82,10 @@ Result: Production-ready demo showcasing team + AI collaboration
 
 ## 🎯 Overview
 
-This project demonstrates how IBM Granite AI models running on IBM Power can solve real business problems through interactive demos showcasing entity extraction and PII compliance.
+This project demonstrates how IBM Granite AI models running on IBM Power can solve real business problems through interactive demos showcasing:
+- **Entity Extraction** - Extract structured data from unstructured text
+- **PII Compliance** - Identify and redact personal information for GDPR/CCPA
+- **Business Content Generation** - Create marketing briefs, proposals, and hiring content
 
 ### 🚀 New Features: Enhanced Demo Experience
 
@@ -197,6 +200,62 @@ Unstructured data discovery for GDPR compliance audits
 - **Customer Reference**: Real IBM Power customer use case
 
 **Key Innovation**: Demonstrates complete compliance workflow - scan documents at scale, classify GDPR risk level, extract sensitive data, and provide redacted version safe for archival and analysis. Shows how Elinar's customers use IBM Power + AI to automate GDPR compliance.
+
+### Business Content Generation Demos
+
+#### 📝 **Brief Builder - Campaign Brief Generation**
+Generate structured marketing campaign briefs from unstructured launch notes
+- **Use Case**: Marketing, product, and partner teams creating consistent campaign documentation
+- **Scenarios**:
+  - **Product Launch Brief**: Transform feature notes into campaign briefs
+  - **Event Campaign Brief**: Create event marketing briefs for conferences/webinars
+  - **Partner Enablement Brief**: Generate joint solution launch documentation
+- **Features**:
+  - Converts semi-structured input into standardized brief templates
+  - Configurable output sections (objectives, messaging, channels, success metrics)
+  - TextArea display with "Copy to Clipboard" for easy sharing
+  - Handles complex nested data structures (arrays, objects)
+  - Title Case formatting for professional presentation
+- **Output Format**: Document-style TextArea (not table) for easy copying and editing
+- **Built by**: Bob with team requirements
+
+#### 📋 **RFP Assistant - Proposal & Response Generation**
+Accelerate RFP response and proposal creation workflows
+- **Use Case**: Sales and bid teams responding to opportunities and creating proposals
+- **Scenarios**:
+  - **Opportunity Matching**: Compare multiple opportunities (table format for comparison)
+  - **Proposal Drafting**: Generate proposal frameworks from RFP requirements (TextArea format)
+  - **Executive Summary & Compliance**: Create executive summaries and compliance responses (TextArea format)
+- **Features**:
+  - Transforms RFP requirements into structured proposal content
+  - Supplier positioning and differentiation
+  - Executive-level language and framing
+  - Mixed display formats: tables for comparison, TextArea for documents
+  - Smart object formatting with Title Case keys
+- **Output Format**: Context-appropriate (tables for comparison, TextArea for documents)
+- **Built by**: Bob with team requirements
+
+#### 👔 **Talent Acquisition - Hiring Content Generation**
+Streamline recruitment workflows with AI-generated hiring content
+- **Use Case**: Recruiters and hiring managers creating job descriptions and candidate assessments
+- **Scenarios**:
+  - **Job Description Generation**: Convert requisitions into polished job postings (TextArea format)
+  - **Resume Search & Candidate Summaries**: Normalize candidate profiles for browsing (table format)
+  - **Candidate Shortlist / Interview Pack**: Generate interview guidance and assessments (TextArea format)
+- **Features**:
+  - Consistent job description structure across roles
+  - Inclusive language and diversity considerations
+  - Candidate profile normalization for easier comparison
+  - Interview focus areas and question prompts
+  - Mixed display formats based on use case
+- **Output Format**: Context-appropriate (tables for candidate comparison, TextArea for documents)
+- **Built by**: Bob with team requirements
+
+**Key Innovation**: All three demos feature intelligent output formatting:
+- **TextArea with Copy Button**: For document-style content (briefs, proposals, job descriptions)
+- **DataTable**: For comparison and structured data (opportunities, candidates)
+- **Smart Object Handling**: Converts nested objects/arrays to readable formatted text
+- **Title Case Formatting**: Transforms snake_case keys (technical_discovery) to natural language (Technical Discovery)
 
 ---
 
@@ -368,11 +427,27 @@ Carbon-GenAI-Demos/
 │   │   │   │   ├── messages.js        # PII-specific prompts (Bob)
 │   │   │   │   ├── postprocess.js     # Response parser
 │   │   │   │   └── extraction.js      # API client
+│   │   │   ├── briefbuilder/          # Campaign brief generation (Bob)
+│   │   │   │   ├── page.js            # Main brief builder - 3 scenarios
+│   │   │   │   ├── defaults.js        # Product launch, event, partner scenarios
+│   │   │   │   ├── messages.js        # Brief-specific prompts
+│   │   │   │   └── postprocess.js     # Smart object formatting with Title Case
+│   │   │   ├── rfpassistant/          # RFP response assistant (Bob)
+│   │   │   │   ├── page.js            # Opportunity matching, proposal drafting
+│   │   │   │   ├── defaults.js        # RFP scenarios
+│   │   │   │   ├── messages.js        # Proposal-specific prompts
+│   │   │   │   └── postprocess.js     # Smart object formatting
+│   │   │   ├── talentacquisition/     # Hiring content generation (Bob)
+│   │   │   │   ├── page.js            # Job descriptions, candidate summaries
+│   │   │   │   ├── defaults.js        # Hiring scenarios
+│   │   │   │   ├── messages.js        # Recruitment-specific prompts
+│   │   │   │   └── postprocess.js     # Smart object formatting
 │   │   │   ├── home/                  # Landing page (Bob)
 │   │   │   └── carbon/                # Carbon components demo
 │   │   ├── llama-proxy/               # Proxy server
 │   │   │   └── server_final.js        # CORS & routing (Henrik Mader)
 │   │   └── components/                # Shared components
+│   │       └── Header/                # Navigation header
 │   ├── public/
 │   │   └── images/                    # Demo images
 │   ├── package.json                   # Node dependencies
@@ -381,6 +456,7 @@ Carbon-GenAI-Demos/
 │   ├── deploy-carbon-genai.sh         # Main deployment script (Bob)
 │   ├── stop-server.sh                 # Stop all servers (Bob)
 │   ├── check-status.sh                # Check deployment status (Bob)
+│   ├── update-all-fqdns.sh            # Update API endpoints for new environments
 │   └── README.md                      # Deployment guide (Bob)
 ├── llama.cpp/                         # LLM server (cloned during deployment)
 └── README.md                          # This file (Bob + Team)
