@@ -2,6 +2,37 @@
 
 Automated deployment script for the Carbon GenAI Demo application on RHEL/PPC64LE systems.
 
+## ⚠️ Before You Begin: Reserve TechZone Environment
+
+**You need an IBM Power environment from TechZone before running this deployment.**
+
+### Quick TechZone Reservation
+
+1. **Environment**: RHEL 9 ready for AI on IBM Power10 (IaaS)
+2. **Collection**: [Generative AI demos on IBM Power](https://techzone.ibm.com/collection/generative-ai-demos-on-ibm-power)
+3. **Reservation**:
+   - Go to TechZone → Search for collection → Reserve environment
+   - **⚠️ IMPORTANT**: Fill the form slowly (wait 2-3 seconds between fields)
+   - This prevents the UI from getting stuck on "Checking availability"
+   - Enter your ISC Opportunity Number (if Demo/Pilot purpose)
+4. **Wait**: Provisioning takes ~15-30 minutes
+
+**📖 Complete Guide**: See [TECHZONE_RESERVATION_GUIDE.md](TECHZONE_RESERVATION_GUIDE.md) for:
+- Step-by-step reservation instructions
+- Troubleshooting common issues
+- Best practices and tips
+- What to do if the form gets stuck
+
+### After Reservation
+
+Once your environment is provisioned:
+1. Note your environment's **FQDN** (hostname)
+2. Note your **SSH credentials**
+3. SSH into the environment
+4. Proceed with deployment below
+
+---
+
 ## Overview
 
 This deployment package provides a fully automated solution to deploy the Carbon GenAI Demo application with minimal user intervention. The script handles all dependencies, configuration, and setup required to get the application running.

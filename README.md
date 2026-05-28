@@ -295,13 +295,35 @@ Streamline recruitment workflows with AI-generated hiring content
 
 ## 🚀 Quick Start
 
-### Prerequisites
-- **RHEL** (Red Hat Enterprise Linux) on **IBM Power (PPC64LE)**
-- **Sudo access** for package installation
-- **Internet connection** for downloading dependencies
-- **5GB+ free disk space**
+### Step 1: Reserve TechZone Environment
 
-### One-Command Deployment (Created by Bob)
+**Before deploying, you need an IBM Power environment from TechZone.**
+
+#### Required Environment
+- **Name**: RHEL 9 ready for AI on IBM Power10 (IaaS)
+- **Collection**: [Generative AI demos on IBM Power](https://techzone.ibm.com/collection/generative-ai-demos-on-ibm-power)
+
+#### Quick Reservation Steps
+1. Go to [TechZone](https://techzone.ibm.com)
+2. Search for "Generative AI demos on IBM Power"
+3. Select "RHEL 9 ready for AI on IBM Power10 (IaaS)"
+4. Click "Reserve"
+5. **⚠️ IMPORTANT**: Fill the form slowly (wait 2-3 seconds between fields to avoid UI getting stuck)
+6. Enter your ISC Opportunity Number (if Demo/Pilot purpose)
+7. Submit and wait for provisioning (~15-30 minutes)
+
+**📖 Detailed Guide**: See [TechZone Reservation Guide](deployment/TECHZONE_RESERVATION_GUIDE.md) for complete instructions, troubleshooting, and best practices.
+
+### Step 2: Verify Prerequisites
+
+Once your TechZone environment is provisioned and you have SSH access:
+
+- ✅ **RHEL** (Red Hat Enterprise Linux) on **IBM Power (PPC64LE)**
+- ✅ **Sudo access** for package installation
+- ✅ **Internet connection** for downloading dependencies
+- ✅ **5GB+ free disk space**
+
+### Step 3: One-Command Deployment (Created by Bob)
 
 ```bash
 # Create deployment directory and download script
