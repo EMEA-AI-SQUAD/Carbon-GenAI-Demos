@@ -410,6 +410,29 @@ install_node_dependencies() {
     run_command "npm install express" "Express package installed"
     run_command "npm install http-proxy-middleware" "HTTP proxy middleware installed"
     
+    # Install proxy server dependencies
+    print_info "Installing proxy server dependencies..."
+    local proxy_dir="${WORK_DIR}/${REPO_DIR}/${APP_DIR}/src/llama-proxy"
+    if [ -d "$proxy_dir" ]; then
+        cd "$proxy_dir" || {
+            print_error "Failed to navigate to proxy directory"
+            cleanup_on_error
+        }
+        if run_command "npm install" "Proxy dependencies installed"; then
+            print_success "Proxy server dependencies installed"
+        else
+            print_error "Failed to install proxy dependencies"
+            cleanup_on_error
+        fi
+        # Return to app directory
+        cd "${WORK_DIR}/${REPO_DIR}/${APP_DIR}" || {
+            print_error "Failed to return to app directory"
+            cleanup_on_error
+        }
+    else
+        print_warning "Proxy directory not found, skipping proxy dependency installation"
+    fi
+    
     print_success "All Node.js dependencies installed"
 }
 
