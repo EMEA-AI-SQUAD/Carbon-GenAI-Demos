@@ -29,8 +29,26 @@ const TutorialHeader = () => (
   <HeaderName prefix="IBM">EMEA AI on IBM Power Squad Demos</HeaderName>
 </Link>
         <HeaderNavigation aria-label="Carbon Tutorial">
-              <Link href="/part1" passHref legacyBehavior>
-                  <HeaderMenuItem>RAG</HeaderMenuItem>
+              <Link href="/briefbuilder" passHref legacyBehavior>
+                  <HeaderMenuItem>Brief Builder</HeaderMenuItem>
+              </Link>
+              <Link href="/carbon" passHref legacyBehavior>
+                  <HeaderMenuItem>Carbon</HeaderMenuItem>
+              </Link>
+              <Link href="/convintel" passHref legacyBehavior>
+                  <HeaderMenuItem>Conv Intel</HeaderMenuItem>
+              </Link>
+              <Link href="/entextract" passHref legacyBehavior>
+                  <HeaderMenuItem>Entity Extract</HeaderMenuItem>
+              </Link>
+              <Link href="/piiextract" passHref legacyBehavior>
+                  <HeaderMenuItem>PII Extract</HeaderMenuItem>
+              </Link>
+              <Link href="/rfpassistant" passHref legacyBehavior>
+                  <HeaderMenuItem>RFP Assistant</HeaderMenuItem>
+              </Link>
+              <Link href="/talentacquisition" passHref legacyBehavior>
+                  <HeaderMenuItem>Talent Acquisition</HeaderMenuItem>
               </Link>
 </HeaderNavigation>
         <SideNav
@@ -39,8 +57,26 @@ const TutorialHeader = () => (
           isPersistent={false}>
           <SideNavItems>
             <HeaderSideNavItems>
-              <Link href="/part1" passHref legacyBehavior>
-                  <HeaderMenuItem>RAG</HeaderMenuItem>
+              <Link href="/briefbuilder" passHref legacyBehavior>
+                  <HeaderMenuItem>Brief Builder</HeaderMenuItem>
+              </Link>
+              <Link href="/carbon" passHref legacyBehavior>
+                  <HeaderMenuItem>Carbon</HeaderMenuItem>
+              </Link>
+              <Link href="/convintel" passHref legacyBehavior>
+                  <HeaderMenuItem>Conv Intel</HeaderMenuItem>
+              </Link>
+              <Link href="/entextract" passHref legacyBehavior>
+                  <HeaderMenuItem>Entity Extract</HeaderMenuItem>
+              </Link>
+              <Link href="/piiextract" passHref legacyBehavior>
+                  <HeaderMenuItem>PII Extract</HeaderMenuItem>
+              </Link>
+              <Link href="/rfpassistant" passHref legacyBehavior>
+                  <HeaderMenuItem>RFP Assistant</HeaderMenuItem>
+              </Link>
+              <Link href="/talentacquisition" passHref legacyBehavior>
+                  <HeaderMenuItem>Talent Acquisition</HeaderMenuItem>
               </Link>
             </HeaderSideNavItems>
           </SideNavItems>
