@@ -560,15 +560,20 @@ start_proxy_server() {
         cleanup_on_error
     fi
     
-    # Start proxy server in background
+    # Create dedicated proxy log file
+    local proxy_log="${WORK_DIR}/deployment/proxy-server.log"
+    
+    # Start proxy server in background with dedicated log
     log_message "INFO" "Starting proxy server with: nohup node server_final.js"
-    nohup node server_final.js >> "$LOG_FILE" 2>&1 &
+    log_message "INFO" "Proxy log file: $proxy_log"
+    nohup node server_final.js > "$proxy_log" 2>&1 &
     local proxy_pid=$!
     
     # Save PID
     local proxy_pid_file="${WORK_DIR}/proxy-server.pid"
     echo "$proxy_pid" > "$proxy_pid_file"
     print_success "Proxy server started (PID: $proxy_pid)"
+    print_info "Proxy log: $proxy_log"
     
     # Wait a moment and verify it's still running
     sleep 3
@@ -579,18 +584,18 @@ start_proxy_server() {
         print_error "Proxy server failed to start"
         log_message "ERROR" "Proxy server process died immediately"
         
-        # Capture and display the last error from the log
-        print_error "Last 20 lines from log file:"
-        tail -20 "$LOG_FILE" | while IFS= read -r line; do
-            echo "  $line"
-        done
-        
-        # Also check if there's a specific Node.js error
-        if grep -i "error" "$LOG_FILE" | tail -5 > /dev/null 2>&1; then
-            print_error "Recent errors found in log:"
-            grep -i "error" "$LOG_FILE" | tail -5 | while IFS= read -r line; do
-                echo "  $line"
-            done
+        # Display proxy-specific log
+        if [ -f "$proxy_log" ]; then
+            print_error "Proxy server output:"
+            echo "----------------------------------------"
+            cat "$proxy_log"
+            echo "----------------------------------------"
+            
+            # Also log it to main log
+            log_message "ERROR" "Proxy server output:"
+            cat "$proxy_log" >> "$LOG_FILE"
+        else
+            print_error "Proxy log file not found: $proxy_log"
         fi
         
         cleanup_on_error
@@ -700,10 +705,21 @@ build_llama_cpp() {
     
     # Check if llama.cpp is already built
     if [ -d "$LLAMA_DIR" ] && [ -f "${LLAMA_DIR}/build/bin/llama-server" ]; then
-        print_warning "llama.cpp already built, skipping rebuild"
+        print_warning "llama.cpp is already built"
         print_info "Existing build: ${WORK_DIR}/${LLAMA_DIR}"
-        print_info "To force rebuild, remove directory: rm -rf ${WORK_DIR}/${LLAMA_DIR}"
-        return 0
+        echo ""
+        read -p "Do you want to rebuild llama.cpp? This will take 10-15 minutes. (y/N): " -n 1 -r
+        echo ""
+        
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            print_info "Skipping llama.cpp rebuild"
+            log_message "INFO" "User chose to skip llama.cpp rebuild"
+            return 0
+        else
+            print_info "Rebuilding llama.cpp as requested"
+            log_message "INFO" "User chose to rebuild llama.cpp"
+            rm -rf "$LLAMA_DIR"
+        fi
     fi
     
     # Remove existing directory if present but not built
