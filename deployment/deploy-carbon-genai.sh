@@ -919,13 +919,13 @@ main() {
     install_node_dependencies
     build_application
     configure_proxy
-    start_proxy_server
-    start_dev_server
     setup_llm_env
     build_llama_cpp
     download_model
     start_llm_server
     setup_passporteye
+    start_proxy_server
+    start_dev_server
     
     # Print summary
     print_summary
