@@ -16,7 +16,10 @@ set -o pipefail
 # Work from home directory, not from deployment subdirectory
 WORK_DIR="$HOME"
 DEPLOYMENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-LOG_FILE="${DEPLOYMENT_DIR}/carbon-deployment-$(date +%Y%m%d-%H%M%S).log"
+# Store logs in home directory to avoid issues when repo is deleted/recreated
+LOG_DIR="${WORK_DIR}/deployment"
+mkdir -p "${LOG_DIR}"
+LOG_FILE="${LOG_DIR}/carbon-deployment-$(date +%Y%m%d-%H%M%S).log"
 PID_FILE="${WORK_DIR}/carbon-dev-server.pid"
 PROXY_PID_FILE="${WORK_DIR}/proxy-server.pid"
 LLM_PID_FILE="${WORK_DIR}/llama-server.pid"
