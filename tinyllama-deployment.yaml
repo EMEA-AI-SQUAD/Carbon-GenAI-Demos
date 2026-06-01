@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    alpha.image.policy.openshift.io/resolve-names: '*'
+    app.openshift.io/route-disabled: "false"
+    app.openshift.io/vcs-ref: ""
+    app.openshift.io/vcs-uri: https://github.com/DSpurway/RAG-with-Notebook
+    image.openshift.io/triggers: '[{"from":{"kind":"ImageStreamTag","name":"tinyllama-service:latest","namespace":"llm-on-techzone"},"fieldPath":"spec.template.spec.containers[?(@.name==\"tinyllama-service\")].image","paused":false}]'
+    openshift.io/generated-by: OpenShiftWebConsole
+  labels:
+    app: tinyllama-service
+    app.kubernetes.io/component: tinyllama-service
+    app.kubernetes.io/instance: tinyllama-service
+    app.kubernetes.io/name: tinyllama-service
+  name: tinyllama-service
+  namespace: llm-on-techzone
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: tinyllama-service
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: tinyllama-service
+        deployment: tinyllama-service
+    spec:
+      containers:
+      - image: image-registry.openshift-image-registry.svc:5000/llm-on-techzone/tinyllama-service:latest
+        imagePullPolicy: Always
+        name: tinyllama-service
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+
+# Made with Bob

@@ -29,26 +29,8 @@ const TutorialHeader = () => (
   <HeaderName prefix="IBM">EMEA AI on IBM Power Squad Demos</HeaderName>
 </Link>
         <HeaderNavigation aria-label="Carbon Tutorial">
-              <Link href="/entextract" passHref legacyBehavior>
-                  <HeaderMenuItem>Entity Extraction</HeaderMenuItem>
-              </Link>
-              <Link href="/piiextract" passHref legacyBehavior>
-                  <HeaderMenuItem>PII Extraction</HeaderMenuItem>
-              </Link>
-              <Link href="/convintel" passHref legacyBehavior>
-                  <HeaderMenuItem>Conversation Intelligence</HeaderMenuItem>
-              </Link>
-              <Link href="/briefbuilder" passHref legacyBehavior>
-                  <HeaderMenuItem>Brief Builder</HeaderMenuItem>
-              </Link>
-              <Link href="/rfpassistant" passHref legacyBehavior>
-                  <HeaderMenuItem>RFP Assistant</HeaderMenuItem>
-              </Link>
-              <Link href="/talentacquisition" passHref legacyBehavior>
-                  <HeaderMenuItem>Talent Acquisition</HeaderMenuItem>
-              </Link>
-              <Link href="/carbon" passHref legacyBehavior>
-                  <HeaderMenuItem>Carbon Design System</HeaderMenuItem>
+              <Link href="/part1" passHref legacyBehavior>
+                  <HeaderMenuItem>RAG</HeaderMenuItem>
               </Link>
 </HeaderNavigation>
         <SideNav
@@ -57,26 +39,8 @@ const TutorialHeader = () => (
           isPersistent={false}>
           <SideNavItems>
             <HeaderSideNavItems>
-              <Link href="/entextract" passHref legacyBehavior>
-                  <HeaderMenuItem>Entity Extraction</HeaderMenuItem>
-              </Link>
-              <Link href="/piiextract" passHref legacyBehavior>
-                  <HeaderMenuItem>PII Extraction</HeaderMenuItem>
-              </Link>
-              <Link href="/convintel" passHref legacyBehavior>
-                  <HeaderMenuItem>Conversation Intelligence</HeaderMenuItem>
-              </Link>
-              <Link href="/briefbuilder" passHref legacyBehavior>
-                  <HeaderMenuItem>Brief Builder</HeaderMenuItem>
-              </Link>
-              <Link href="/rfpassistant" passHref legacyBehavior>
-                  <HeaderMenuItem>RFP Assistant</HeaderMenuItem>
-              </Link>
-              <Link href="/talentacquisition" passHref legacyBehavior>
-                  <HeaderMenuItem>Talent Acquisition</HeaderMenuItem>
-              </Link>
-              <Link href="/carbon" passHref legacyBehavior>
-                  <HeaderMenuItem>Carbon Design System</HeaderMenuItem>
+              <Link href="/part1" passHref legacyBehavior>
+                  <HeaderMenuItem>RAG</HeaderMenuItem>
               </Link>
             </HeaderSideNavItems>
           </SideNavItems>

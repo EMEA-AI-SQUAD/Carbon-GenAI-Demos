@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    app.openshift.io/vcs-ref: ""
+    app.openshift.io/vcs-uri: https://github.com/DSpurway/RAG-with-Notebook
+    openshift.io/generated-by: OpenShiftWebConsole
+  labels:
+    app: tinyllama-service
+    app.kubernetes.io/component: tinyllama-service
+    app.kubernetes.io/instance: tinyllama-service
+    app.kubernetes.io/name: tinyllama-service
+  name: tinyllama-service
+  namespace: llm-on-techzone
+spec:
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: 8080-tcp
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: tinyllama-service
+    deployment: tinyllama-service
+  sessionAffinity: None
+  type: ClusterIP
+
+# Made with Bob

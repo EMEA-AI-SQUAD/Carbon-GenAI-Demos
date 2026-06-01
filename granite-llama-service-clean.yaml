@@ -1,0 +1,39 @@
+﻿
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    app.openshift.io/vcs-ref: ""
+    app.openshift.io/vcs-uri: https://github.com/DSpurway/RAG-with-Notebook
+    openshift.io/generated-by: OpenShiftWebConsole
+  creationTimestamp: "2026-04-10T15:51:32Z"
+  labels:
+    app: llama-cpp-server
+    app.kubernetes.io/component: llama-cpp-server
+    app.kubernetes.io/instance: llama-cpp-server
+    app.kubernetes.io/name: llama-cpp-server
+  name: llama-cpp-server
+  namespace: llm-on-techzone
+  resourceVersion: "36591"
+  uid: e09cac98-75c0-4191-b53f-33168e8cb7c3
+spec:
+  clusterIP: 172.30.104.211
+  clusterIPs:
+  - 172.30.104.211
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: 8080-tcp
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: llama-cpp-server
+    deployment: llama-cpp-server
+  sessionAffinity: None
+  type: ClusterIP
+  loadBalancer: {}
+
+

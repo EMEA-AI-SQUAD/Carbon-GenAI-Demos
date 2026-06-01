@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    alpha.image.policy.openshift.io/resolve-names: '*'
+    app.openshift.io/route-disabled: "false"
+    app.openshift.io/vcs-ref: ""
+    app.openshift.io/vcs-uri: https://github.com/DSpurway/RAG-with-Notebook
+    image.openshift.io/triggers: '[{"from":{"kind":"ImageStreamTag","name":"llama-cpp-server:latest","namespace":"llm-on-techzone"},"fieldPath":"spec.template.spec.containers[?(@.name==\"granite-llama-service\")].image","paused":false}]'
+    openshift.io/generated-by: OpenShiftWebConsole
+  labels:
+    app: granite-llama-service
+    app.kubernetes.io/component: granite-llama-service
+    app.kubernetes.io/instance: granite-llama-service
+    app.kubernetes.io/name: granite-llama-service
+  name: granite-llama-service
+  namespace: llm-on-techzone
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: granite-llama-service
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: granite-llama-service
+        deployment: granite-llama-service
+    spec:
+      containers:
+      - image: image-registry.openshift-image-registry.svc:5000/llm-on-techzone/llama-cpp-server@sha256:9d6bad4d7936165c559a17d5be9eca9fce6bbb59fb144acfc058dad9a62ed163
+        imagePullPolicy: Always
+        name: granite-llama-service
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+
+# Made with Bob
