@@ -13,10 +13,16 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
+# Get script directory and set absolute paths
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_DIR="$(dirname "$SCRIPT_DIR")"
+WORK_DIR="$(dirname "$REPO_DIR")"
+
 # Configuration
 SERVICE_PORT=5000
-LOG_FILE="deployment/passporteye-service.log"
-VENV_DIR=".passporteye-venv"
+LOG_FILE="${WORK_DIR}/deployment/passporteye-service.log"
+VENV_DIR="${WORK_DIR}/.passporteye-venv"
+SERVICE_FILE="${REPO_DIR}/deployment/passport_service.py"
 
 echo -e "${GREEN}================================${NC}"
 echo -e "${GREEN}Starting PassportEye Service${NC}"
@@ -60,7 +66,7 @@ echo "Port: ${SERVICE_PORT}"
 echo "Log: ${LOG_FILE}"
 echo ""
 
-nohup python3 deployment/passport_service.py > "${LOG_FILE}" 2>&1 &
+nohup python3 "${SERVICE_FILE}" > "${LOG_FILE}" 2>&1 &
 SERVICE_PID=$!
 echo "Service PID: ${SERVICE_PID}"
 
