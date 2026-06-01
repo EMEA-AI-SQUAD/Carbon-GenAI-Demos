@@ -578,6 +578,21 @@ start_proxy_server() {
     else
         print_error "Proxy server failed to start"
         log_message "ERROR" "Proxy server process died immediately"
+        
+        # Capture and display the last error from the log
+        print_error "Last 20 lines from log file:"
+        tail -20 "$LOG_FILE" | while IFS= read -r line; do
+            echo "  $line"
+        done
+        
+        # Also check if there's a specific Node.js error
+        if grep -i "error" "$LOG_FILE" | tail -5 > /dev/null 2>&1; then
+            print_error "Recent errors found in log:"
+            grep -i "error" "$LOG_FILE" | tail -5 | while IFS= read -r line; do
+                echo "  $line"
+            done
+        fi
+        
         cleanup_on_error
     fi
 }
@@ -683,9 +698,17 @@ build_llama_cpp() {
         cleanup_on_error
     }
     
-    # Remove existing directory if present
+    # Check if llama.cpp is already built
+    if [ -d "$LLAMA_DIR" ] && [ -f "${LLAMA_DIR}/build/bin/llama-server" ]; then
+        print_warning "llama.cpp already built, skipping rebuild"
+        print_info "Existing build: ${WORK_DIR}/${LLAMA_DIR}"
+        print_info "To force rebuild, remove directory: rm -rf ${WORK_DIR}/${LLAMA_DIR}"
+        return 0
+    fi
+    
+    # Remove existing directory if present but not built
     if [ -d "$LLAMA_DIR" ]; then
-        print_warning "llama.cpp directory already exists, removing..."
+        print_warning "llama.cpp directory exists but not built, removing..."
         rm -rf "$LLAMA_DIR"
     fi
     
