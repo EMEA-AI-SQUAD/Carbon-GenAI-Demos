@@ -564,10 +564,15 @@ start_proxy_server() {
     local proxy_log="${WORK_DIR}/deployment/proxy-server.log"
     
     # Start proxy server in background with dedicated log
-    log_message "INFO" "Starting proxy server with: nohup node server_final.js"
+    log_message "INFO" "Starting proxy server with: node server_final.js"
     log_message "INFO" "Proxy log file: $proxy_log"
-    nohup node server_final.js > "$proxy_log" 2>&1 &
+    
+    # Use setsid to properly detach the process
+    setsid node server_final.js > "$proxy_log" 2>&1 < /dev/null &
     local proxy_pid=$!
+    
+    # Disown the process to prevent it from being killed when shell exits
+    disown $proxy_pid 2>/dev/null || true
     
     # Save PID
     local proxy_pid_file="${WORK_DIR}/proxy-server.pid"
