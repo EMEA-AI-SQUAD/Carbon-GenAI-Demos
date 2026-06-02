@@ -2,38 +2,55 @@
 
 Automated deployment script for the Carbon GenAI Demo application on RHEL/PPC64LE systems.
 
-## ⚠️ Before You Begin: Reserve TechZone Environment
+## 🚀 Quick Start (3 Steps)
+
+**Prerequisites**: Reserve a TechZone environment first ([see guide](#techzone-environment-reservation))
+
+Once you have your RHEL environment, SSH in and run:
+
+```bash
+# 1. Download the deployment script
+curl -O https://raw.githubusercontent.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos/main/deployment/deploy-carbon-genai.sh
+
+# 2. Make it executable
+chmod +x deploy-carbon-genai.sh
+
+# 3. Run it
+./deploy-carbon-genai.sh
+```
+
+**That's it!** The script will:
+- Install all dependencies (Python, Node.js, etc.)
+- Clone the repository
+- Build llama.cpp (asks if you want to rebuild if already exists)
+- Download the Granite AI model
+- Start all services (LLM server, proxy, web app)
+
+**Access your demo**: `http://your-hostname:3000`
+
+---
+
+## 📖 Detailed Documentation
+
+### TechZone Environment Reservation
 
 **You need an IBM Power environment from TechZone before running this deployment.**
 
-### Quick TechZone Reservation
+#### Quick TechZone Reservation
 
 1. **Environment**: RHEL 9 ready for AI on IBM Power10 (IaaS)
 2. **Collection**: [Generative AI demos on IBM Power](https://techzone.ibm.com/collection/generative-ai-demos-on-ibm-power)
 3. **Reservation**:
    - Go to TechZone → Search for collection → Reserve environment
    - **⚠️ IMPORTANT**: Fill the form slowly (wait 2-3 seconds between fields)
-   - This prevents the UI from getting stuck on "Checking availability"
    - Enter your ISC Opportunity Number (if Demo/Pilot purpose)
 4. **Wait**: Provisioning takes ~15-30 minutes
 
-**📖 Complete Guide**: See [TECHZONE_RESERVATION_GUIDE.md](TECHZONE_RESERVATION_GUIDE.md) for:
-- Step-by-step reservation instructions
-- Troubleshooting common issues
-- Best practices and tips
-- What to do if the form gets stuck
-
-### After Reservation
-
-Once your environment is provisioned:
-1. Note your environment's **FQDN** (hostname)
-2. Note your **SSH credentials**
-3. SSH into the environment
-4. Proceed with deployment below
+**📖 Complete Guide**: See [TECHZONE_RESERVATION_GUIDE.md](TECHZONE_RESERVATION_GUIDE.md) for detailed instructions and troubleshooting.
 
 ---
 
-## Overview
+### Overview
 
 This deployment package provides a fully automated solution to deploy the Carbon GenAI Demo application with minimal user intervention. The script handles all dependencies, configuration, and setup required to get the application running.
 
@@ -68,11 +85,11 @@ The script will automatically install:
 - Various npm packages (OpenAI, Express, CORS, etc.)
 - Carbon React components
 
-## Quick Start
+## Alternative: Manual Download (Advanced Users)
 
-### 1. Get Scripts on Your Server
+If you need more control or want to download additional helper scripts:
 
-**Method 1: Download Directly from GitHub (RECOMMENDED - No Git Required!)**
+### Method 1: Download Directly from GitHub (RECOMMENDED - No Git Required!)
 
 SSH into your clean server and run:
 ```bash
@@ -83,9 +100,10 @@ cd ~/deployment
 # Download the main deployment script
 curl -O https://raw.githubusercontent.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos/main/deployment/deploy-carbon-genai.sh
 
-# Download helper scripts
+# Download helper scripts (optional)
 curl -O https://raw.githubusercontent.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos/main/deployment/stop-server.sh
 curl -O https://raw.githubusercontent.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos/main/deployment/check-status.sh
+curl -O https://raw.githubusercontent.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos/main/deployment/test-proxy-only.sh
 
 # Download README (optional but recommended)
 curl -O https://raw.githubusercontent.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos/main/deployment/README.md
@@ -98,30 +116,23 @@ cd ~/deployment
 wget https://raw.githubusercontent.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos/main/deployment/deploy-carbon-genai.sh
 wget https://raw.githubusercontent.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos/main/deployment/stop-server.sh
 wget https://raw.githubusercontent.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos/main/deployment/check-status.sh
-wget https://raw.githubusercontent.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos/main/deployment/README.md
 ```
 
-**Method 3: Using SCP from your local machine:**
-```powershell
-# From Windows PowerShell
-scp -r "C:\Users\YOUR-USERNAME\Desktop\Carbon-GenAI-Demos\Carbon-GenAI-Demos\deployment" username@your-server-ip:/home/username/
-```
-
-**Method 4: If Git is already installed:**
+**Method 3: Clone the Repository (if you want the full source code):**
 ```bash
-git clone https://github.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos
+git clone https://github.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos.git
 cd Carbon-GenAI-Demos/deployment
 ```
-
-**Note**: The deployment script will install Git automatically during the process, so you don't need it pre-installed!
 
 ### 2. Make Scripts Executable
 
 ```bash
-chmod +x deploy-carbon-genai.sh stop-server.sh check-status.sh
+chmod +x deploy-carbon-genai.sh
+chmod +x stop-server.sh      # if downloaded
+chmod +x check-status.sh     # if downloaded
 ```
 
-### 3. Run the Deployment
+### 3. Run Deployment
 
 ```bash
 ./deploy-carbon-genai.sh
@@ -130,476 +141,244 @@ chmod +x deploy-carbon-genai.sh stop-server.sh check-status.sh
 The script will:
 1. Run pre-flight checks
 2. Update system packages
-3. Install all dependencies
+3. Install dependencies
 4. Set up Python virtual environment
 5. Clone the repository
 6. Install Node.js dependencies
 7. Build the application
-8. Start the development server in background
+8. Configure proxy and web app
+9. Set up llama.cpp environment
+10. Build llama.cpp (with option to skip if already built)
+11. Download Granite AI model
+12. Start LLM server
+13. Set up PassportEye OCR service
+14. Start proxy server
+15. Start development server
 
-### 4. Check Status
+## What Gets Deployed
+
+### Directory Structure
+```
+$HOME/
+├── Carbon-GenAI-Demos/          # Main application repository
+│   ├── carbon-ui/               # Next.js application
+│   │   ├── src/                 # Source code
+│   │   ├── public/              # Static assets
+│   │   └── node_modules/        # Dependencies
+│   └── deployment/              # Deployment scripts
+├── llama.cpp/                   # LLM server
+│   └── build/                   # Compiled binaries
+├── carbon.venv/                 # Python virtual environment
+├── llama.cpp.venv/              # LLM Python environment
+├── .passporteye-venv/           # PassportEye environment
+└── deployment/                  # Log files
+    ├── carbon-deployment-*.log  # Deployment logs
+    ├── proxy-server.log         # Proxy logs
+    └── passporteye-service.log  # PassportEye logs
+```
+
+### Running Services
+After deployment, these services will be running:
+- **Web Application**: Port 3000 (Next.js dev server)
+- **Proxy Server**: Port 3001 (CORS proxy)
+- **LLM Server**: Port 8080 (llama.cpp server)
+- **PassportEye**: Port 5000 (OCR service)
+
+## Post-Deployment
+
+### Access the Application
+
+Open your browser and navigate to:
+```
+http://your-server-hostname:3000
+```
+
+Replace `your-server-hostname` with your server's FQDN or IP address.
+
+### Check Server Status
 
 ```bash
 ./check-status.sh
 ```
 
-### 5. Stop the Server (when needed)
+This will show:
+- Running processes and their PIDs
+- Port usage
+- Service health status
+
+### View Logs
+
+```bash
+# Deployment log
+tail -f ~/deployment/carbon-deployment-*.log
+
+# Proxy server log
+tail -f ~/deployment/proxy-server.log
+
+# PassportEye log
+tail -f ~/deployment/passporteye-service.log
+```
+
+### Stop Servers
 
 ```bash
 ./stop-server.sh
 ```
 
-## Deployment Process
-
-The deployment follows these phases:
-
-```
-[1/13] 🔍 Pre-flight Checks
-       ├─ Verify RHEL OS
-       ├─ Check PPC64LE architecture
-       ├─ Validate sudo access
-       ├─ Test internet connectivity
-       └─ Check disk space
-
-[2/13] 📦 System Update
-       └─ Update all system packages
-
-[3/13] 🔧 Install Dependencies
-       ├─ Python 3.12 + pip + dev tools
-       ├─ Git, GCC/G++, Node.js
-       ├─ CMake, Make, Ninja
-       └─ Build tools for llama.cpp
-
-[4/13] 🐍 Web App Python Environment
-       ├─ Create virtual environment
-       ├─ Activate environment
-       └─ Upgrade pip
-
-[5/13] 📥 Clone Repository
-       └─ Clone Carbon-GenAI-Demos from GitHub
-
-[6/13] 📦 Node Dependencies
-       ├─ Install Yarn globally
-       ├─ Install project dependencies
-       ├─ Add Carbon React packages
-       └─ Install additional npm packages
-
-[7/13] 🏗️  Build Application
-       └─ Build web application with Yarn
-
-[8/13] 🔧 Configure Proxy & Web App
-       ├─ Detect server FQDN
-       ├─ Update proxy configuration
-       ├─ Update web app API URLs
-       └─ Create configuration backups
-
-[9/13] 🔌 Start Proxy Server
-       └─ Start proxy on port 3001 (background)
-
-[10/13] 🚀 Start Web Dev Server
-        └─ Start web app on port 3000 (background)
-
-[11/13] 🤖 Setup LLM Environment
-        ├─ Create LLM virtual environment
-        ├─ Install PyTorch & OpenBLAS
-        └─ Configure for PPC64LE
-
-[12/13] 🔨 Build llama.cpp
-        ├─ Clone llama.cpp repository
-        ├─ Configure with OpenBLAS
-        └─ Build llama-server binary
-
-[13/13] 📥 Download Model & Start LLM
-        ├─ Download Granite 4.0 Micro model
-        └─ Start LLM server on port 8080 (background)
-```
-
-## File Structure
-
-After deployment, your directory structure will be:
-
-```
-~/                                  # Home directory (working directory)
-├── carbon.venv/                    # Web app Python virtual environment
-├── llama.cpp.venv/                 # LLM Python virtual environment
-├── Carbon-GenAI-Demos/             # Cloned repository
-│   ├── carbon-ui/                  # Application directory
-│   │   └── src/
-│   │       ├── llama-proxy/        # Proxy server (configured)
-│   │       │   └── server_final.js.backup
-│   │       └── app/entextract/
-│   │           └── page.js.backup  # Web app (configured)
-│   └── deployment/                 # Deployment scripts (in repo)
-├── llama.cpp/                      # llama.cpp installation
-│   └── build/bin/llama-server      # LLM server binary
-├── carbon-dev-server.pid           # Web server process ID
-├── proxy-server.pid                # Proxy server process ID
-├── llama-server.pid                # LLM server process ID
-└── deployment/                     # Deployment directory
-    ├── deploy-carbon-genai.sh      # Main deployment script
-    ├── stop-server.sh              # Stop all servers
-    ├── check-status.sh             # Check deployment status
-    ├── README.md                   # This file
-    ├── carbon-deployment-*.log     # Deployment log files
-    └── other deployment scripts...
-```
-
-**Key Points:**
-- Deployment scripts are in `~/deployment/`
-- Repository is cloned to `~/Carbon-GenAI-Demos/`
-- Virtual environments are in home directory (`~/carbon.venv`, `~/llama.cpp.venv`)
-- Log files are kept in `~/deployment/`
-- PID files are in home directory for easy access
-
-## Logging
-
-### Console Output
-The script provides clean, user-friendly output:
-- Step-by-step progress indicators
-- Success/failure status for each operation
-- Estimated time and progress tracking
-- Final deployment summary
-
-### Log Files
-Detailed logs are saved to: `~/deployment/carbon-deployment-YYYYMMDD-HHMMSS.log`
-
-Log files contain:
-- Timestamps for all operations
-- Full command output (stdout/stderr)
-- Error details and stack traces
-- System information
-- Performance metrics
-
-To view logs in real-time:
-```bash
-tail -f ~/deployment/carbon-deployment-*.log
-```
-
-## Management Commands
-
-### Check Deployment Status
-```bash
-~/deployment/check-status.sh
-```
-
-Shows:
-- Web app and LLM Python virtual environments
-- Repository and application status
-- All server statuses (web, proxy, LLM)
-- Resource usage (CPU/memory)
-- Listening ports
-- System dependencies
-- Log files information
-
-### Stop All Servers
-```bash
-~/deployment/stop-server.sh
-```
-
-Gracefully stops all three servers:
-- Web development server (port 3000)
-- Proxy server (port 3001)
-- LLM server (port 8080)
-
-### Manual Server Stop
-```bash
-# Stop individual servers (from home directory)
-cd ~
-kill $(cat carbon-dev-server.pid)  # Web server
-kill $(cat proxy-server.pid)       # Proxy server
-kill $(cat llama-server.pid)        # LLM server
-
-# Or stop all at once
-kill $(cat ~/carbon-dev-server.pid ~/proxy-server.pid ~/llama-server.pid)
-```
-
-### View Server Logs
-```bash
-# View latest deployment log
-tail -f ~/deployment/carbon-deployment-*.log
-
-# View specific log
-tail -f ~/deployment/carbon-deployment-20260303-162800.log
-```
-
-### Restart Servers Manually
-
-**Web Dev Server:**
-```bash
-cd ~/Carbon-GenAI-Demos/carbon-ui
-source ~/carbon.venv/bin/activate
-yarn dev
-```
-
-**Proxy Server:**
-```bash
-cd ~/Carbon-GenAI-Demos/carbon-ui/src/llama-proxy
-node server_final.js
-```
-
-**LLM Server:**
-```bash
-cd ~/llama.cpp
-source ~/llama.cpp.venv/bin/activate
-./build/bin/llama-server -m /tmp/models/granite-4.0-micro-Q4_K_M.gguf --host 0.0.0.0
-```
+This will stop all running services (web server, proxy, LLM server, PassportEye).
 
 ## Troubleshooting
 
-### Deployment Fails During System Update
+### Common Issues
 
-**Problem**: `dnf update` fails or times out
-
-**Solution**:
+#### 1. Port Already in Use
+If you see "port already in use" errors:
 ```bash
-# Check internet connectivity
-ping -c 3 github.com
+# Check what's using the port
+lsof -i :3000  # or :3001, :8080, :5000
 
-# Try updating manually
-sudo dnf clean all
-sudo dnf -y update
+# Kill the process
+lsof -ti :3000 | xargs kill
+```
 
-# Re-run deployment
+#### 2. Permission Denied
+If you get permission errors:
+```bash
+# Make sure you have sudo access
+sudo -v
+
+# Check file permissions
+ls -la deploy-carbon-genai.sh
+```
+
+#### 3. Build Failures
+If the build fails:
+```bash
+# Check the log file
+tail -100 ~/deployment/carbon-deployment-*.log
+
+# Try running with more verbose output
+bash -x ./deploy-carbon-genai.sh
+```
+
+#### 4. llama.cpp Build Issues
+If llama.cpp fails to build:
+- Check you have enough disk space (5GB minimum)
+- Ensure GCC/G++ are installed
+- Check the log for specific compiler errors
+
+### Getting Help
+
+1. **Check Logs**: Always check the deployment log first
+2. **GitHub Issues**: Report issues at [GitHub Issues](https://github.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos/issues)
+3. **Documentation**: See other guides in the deployment directory
+
+## Helper Scripts
+
+### stop-server.sh
+Stops all running services:
+```bash
+./stop-server.sh
+```
+
+### check-status.sh
+Shows status of all services:
+```bash
+./check-status.sh
+```
+
+### test-proxy-only.sh
+Tests just the proxy server without full deployment:
+```bash
+./test-proxy-only.sh
+```
+
+## Advanced Configuration
+
+### Environment Variables
+
+You can customize the deployment by setting environment variables before running:
+
+```bash
+# Custom model URL
+export MODEL_URL="https://your-model-url.com/model.gguf"
+
+# Custom ports (not recommended)
+export WEB_PORT=3000
+export PROXY_PORT=3001
+export LLM_PORT=8080
+```
+
+### Manual Service Management
+
+If you need to manage services manually:
+
+```bash
+# Start web server
+cd ~/Carbon-GenAI-Demos/carbon-ui
+yarn dev
+
+# Start proxy
+cd ~/Carbon-GenAI-Demos/carbon-ui/src/llama-proxy
+node server_final.js
+
+# Start LLM server
+cd ~/llama.cpp
+./build/bin/llama-server -m /tmp/models/granite-4.0-micro-Q4_K_M.gguf --host 0.0.0.0
+```
+
+## Updating the Application
+
+To update to the latest version:
+
+```bash
+# Stop services
+./stop-server.sh
+
+# Update repository
+cd ~/Carbon-GenAI-Demos
+git pull origin main
+
+# Rebuild
+cd carbon-ui
+yarn
+yarn build
+
+# Restart services
+cd ~/deployment
 ./deploy-carbon-genai.sh
 ```
 
-### Python Virtual Environment Issues
-
-**Problem**: Virtual environment creation fails
-
-**Solution**:
-```bash
-# Verify Python 3.12 is installed
-python3.12 --version
-
-# Remove existing venv and retry
-rm -rf ~/carbon.venv
-cd ~
-./deployment/deploy-carbon-genai.sh
-```
-
-### Repository Clone Fails
-
-**Problem**: Git clone fails or times out
-
-**Solution**:
-```bash
-# Check GitHub connectivity
-ping -c 3 github.com
-
-# Try cloning manually
-cd ~
-git clone https://github.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos
-
-# Re-run deployment
-cd ~
-./deployment/deploy-carbon-genai.sh
-```
-
-### Node Dependencies Installation Fails
-
-**Problem**: Yarn or npm install fails
-
-**Solution**:
-```bash
-# Clear npm cache
-npm cache clean --force
-
-# Clear yarn cache
-yarn cache clean
-
-# Remove node_modules and retry
-cd ~/Carbon-GenAI-Demos/carbon-ui
-rm -rf node_modules
-cd ~
-./deployment/deploy-carbon-genai.sh
-```
-
-### Dev Server Won't Start
-
-**Problem**: Server starts but immediately stops
-
-**Solution**:
-```bash
-# Check the logs for errors
-tail -100 ~/deployment/carbon-deployment-*.log
-
-# Try starting manually to see errors
-cd ~/Carbon-GenAI-Demos/carbon-ui
-source ~/carbon.venv/bin/activate
-yarn dev
-```
-
-### Port Already in Use
-
-**Problem**: Dev server can't bind to port
-
-**Solution**:
-```bash
-# Find process using the port (usually 3000)
-sudo lsof -i :3000
-
-# Kill the process
-kill -9 <PID>
-
-# Restart server
-cd ~/Carbon-GenAI-Demos/carbon-ui
-yarn dev
-```
-
-### Insufficient Disk Space
-
-**Problem**: Deployment fails due to low disk space
-
-**Solution**:
-```bash
-# Check available space
-df -h
-
-# Clean up old logs
-rm -f ~/deployment/carbon-deployment-*.log
-
-# Clean package caches
-sudo dnf clean all
-npm cache clean --force
-yarn cache clean
-
-# Re-run deployment
-cd ~
-./deployment/deploy-carbon-genai.sh
-```
-
-## Manual Deployment Steps
-
-If the automated script fails, you can deploy manually:
-
-```bash
-# 1. Update system
-sudo dnf -y update
-
-# 2. Install dependencies
-sudo dnf install -y python3.12 python3.12-pip python3.12-devel git gcc gcc-c++ nodejs
-
-# 3. Create Python virtual environment in home directory
-cd ~
-python3.12 -m venv carbon.venv
-source carbon.venv/bin/activate
-
-# 4. Upgrade pip
-pip install --upgrade pip
-
-# 5. Clone repository to home directory
-cd ~
-git clone https://github.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos
-
-# 6. Install Yarn
-sudo npm install --global yarn
-
-# 7. Install Node dependencies
-cd ~/Carbon-GenAI-Demos/carbon-ui
-yarn
-yarn add @carbon/react@1.33.0
-yarn add sass@1.63.6
-yarn add typescript
-yarn add @carbon/icons-react
-npm install openai
-npm install cors
-npm install express
-npm install http-proxy-middleware
-
-# 8. Build application
-yarn build
-
-# 9. Start dev server
-yarn dev
-```
-
-## Accessing the Application
-
-After successful deployment, the application will be available at:
-
-```
-Web Application: http://<your-server-fqdn>:3000
-Proxy Server:    http://<your-server-fqdn>:3001
-LLM API:         http://localhost:8080
-```
-
-**Note**:
-- The script automatically configures the correct hostname (FQDN)
-- Access the web app from your browser using the server's FQDN
-- The proxy forwards requests from the web app to the LLM server
-- The LLM server is only accessible locally for security
-
-### Testing the Deployment
-
-```bash
-# Check web app
-curl http://<your-server-fqdn>:3000
-
-# Check proxy server
-curl http://<your-server-fqdn>:3001/health
-
-# Check LLM server
-curl http://localhost:8080/health
-```
-
-## Cleanup
+## Uninstalling
 
 To completely remove the deployment:
 
 ```bash
-# Stop all servers
-~/deployment/stop-server.sh
+# Stop all services
+./stop-server.sh
 
-# Remove all files from home directory
-cd ~
-rm -rf carbon.venv llama.cpp.venv Carbon-GenAI-Demos llama.cpp \
-       carbon-dev-server.pid proxy-server.pid llama-server.pid /tmp/models
-
-# Optionally remove deployment directory
+# Remove directories
+rm -rf ~/Carbon-GenAI-Demos
+rm -rf ~/llama.cpp
+rm -rf ~/carbon.venv
+rm -rf ~/llama.cpp.venv
+rm -rf ~/.passporteye-venv
 rm -rf ~/deployment
+
+# Remove downloaded model (optional)
+rm -rf /tmp/models
 ```
 
-**Note**: This will remove:
-- Both Python virtual environments
-- Cloned repositories
-- Built binaries
-- Downloaded models
-- All log files and PID files
+## Contributing
 
-## Support
-
-For issues or questions:
-
-1. Check the deployment logs: `tail -f ~/deployment/carbon-deployment-*.log`
-2. Run status check: `~/deployment/check-status.sh`
-3. Review the troubleshooting section above
-4. Check the original repository: https://github.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos
+This project was built with assistance from Bob (Roo-Cline AI Assistant). Contributions are welcome!
 
 ## License
 
-This deployment script is provided as-is. The Carbon GenAI Demo application has its own license - please refer to the repository for details.
-
-## Version History
-
-- **v2.0.0** (2026-03-03): Complete automation with LLM and proxy
-  - Added LLM server integration (llama.cpp + Granite model)
-  - Added proxy server automation
-  - Automatic hostname configuration (FQDN detection)
-  - 13-step fully automated deployment
-  - Three background servers (web, proxy, LLM)
-  - Enhanced monitoring and management scripts
-
-- **v1.0.0** (2026-03-03): Initial release
-  - Automated web app deployment for RHEL/PPC64LE
-  - Dual logging system
-  - Helper scripts for management
-  - Comprehensive error handling
-## Credits
-
-This deployment automation was created with assistance from **Bob** (Roo-Cline AI Assistant).
-
-- **Roo-Cline**: https://github.com/RooVetGit/Roo-Cline
-- **AI Assistant**: Bob - Expert software engineer specializing in automation and deployment
+See LICENSE file in the repository root.
 
 ---
+
+**Made with ❤️ by the EMEA AI on IBM Power Squad**
+
+**Built with 🤖 Bob (Roo-Cline AI Assistant)**

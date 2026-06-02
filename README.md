@@ -11,6 +11,20 @@ A modern web application demonstrating real-world AI use cases for entity extrac
 [![Next.js](https://img.shields.io/badge/Next.js-13-black?logo=next.js)](https://nextjs.org/)
 [![Built with Bob](https://img.shields.io/badge/Built%20with-Bob%20(Roo--Cline)-purple)](https://github.com/RooVetGit/Roo-Cline)
 
+## 🚀 Quick Start
+
+**Deploy in 3 commands:**
+
+```bash
+curl -O https://raw.githubusercontent.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos/main/deployment/deploy-carbon-genai.sh
+chmod +x deploy-carbon-genai.sh
+./deploy-carbon-genai.sh
+```
+
+**📖 Full deployment guide**: [deployment/README.md](deployment/README.md)
+
+**Prerequisites**: Reserve a TechZone RHEL environment first ([see guide](deployment/TECHZONE_RESERVATION_GUIDE.md))
+
 ---
 
 ## 👥 Team & Collaboration
