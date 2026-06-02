@@ -577,17 +577,33 @@ start_proxy_server() {
     # Save PID
     local proxy_pid_file="${WORK_DIR}/proxy-server.pid"
     echo "$proxy_pid" > "$proxy_pid_file"
-    print_success "Proxy server started (PID: $proxy_pid)"
+    print_success "Proxy server started (initial PID: $proxy_pid)"
     print_info "Proxy log: $proxy_log"
     
-    # Wait a moment and verify it's still running
-    sleep 3
-    if kill -0 "$proxy_pid" 2>/dev/null; then
-        print_success "Proxy server is running on port 3001"
-        log_message "INFO" "Proxy server verified running with PID: $proxy_pid"
-    else
-        print_error "Proxy server failed to start"
-        log_message "ERROR" "Proxy server process died immediately"
+    # Wait and verify the proxy is listening on port 3001
+    print_info "Waiting for proxy to start listening on port 3001..."
+    local max_attempts=10
+    local attempt=0
+    local proxy_running=false
+    
+    while [ $attempt -lt $max_attempts ]; do
+        sleep 1
+        attempt=$((attempt + 1))
+        
+        # Check if port 3001 is listening
+        if lsof -Pi :3001 -sTCP:LISTEN -t >/dev/null 2>&1; then
+            proxy_running=true
+            local actual_pid=$(lsof -ti :3001)
+            echo "$actual_pid" > "$proxy_pid_file"
+            print_success "Proxy server is running on port 3001 (PID: $actual_pid)"
+            log_message "INFO" "Proxy server verified running with PID: $actual_pid"
+            break
+        fi
+    done
+    
+    if [ "$proxy_running" = false ]; then
+        print_error "Proxy server failed to start listening on port 3001"
+        log_message "ERROR" "Proxy server did not start listening after ${max_attempts} seconds"
         
         # Display proxy-specific log
         if [ -f "$proxy_log" ]; then
