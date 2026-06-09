@@ -46,7 +46,7 @@ NC='\033[0m' # No Color
 
 # Step tracking
 CURRENT_STEP=0
-TOTAL_STEPS=15
+TOTAL_STEPS=16
 
 # ============================================================================
 # LOGGING FUNCTIONS
