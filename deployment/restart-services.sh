@@ -50,8 +50,8 @@ if [ -d "${HOME_DIR}/.passporteye-venv" ]; then
     echo -e "${BLUE}ℹ${NC} PassportEye is installed, starting service..."
     cd "${HOME_DIR}/${REPO_DIR}"
     
-    # Activate venv and start service
-    source .passporteye-venv/bin/activate
+    # Activate venv and start service (use absolute path to venv)
+    source "${HOME_DIR}/.passporteye-venv/bin/activate"
     PASSPORT_LOG="${HOME_DIR}/passporteye-service.log"
     nohup python3 deployment/passport_service.py > "$PASSPORT_LOG" 2>&1 &
     PASSPORT_PID=$!
