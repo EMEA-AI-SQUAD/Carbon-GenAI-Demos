@@ -10,7 +10,7 @@ Once you have your RHEL environment, SSH in and run:
 
 ```bash
 # 1. Download the deployment script
-curl -O https://raw.githubusercontent.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos/main/deployment/deploy-carbon-genai.sh
+curl -O https://raw.githubusercontent.com/ibm-power-demos-with-bob/Carbon-GenAI-Demos/main/deployment/deploy-carbon-genai.sh
 
 # 2. Make it executable
 chmod +x deploy-carbon-genai.sh

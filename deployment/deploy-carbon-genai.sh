@@ -25,7 +25,7 @@ PROXY_PID_FILE="${WORK_DIR}/proxy-server.pid"
 LLM_PID_FILE="${WORK_DIR}/llama-server.pid"
 VENV_NAME="carbon.venv"
 LLM_VENV_NAME="llama.cpp.venv"
-REPO_URL="https://github.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos"
+REPO_URL="https://github.com/ibm-power-demos-with-bob/Carbon-GenAI-Demos"
 REPO_DIR="Carbon-GenAI-Demos"
 APP_DIR="carbon-ui"
 LLAMA_REPO_URL="https://github.com/ggml-org/llama.cpp.git"
@@ -360,6 +360,14 @@ clone_repository() {
         else
             print_error "Application directory not found: $APP_DIR"
             cleanup_on_error
+        fi
+        
+        # Set execute permissions on all shell scripts in deployment directory
+        print_info "Setting execute permissions on deployment scripts..."
+        if chmod +x "${WORK_DIR}/${REPO_DIR}/deployment/"*.sh 2>/dev/null; then
+            print_success "Execute permissions set on deployment scripts"
+        else
+            print_warning "Could not set execute permissions on some scripts"
         fi
     else
         print_error "Failed to clone repository"
