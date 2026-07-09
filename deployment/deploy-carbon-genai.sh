@@ -291,22 +291,40 @@ update_system() {
 # Phase 2: Install System Dependencies
 install_dependencies() {
     print_step "🔧 Installing system dependencies..."
-    
-    local packages="python3.12 python3.12-pip python3.12-devel git gcc gcc-c++ nodejs make cmake automake llvm-toolset ninja-build gfortran curl-devel wget"
-    
-    if run_command "sudo dnf install -y $packages" "System dependencies installed"; then
-        # Verify installations
-        for cmd in python3.12 git gcc g++ node npm make cmake wget; do
-            if command_exists "$cmd"; then
-                local version=$($cmd --version 2>&1 | head -n1)
-                print_info "$cmd: $version"
-            fi
-        done
-        return 0
+
+    # Install base packages (without nodejs — installed via dnf module below)
+    local packages="python3.12 python3.12-pip python3.12-devel git gcc gcc-c++ make cmake automake llvm-toolset ninja-build gfortran curl-devel wget"
+
+    if run_command "sudo dnf install -y $packages" "Base system dependencies installed"; then
+        print_success "Base packages installed"
     else
         print_error "Failed to install system dependencies"
         cleanup_on_error
     fi
+
+    # Install Node.js 20 via RHEL dnf module stream
+    # Note: NodeSource does not support ppc64le — use the RHEL AppStream module instead
+    # RHEL 9 default stream is Node 16 which is too old (Express 5 requires >=18)
+    print_info "Enabling Node.js 20 module stream..."
+    if run_command "sudo dnf module enable -y nodejs:20" "Node.js 20 module enabled"; then
+        if run_command "sudo dnf install -y nodejs" "Node.js 20 installed"; then
+            print_success "Node.js $(node --version) installed"
+        else
+            print_error "Failed to install Node.js 20"
+            cleanup_on_error
+        fi
+    else
+        print_error "Failed to enable Node.js 20 module stream"
+        cleanup_on_error
+    fi
+
+    # Verify installations
+    for cmd in python3.12 git gcc g++ node npm make cmake wget; do
+        if command_exists "$cmd"; then
+            local version=$($cmd --version 2>&1 | head -n1)
+            print_info "$cmd: $version"
+        fi
+    done
 }
 
 # Phase 3: Setup Python Environment
