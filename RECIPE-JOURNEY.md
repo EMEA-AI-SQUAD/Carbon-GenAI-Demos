@@ -156,7 +156,14 @@ is the "one page" a seller reads to understand what they are deploying and why.
 | 2026-07-09 | Environment: `p1294-pvm1.p1294.cecc.ihost.com` (RHEL 9.4, ppc64le, 123GB RAM, 43GB free disk) |
 | 2026-07-09 | SSH key authentication confirmed working via `ssh -i <pem>` |
 | 2026-07-09 | PuTTY registry corruption issue discovered and resolved (corrupt dummy key from automation attempts) |
-| 2026-07-09 | Deployment script staged to server — awaiting stable connectivity to run |
+| 2026-07-09 | **Build failure 1:** RHEL 9 AppStream provides Node 16 by default; Express 5 requires ≥18. Fix: `dnf module enable nodejs:20`. NodeSource does not support ppc64le. |
+| 2026-07-09 | **Build failure 2:** `http-proxy-middleware@4.x` requires Node ≥22; `openai@5.x` and `typescript@7.x` similarly too new. Fix: pin to `http-proxy-middleware@^2.0.7`, `openai@^4.104.0`, `typescript@^5.8.3`, `express@^4.21.2` in deploy script. |
+| 2026-07-09 | **Build failure 3:** `tsconfig.json` contained `"ignoreDeprecations": "6.0"` — only valid in TypeScript 6+. Fix: remove that line. |
+| 2026-07-09 | Next.js build **succeeded** — all 9 routes compiled cleanly |
+| 2026-07-09 | FQDN configured across all 8 files via `update-all-fqdns.sh` |
+| 2026-07-09 | Proxy server (port 3001) confirmed running |
+| 2026-07-09 | **Paused here** — Next.js web app, llama.cpp build, Granite model download, PassportEye still to complete |
+| 2026-07-09 | All fixes committed and pushed to GitHub (commits: `a0dc915`, `2322333`, `b99cceb`) |
 
 ---
 
