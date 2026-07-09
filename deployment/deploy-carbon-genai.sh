@@ -425,16 +425,18 @@ install_node_dependencies() {
     print_info "Installing Carbon packages..."
     run_command "yarn add @carbon/react@latest" "Carbon React added"
     run_command "yarn add sass@1.63.6" "Sass added"
-    run_command "yarn add typescript" "TypeScript added"
     run_command "yarn add @carbon/icons-react@latest" "Carbon Icons added"
     run_command "yarn add @carbon/pictograms-react@latest" "Carbon Pictograms added"
-    
-    # Install npm packages
-    print_info "Installing additional npm packages..."
-    run_command "npm install openai" "OpenAI package installed"
+
+    # Install npm packages — versions pinned for Node 20 compatibility on ppc64le
+    # express 5.x requires Node >=18 but http-proxy-middleware 3.x+ requires Node >=22
+    # openai 5.x requires Node >=18; typescript 7.x requires Node >=22
+    print_info "Installing additional npm packages (Node 20 compatible versions)..."
+    run_command "npm install openai@^4.104.0" "OpenAI package installed"
     run_command "npm install cors" "CORS package installed"
-    run_command "npm install express" "Express package installed"
-    run_command "npm install http-proxy-middleware" "HTTP proxy middleware installed"
+    run_command "npm install express@^4.21.2" "Express package installed"
+    run_command "npm install http-proxy-middleware@^2.0.7" "HTTP proxy middleware installed"
+    run_command "yarn add typescript@^5.8.3" "TypeScript added"
     
     # Install proxy server dependencies
     print_info "Installing proxy server dependencies..."
