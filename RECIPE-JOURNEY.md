@@ -164,18 +164,30 @@ is the "one page" a seller reads to understand what they are deploying and why.
 | 2026-07-09 | Proxy server (port 3001) confirmed running |
 | 2026-07-09 | **Paused here** — Next.js web app, llama.cpp build, Granite model download, PassportEye still to complete |
 | 2026-07-09 | All fixes committed and pushed to GitHub (commits: `a0dc915`, `2322333`, `b99cceb`) |
+| 2026-07-10 | Resumed work. Diagnosed three bugs in `deploy-carbon-genai.sh` via re-run on live server: |
+| 2026-07-10 | **Script bug 1:** `configure_proxy()` was nested inside `build_application()` — missing closing brace caused the entire script to abort at step 7 on every run. Fixed: `cd804f8` |
+| 2026-07-10 | **Script bug 2:** `start_dev_server()` ran `yarn build` a second time. Removed duplicate build. Fixed: `cd804f8` |
+| 2026-07-10 | **Script bug 3:** `TOTAL_STEPS` was 16, corrected to 15. Fixed: `cd804f8` |
+| 2026-07-10 | **Script bug 4:** `package.json` had `"typescript": "^5.9.3"` (caret) and deploy script ran `yarn add typescript` with no lock file — yarn resolved TypeScript 7.x which crashes Next.js 13's `verifyTypeScriptSetup`. Fix: pin to exact `"typescript": "5.9.3"` in `package.json`, remove `yarn add typescript` from deploy script. Fixed: `5a06595` |
+| 2026-07-10 | **Script bug 5:** `start_dev_server()` was missing `cd` to app directory after the build step was removed. `yarn start` ran from wrong directory. Fixed: `e5a03d1` |
+| 2026-07-10 | **Repo mismatch discovered:** fixes pushed to `EMEA-AI-SQUAD/Carbon-GenAI-Demos` but deploy script clones from `ibm-power-demos-with-bob/Carbon-GenAI-Demos`. Both remotes now kept in sync on every commit. |
+| 2026-07-10 | **Full end-to-end deployment succeeded** — all 15 steps green, elapsed time 3m 18s (on environment with cached packages/model) |
+| 2026-07-10 | All four services confirmed listening: `:8080` llama-server, `:3001` proxy, `:3000` Next.js, `:5000` PassportEye |
+| 2026-07-10 | Demo accessible at `http://p1294-pvm1.p1294.cecc.ihost.com:3000` (IBM VPN required) |
 
 ---
 
 ## Open Items
 
-- [ ] Complete first end-to-end deployment on this environment
-- [ ] Validate all 9 demo use cases work on fresh RHEL 9.4 / ppc64le
+- [x] Complete first end-to-end deployment on this environment
+- [ ] Validate all 9 demo use cases work on RHEL 9.4 / ppc64le
 - [ ] Write `deploy-carbon-genai-power` SKILL.md
 - [ ] Write seller mode persona
 - [ ] Write collection README
 - [ ] Determine correct marketplace repo target (EMEA or default CE marketplace)
-- [ ] Decide whether to keep EMEA-AI-SQUAD repo or migrate to `ibm-power-demos-with-bob`
+- [ ] Decide whether to keep both repos in sync or consolidate to `ibm-power-demos-with-bob`
+- [ ] Add `yarn.lock` to the repository to prevent future version resolution surprises
+- [ ] Move Granite model download to a persistent path (not `/tmp/models`) — `/tmp` may be cleared on reboot
 - [ ] Revisit v2 TechZone migration when/if the collection is upgraded
 
 ---
