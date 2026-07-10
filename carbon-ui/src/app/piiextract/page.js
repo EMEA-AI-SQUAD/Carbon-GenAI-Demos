@@ -47,8 +47,12 @@ import { getExpectedKeys, parseModelJson, reconcileOutput, buildKeyLabelMap } fr
 import { extractPassportWithPassportEye, fileToBase64, checkPassportEyeAvailability } from "./passporteye-extraction";
 import OpenAI from 'openai';
 
-const API_URL = 'http://p1362-pvm1.p1362.cecc.ihost.com:3001/v1';
-const PROXY_URL = 'http://p1362-pvm1.p1362.cecc.ihost.com:3001'; // For PassportEye (no /v1)
+const API_URL = typeof window !== 'undefined'
+  ? `http://${window.location.hostname}:3001/v1`
+  : 'http://localhost:3001/v1';
+const PROXY_URL = typeof window !== 'undefined'
+  ? `http://${window.location.hostname}:3001`
+  : 'http://localhost:3001'; // For PassportEye (no /v1)
 
 const openai_client = new OpenAI({
   baseURL: API_URL,

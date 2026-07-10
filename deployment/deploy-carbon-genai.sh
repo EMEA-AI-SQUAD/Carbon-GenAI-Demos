@@ -500,73 +500,17 @@ EOF
     fi
 }
 
-# Phase 7: Configure Proxy and Web App
+# Phase 7: Note FQDN (no substitution needed — frontend derives hostname at runtime)
 configure_proxy() {
-    print_step "🔧 Configuring proxy and web application..."
-    
-    # Get the fully qualified hostname
+    print_step "🔧 Confirming server FQDN..."
+
     local fqdn=$(hostname -f)
     if [ -z "$fqdn" ]; then
-        print_warning "Could not get FQDN, using hostname"
         fqdn=$(hostname)
     fi
     print_info "Server FQDN: $fqdn"
-    
-    # 1. Update proxy server configuration
-    local proxy_file="${WORK_DIR}/${REPO_DIR}/${APP_DIR}/src/llama-proxy/server_final.js"
-    
-    if [ ! -f "$proxy_file" ]; then
-        print_error "Proxy configuration file not found: $proxy_file"
-        cleanup_on_error
-    fi
-    
-    # Backup proxy file
-    if [ ! -f "${proxy_file}.backup" ]; then
-        cp "$proxy_file" "${proxy_file}.backup"
-        print_info "Created backup: ${proxy_file}.backup"
-    fi
-    
-    print_info "Updating proxy server configuration..."
-    # Replace hardcoded hostname in proxy (port 3000)
-    sed -i "s|http://[^:]*:3000|http://${fqdn}:3000|g" "$proxy_file"
-    
-    if [ $? -eq 0 ]; then
-        print_success "Proxy server configuration updated"
-        if grep -q "http://${fqdn}:3000" "$proxy_file"; then
-            print_success "Hostname verified in proxy config"
-        fi
-    else
-        print_error "Failed to update proxy configuration"
-        cleanup_on_error
-    fi
-    
-    # 2. Update web application page
-    # Update all demo pages (entextract, piiextract, convintel)
-    for page in entextract piiextract convintel; do
-        local page_file="${WORK_DIR}/${REPO_DIR}/${APP_DIR}/src/app/${page}/page.js"
-        
-        if [ -f "$page_file" ]; then
-            # Backup page file
-            if [ ! -f "${page_file}.backup" ]; then
-                cp "$page_file" "${page_file}.backup"
-                print_info "Created backup: ${page_file}.backup"
-            fi
-            
-            print_info "Updating ${page} API URL..."
-            # Replace hardcoded hostname in page.js (port 3001 - proxy port)
-            sed -i "s|http://[^:]*:3001|http://${fqdn}:3001|g" "$page_file"
-            
-            if [ $? -eq 0 ]; then
-                print_success "${page} API URL updated"
-            else
-                print_warning "Failed to update ${page} (may not exist yet)"
-            fi
-        else
-            print_info "Skipping ${page} (file not found)"
-        fi
-    done
-    
-    print_success "All hostname configurations updated successfully"
+    print_info "Demo will be available at: http://${fqdn}:3000"
+    print_success "No FQDN substitution needed — frontend derives hostname dynamically at runtime"
 }
 
 
@@ -992,8 +936,8 @@ main() {
     setup_python_env
     clone_repository
     install_node_dependencies
-    build_application
     configure_proxy
+    build_application
     setup_llm_env
     build_llama_cpp
     download_model

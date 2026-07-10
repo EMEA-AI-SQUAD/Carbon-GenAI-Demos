@@ -11,7 +11,7 @@ const PASSPORTEYE_URL = 'http://localhost:5000';
  * CORS must be first
  */
 app.use(cors({
-  origin: 'http://p1362-pvm1.p1362.cecc.ihost.com:3000',
+  origin: true,  // reflect request origin — safe on IBM VPN-only network
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 }));
@@ -94,6 +94,6 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`✓ CORS Proxy running on http://localhost:${PORT}`);
   console.log(`→ Forwarding /passporteye to PassportEye service at ${PASSPORTEYE_URL}`);
   console.log(`→ Forwarding all other requests to llama.cpp at ${LLAMA_URL}`);
-  console.log(`→ Accepting requests from http://p1362-pvm1.p1362.cecc.ihost.com:3000`);
+  console.log(`→ Accepting requests from any origin (IBM VPN network)`);
 });
 

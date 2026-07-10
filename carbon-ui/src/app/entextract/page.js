@@ -49,7 +49,9 @@ import { runExtractionWithStreaming } from "./extraction";
 import { IT_OPS_SCENARIOS } from "./it-ops-emails";
 import { LOGISTICS_QUOTE_SCENARIO } from "./logistics-quote";
 
-const API_URL = 'http://p1362-pvm1.p1362.cecc.ihost.com:3001/v1';
+const API_URL = typeof window !== 'undefined'
+  ? `http://${window.location.hostname}:3001/v1`
+  : 'http://localhost:3001/v1';
 
 const openai_client = new OpenAI({
   baseURL: API_URL,

@@ -1,180 +1,281 @@
 ---
 name: deploy-carbon-genai-power
 description: >
-  Deploy the Carbon GenAI demo to a fresh RHEL 9 IBM Power TechZone environment.
-  Covers TechZone reservation (manual, v1 API), SSH key auth, running the deployment
-  script remotely, monitoring progress, and verifying all three services are healthy.
-  Use when a seller or CE wants to stand up the Carbon GenAI IBM Power demo.
+  Everything Bob needs to know to deploy, verify, and troubleshoot the
+  Carbon GenAI demo on a fresh IBM Power TechZone environment. Covers
+  the one manual step (TechZone reservation), SSH key authentication,
+  the automated deployment script, service verification, and all known
+  failure modes discovered during recipe development.
+version: 1.0.0
+author: EMEA AI on IBM Power Squad
 ---
 
-# Carbon GenAI IBM Power — Deployment Skill
+# Skill: Deploy Carbon GenAI Demo on IBM Power
 
-## Overview
+## What This Deploys
 
-This skill guides the full deployment of the Carbon GenAI demo onto a fresh IBM Power
-TechZone environment. The demo runs IBM Granite 4.0 Micro via llama.cpp on RHEL 9
-(PPC64LE) — no watsonx.ai, no cloud API keys.
+A four-service stack running entirely on IBM Power (ppc64le), no cloud
+APIs, no watsonx.ai SaaS — Granite 4.0 Micro runs on the hardware itself:
 
----
+```
+Browser (port 3000)
+    │
+    ▼
+Next.js app  (Carbon Design System UI — 9 demo use cases)
+    │
+    ▼ port 3001
+Node.js proxy  (CORS + routing)
+    │
+    ▼ port 8080  (OpenAI-compatible API)
+llama-server
+  └── IBM Granite 4.0 Micro (GGUF Q4_K_M, ~2.5 GB)
+       running on IBM Power10 (ppc64le)
 
-## Step 1 — TechZone Reservation (Manual)
+PassportEye OCR service (port 5000) — for passport verification demo
+```
 
-> ⚠️ The TechZone MCP cannot automate this reservation — the collection uses the v1 API.
-> This is the one manual step. It takes ~5 minutes of form-filling and ~15–30 minutes
-> to provision.
-
-**Direct link:**
-`https://techzone.ibm.com/collection/generative-ai-demos-on-ibm-power`
-
-**Environment to select:** `RHEL 9 ready for AI on IBM Power10 (IaaS)`
-**Platform ID:** `66479c385e3bbb001e089937`
-
-**Form tips:**
-- Wait 2–3 seconds between fields — the form validates in the background
-- Purpose: Demo (requires ISC Opportunity Number) or Test
-- Geography: any — pick the closest region
-- Duration: 7 days minimum recommended
-
-**After provisioning, collect:**
-- FQDN (e.g. `p1294-pvm1.p1294.cecc.ihost.com`) — unique per reservation, changes each time
-- **Private SSH key** — download from the reservation details page ("User Private SSH Key" button)
-
-**Fixed across all CE TechZone environments:**
-- Username is always `cecuser`
-- A password is shown on the reservation page but **do not use it** — it contains special
-  characters that break automated SSH pipelines. The downloaded private key is the correct
-  and only reliable authentication method.
+The client story: *your data stays on your Power infrastructure, the
+model runs on your hardware, there is no external API dependency.*
 
 ---
 
-## Step 2 — SSH Connectivity
+## Step 1 — Reserve a TechZone Environment (Manual — ~5 minutes effort)
 
-**Always use key-based auth.** The TechZone-provided password contains special characters
-that are not reliably passable in automated SSH pipelines on Windows.
+Bob cannot make this reservation automatically. The TechZone collection
+is a v1 environment; the TechZone MCP only supports v2 API collections.
+
+1. Go to: https://techzone.ibm.com/collection/generative-ai-demos-on-ibm-power
+2. Select: **RHEL 9 ready for AI on IBM Power10 (IaaS)**
+3. Fill in the reservation form — go slowly (2–3 seconds between fields)
+   to avoid the "Checking availability" hang
+4. Purpose: **Test** or **Demo** as appropriate
+5. Duration: 1–2 weeks is sufficient
+6. Wait for status **Ready** — provisioning takes ~15–30 minutes
+
+Once ready, from the reservation details page collect:
+- **FQDN** — format: `p<NNNN>-pvm1.p<NNNN>.cecc.ihost.com`
+- **Private SSH key** — click "User Private SSH Key" button to download
+  the `.pem` file. Use this key, not the password. The password contains
+  `!` characters which break automated SSH pipelines on Windows.
+
+> **Note on FQDNs:** TechZone sometimes reuses FQDNs across reservations.
+> If SSH complains about a host key conflict, clear the stale entry:
+> ```powershell
+> ssh-keygen -R <old-fqdn>
+> ```
+
+---
+
+## Step 2 — Verify SSH Connectivity
+
+Ask the seller to confirm with:
 
 ```powershell
-# Test connectivity (Windows)
-ssh -i "C:\path\to\pem_user_privatekey_download.pem" -o StrictHostKeyChecking=no cecuser@<fqdn> "echo OK && uname -m"
+ssh -i "<path-to-key.pem>" -o StrictHostKeyChecking=no cecuser@<fqdn> "uname -m"
 ```
 
-Expected output: `OK` then `ppc64le`
+Expected response: `ppc64le`
 
-**If the host key causes issues** (reused FQDN from a previous reservation):
-```powershell
-ssh-keygen -R <fqdn>
-ssh-keygen -R <ip-address>
-```
-Also clear PuTTY registry if plink is being used:
-```powershell
-Remove-ItemProperty 'HKCU:\Software\SimonTatham\PuTTY\SshHostKeys' -Name "ssh-ed25519@22:<fqdn>"
-```
+The username is always `cecuser` on CE TechZone environments.
+IBM VPN must be active — `cecc.ihost.com` hosts are not reachable
+from the public internet.
+
+Minimum environment requirements:
+- Architecture: `ppc64le` (IBM Power)
+- OS: RHEL 9.x
+- Free disk: ≥ 10 GB (`df -h /`)
+- RAM: ≥ 4 GB free (`free -h`) — 123 GB is typical on these reservations
 
 ---
 
 ## Step 3 — Run the Deployment Script
 
-The deployment script lives at:
-`https://raw.githubusercontent.com/ibm-power-demos-with-bob/Carbon-GenAI-Demos/main/deployment/deploy-carbon-genai.sh`
+The deployment is fully automated from this point. Bob drives it over SSH.
 
-**Stage and launch (run as a background job so SSH disconnect doesn't kill it):**
+### Stage the launcher and start the deployment
+
 ```powershell
-# Stage the script
-ssh -i "<keyfile>" -o StrictHostKeyChecking=no cecuser@<fqdn> `
-  "curl -fsSL https://raw.githubusercontent.com/ibm-power-demos-with-bob/Carbon-GenAI-Demos/main/deployment/deploy-carbon-genai.sh -o ~/deploy-carbon-genai.sh && chmod +x ~/deploy-carbon-genai.sh && echo STAGED"
+# Copy the launcher to the server
+scp -i "<key.pem>" deployment/remote-launch.sh cecuser@<fqdn>:/home/cecuser/remote-launch.sh
 
-# Launch in background
-ssh -i "<keyfile>" -o StrictHostKeyChecking=no cecuser@<fqdn> `
-  "mkdir -p ~/deployment && nohup bash ~/deploy-carbon-genai.sh > ~/deployment/deploy-live.log 2>&1 & echo STARTED PID:\$!"
+# Launch — this starts the deploy in the background and returns immediately
+ssh -i "<key.pem>" -o StrictHostKeyChecking=no cecuser@<fqdn> "bash ~/remote-launch.sh"
 ```
 
-**What the script does (16 steps, ~15–20 minutes):**
-1. Pre-flight checks (OS, architecture, sudo, internet, disk space)
-2. `dnf -y update` system packages
-3. Install: Python 3.12, Node.js, GCC, CMake, OpenBLAS, git, wget
-4. Create Python virtual environment (`carbon.venv`)
-5. Clone repo from `ibm-power-demos-with-bob/Carbon-GenAI-Demos`
-6. Install Node.js dependencies (Yarn, Carbon packages, Express, OpenAI SDK)
-7. Build Next.js application (`yarn build`)
-8. Configure proxy + update FQDN in all app pages
-9. Create LLM Python virtual environment (`llama.cpp.venv`)
-10. Install PyTorch + OpenBLAS (IBM PPC64LE wheels)
-11. Clone and build llama.cpp at commit `b6122` with OpenBLAS
-12. Download IBM Granite 4.0 Micro GGUF (`granite-4.0-micro-Q4_K_M.gguf`, ~2.5GB)
-13. Start llama-server on port 8080
-14. Set up PassportEye OCR service (port 5000)
-15. Start proxy server on port 3001
-16. Start Next.js production server on port 3000
+The launcher:
+- Kills any prior deploy process
+- Removes any existing `~/Carbon-GenAI-Demos` clone
+- Clones fresh from `https://github.com/ibm-power-demos-with-bob/Carbon-GenAI-Demos`
+- Starts `deploy-carbon-genai.sh` under `nohup` with output to `~/deployment/deploy-live.log`
+- Returns the PID immediately
+
+### Monitor progress
+
+Tail the live log to show the seller what is happening:
+
+```powershell
+ssh -i "<key.pem>" -o StrictHostKeyChecking=no cecuser@<fqdn> "tail -30 ~/deployment/deploy-live.log"
+```
+
+Call this every 30–60 seconds. The 15 steps and their expected durations:
+
+| Step | Description | Typical duration |
+|------|-------------|-----------------|
+| 1 | Pre-flight checks | < 10s |
+| 2 | System update (`dnf -y update`) | 3–8 min |
+| 3 | Install system dependencies | 1–3 min |
+| 4 | Python virtual environment | < 30s |
+| 5 | Clone repository | < 30s |
+| 6 | Node.js dependencies (yarn install) | 3–5 min |
+| 7 | Next.js build (`yarn build`) | ~60s |
+| 8 | Configure proxy + FQDN substitution | < 10s |
+| 9 | LLM Python environment + PyTorch | 2–4 min |
+| 10 | Build llama.cpp from source | 15–20 min |
+| 11 | Download Granite 4.0 Micro model (~2.5 GB) | 5–10 min |
+| 12 | Start llama-server (port 8080) | < 15s |
+| 13 | Install + start PassportEye (port 5000) | 1–2 min |
+| 14 | Start Node.js proxy (port 3001) | < 10s |
+| 15 | Start Next.js production server (port 3000) | < 10s |
+
+**Total on a clean instance:** ~35–50 minutes
+**Total on re-run (cached packages, model, llama.cpp):** ~5 minutes
 
 ---
 
-## Step 4 — Monitor Progress
+## Step 4 — Verify All Services Are Running
 
 ```powershell
-# Tail the live log
-ssh -i "<keyfile>" -o StrictHostKeyChecking=no cecuser@<fqdn> "tail -f ~/deployment/deploy-live.log"
+ssh -i "<key.pem>" -o StrictHostKeyChecking=no cecuser@<fqdn> "ss -tlnp | grep -E ':(3000|3001|5000|8080)'"
 ```
 
-Key log markers to watch for:
-- `[1/16] 🔍 Running pre-flight checks` — started
-- `[10/16] 🔨 Building llama.cpp` — longest step (~8–10 min)
-- `[12/16] 📥 Downloading LLM model` — second longest (~2–5 min on good connection)
-- `✅ Deployment Summary` — complete
+Expected output — all four ports listening:
+```
+LISTEN  0.0.0.0:5000   python3    (PassportEye)
+LISTEN  0.0.0.0:8080   llama-server
+LISTEN  0.0.0.0:3001   node       (proxy)
+LISTEN  *:3000         node       (Next.js)
+```
+
+If any port is missing, check the deployment log:
+```powershell
+ssh -i "<key.pem>" -o StrictHostKeyChecking=no cecuser@<fqdn> "grep -E 'ERROR|STEP' ~/deployment/deploy-live.log"
+```
 
 ---
 
-## Step 5 — Verify Deployment
+## Step 5 — Open the Demo
 
-```powershell
-ssh -i "<keyfile>" -o StrictHostKeyChecking=no cecuser@<fqdn> `
-  "lsof -i :3000,3001,8080,5000 -sTCP:LISTEN 2>/dev/null | awk '{print \$1, \$9}' | sort -u"
+```
+http://<fqdn>:3000
 ```
 
-Expected — four listening ports:
-```
-llama-ser  *:8080    (LLM server)
-node       *:3001    (proxy)
-node       *:3000    (web app)
-python3    *:5000    (PassportEye)
-```
-
-**Access the demo:** `http://<fqdn>:3000`
+IBM VPN must be active. The demo runs in any modern browser.
 
 ---
 
-## Re-Deployment / New Environment
+## Known Failure Modes and Fixes
 
-When the TechZone reservation expires and a new one is provisioned with a different FQDN,
-the deployment script handles everything automatically — it re-clones the repo and
-reconfigures the FQDN in the proxy and app pages.
+### `yarn build` fails with `ERR_INVALID_ARG_TYPE` / TypeScript error
+**Cause:** yarn resolved TypeScript 7.x instead of 5.9.3.
+**Fix:** `yarn.lock` is now committed and pins TypeScript to 5.9.3 exactly.
+If this recurs, check that `yarn.lock` is present in the cloned repo.
 
-If only updating the FQDN on an already-deployed environment:
+### `yarn start` fails with `Command "start" not found`
+**Cause:** script running from wrong directory.
+**Fix:** resolved in commit `e5a03d1`. If this recurs, check the
+`start_dev_server()` function has a `cd` to the app directory.
+
+### Node.js version too old — Express/package version errors
+**Cause:** RHEL 9 AppStream defaults to Node 16. NodeSource does not
+support ppc64le.
+**Fix:** the script uses `dnf module enable nodejs:20` then
+`dnf install nodejs`. This is already in the current deploy script.
+Never use NodeSource on ppc64le.
+
+### `configure_proxy` does not run / FQDN not substituted
+**Cause:** historic bug — `configure_proxy()` was nested inside
+`build_application()`. Fixed in commit `cd804f8`.
+
+### llama-server dies immediately after start
+**Cause:** model file not fully downloaded, or downloaded to `/tmp/models`
+which was cleared by a reboot.
+**Fix:** model is now downloaded to `~/models` which persists across
+reboots. Check with:
 ```bash
-# On the server
-cd ~/Carbon-GenAI-Demos
-./deployment/update-all-fqdns.sh <new-fqdn>
+ls -lh ~/models/granite-4.0-micro-Q4_K_M.gguf
+# expected: ~2.5 GB
+```
+If missing, re-run the deployment script — it will skip all already-complete
+steps and only re-download the model.
+
+### SSH connection times out before reaching the server
+**Cause:** IBM VPN not active. The `cecc.ihost.com` domain is only
+reachable on the IBM intranet.
+**Fix:** connect to IBM VPN, then retry.
+
+### PassportEye setup fails
+**Cause:** `tesseract` may not be available in RHEL 9 AppStream for
+ppc64le, or pip dependencies may fail to build.
+**Status:** PassportEye setup has a soft-fail wrapper in the main script
+— if it fails, the rest of the deployment continues. The Passport
+Verification use case will not work but all other 8 demos will.
+**Fix:** run `bash ~/Carbon-GenAI-Demos/deployment/setup-passporteye.sh`
+manually after deployment and inspect the output.
+
+### Port 3000 or 3001 already in use on a re-deploy
+**Cause:** previous deploy's processes still running.
+**Fix:** `bash ~/Carbon-GenAI-Demos/deployment/stop-server.sh` then
+re-run the deployment, or kill individual processes:
+```bash
+kill $(cat ~/carbon-dev-server.pid)   # Next.js
+kill $(cat ~/proxy-server.pid)        # proxy
+kill $(cat ~/llama-server.pid)        # llama-server
 ```
 
 ---
 
-## Common Failure Modes
+## Repository and Architecture Notes
 
-| Symptom | Likely Cause | Fix |
-|---------|-------------|-----|
-| `Access denied` on SSH | Password used instead of key, or key not yet accepted | Use `-i <keyfile>`, ensure key is chmod 600 |
-| Form stuck on "Checking availability" | TechZone form filled too fast | Refresh, start over, wait 2–3s between fields |
-| llama.cpp build fails | Missing compiler or disk space | Check `~/deployment/*.log`, verify `df -h` |
-| Port 3000 not listening | Next.js build failed | Check log for ESLint/TypeScript errors |
-| LLM server crashes at startup | Model file corrupt or incomplete | Re-download: `wget <MODEL_URL> -O /tmp/models/granite-4.0-micro-Q4_K_M.gguf` |
+**Two GitHub remotes are kept in sync — always push to both:**
+- `origin` — `https://github.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos`
+- `power-demos` — `https://github.com/ibm-power-demos-with-bob/Carbon-GenAI-Demos`
+
+The deploy script clones from `ibm-power-demos-with-bob`. If fixes are
+committed only to `EMEA-AI-SQUAD`, the deployed code will be stale.
+
+**Key ppc64le constraints:**
+- NodeSource does not support ppc64le — use `dnf module enable nodejs:20`
+- PyTorch and OpenBLAS must come from IBM's wheels repo:
+  `https://wheels.developerfirst.ibm.com/ppc64le/linux`
+- llama.cpp must be built from source — no ppc64le binary releases
+- All npm package versions are pinned for Node 20 compatibility;
+  `http-proxy-middleware`, `openai`, and `express` all have recent
+  major versions that require Node ≥22
+
+**No watsonx.ai, no API keys:**
+This deployment is intentionally self-contained. The LLM runs locally
+via llama.cpp. There are no environment variables to configure for
+the AI inference path.
 
 ---
 
-## Key URLs and IDs
+## Demo Use Cases Quick Reference
 
-| Item | Value |
-|------|-------|
-| TechZone Collection | https://techzone.ibm.com/collection/generative-ai-demos-on-ibm-power |
-| Platform ID | `66479c385e3bbb001e089937` |
-| GitHub repo | https://github.com/ibm-power-demos-with-bob/Carbon-GenAI-Demos |
-| Model (HuggingFace) | https://huggingface.co/ibm-granite/granite-4.0-micro-GGUF |
-| Model file | `granite-4.0-micro-Q4_K_M.gguf` |
-| Demo URL (post-deploy) | `http://<fqdn>:3000` |
+Open `http://<fqdn>:3000` and verify each tab loads and returns
+a structured AI response:
+
+| Tab | Use Case | What to submit |
+|-----|----------|----------------|
+| Entity Extraction | 📚 Book Review Analysis | Short book review text |
+| Entity Extraction | 🌍 Multilingual IT Ops | Italian or French support email |
+| Entity Extraction | 🚚 German Logistics Quote | Hans Geis sample logistics text |
+| PII Extraction | 🔒 Fraud Complaint | Text with name/address/card number |
+| PII Extraction | 🛂 Passport Verification | Sample passport MRZ text |
+| PII Extraction | 📄 Document Discovery | Any document text |
+| Other | 📝 Brief Builder | Campaign launch notes |
+| Other | 📋 RFP Assistant | RFP extract |
+| Other | 👔 Talent Acquisition | Job title and description |
+
+A healthy response is structured JSON or formatted text returned within
+~5–15 seconds. A spinner that never resolves indicates the llama-server
+is not running or the proxy is misconfigured.

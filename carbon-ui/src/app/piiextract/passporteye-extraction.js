@@ -8,10 +8,10 @@
 /**
  * Extract passport data using PassportEye OCR service
  * @param {string} imageBase64 - Base64 encoded passport image
- * @param {string} proxyUrl - URL of the proxy server (default: http://p1362-pvm1.p1362.cecc.ihost.com:3001)
+ * @param {string} proxyUrl - URL of the proxy server (defaults to same hostname as page, port 3001)
  * @returns {Promise<Object>} Extraction results with MRZ data
  */
-export async function extractPassportWithPassportEye(imageBase64, proxyUrl = 'http://p1362-pvm1.p1362.cecc.ihost.com:3001') {
+export async function extractPassportWithPassportEye(imageBase64, proxyUrl = typeof window !== 'undefined' ? `http://${window.location.hostname}:3001` : 'http://localhost:3001') {
   try {
     console.log('🔍 Starting PassportEye extraction...');
     const startTime = Date.now();
@@ -108,7 +108,7 @@ export function fileToBase64(file) {
  * @param {string} proxyUrl - URL of the proxy server
  * @returns {Promise<boolean>} True if service is available
  */
-export async function checkPassportEyeAvailability(proxyUrl = 'http://p1362-pvm1.p1362.cecc.ihost.com:3001') {
+export async function checkPassportEyeAvailability(proxyUrl = typeof window !== 'undefined' ? `http://${window.location.hostname}:3001` : 'http://localhost:3001') {
   try {
     const response = await fetch(`${proxyUrl}/passporteye/health`, {
       method: 'GET',
