@@ -15,6 +15,9 @@ sleep 2
 mkdir -p ~/deployment
 rm -rf ~/Carbon-GenAI-Demos
 
+# Ensure git is available — on a clean RHEL 9 instance it may not be installed yet
+sudo dnf install -y git >/dev/null 2>&1 || true
+
 git clone https://github.com/ibm-power-demos-with-bob/Carbon-GenAI-Demos ~/Carbon-GenAI-Demos
 
 nohup bash ~/Carbon-GenAI-Demos/deployment/deploy-carbon-genai.sh \

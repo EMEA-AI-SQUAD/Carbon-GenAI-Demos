@@ -178,21 +178,30 @@ is the "one page" a seller reads to understand what they are deploying and why.
 | 2026-07-10 | **Fix — eliminate hardcoded FQDNs entirely:** all 7 `page.js` files and `passporteye-extraction.js` now derive the proxy URL from `window.location.hostname` at browser runtime. `server_final.js` CORS origin changed from hardcoded hostname to `origin: true`. `configure_proxy()` in deploy script gutted — no sed substitution needed. Zero FQDNs in source. |
 | 2026-07-10 | **Fix — `remote-launch.sh` now kills running services** before redeploying, preventing `EADDRINUSE` on port 3000 on re-runs. |
 | 2026-07-10 | All 15 steps green again (3m 9s). Demo confirmed loading correctly. |
+| 2026-07-10 | **New clean environment** — `p1279-pvm1.p1279.cecc.ihost.com` (RHEL 9.4, ppc64le, 123 GB RAM, 43 GB free disk) |
+| 2026-07-10 | **Bug discovered in `remote-launch.sh`:** script calls `git clone` before `git` is installed on a clean RHEL instance. Fix: added `sudo dnf install -y git` before the clone step. |
+| 2026-07-10 | **Full clean deployment succeeded** — all 15 steps green, elapsed time 19m 14s on a completely fresh instance (nothing pre-cached). |
+| 2026-07-10 | All four services confirmed listening: `:8080` llama-server, `:3001` proxy, `:3000` Next.js, `:5000` PassportEye |
+| 2026-07-10 | Demo accessible at `http://p1279-pvm1.p1279.cecc.ihost.com:3000` (IBM VPN required) |
 
 ---
 
 ## Open Items
 
 - [x] Complete first end-to-end deployment on this environment
+- [x] Confirm recipe deploys cleanly on a second, completely fresh environment (19m 14s — `p1279`, 2026-07-10)
+- [x] Fix `remote-launch.sh` — added `sudo dnf install -y git` before clone (clean RHEL 9 has no git)
+- [x] Write `deploy-carbon-genai-power` skill (`.bob/skills/deploy-carbon-genai-power.md`)
+- [x] Write collection README (`COLLECTION.md`)
+- [ ] **Handoff test** — tester provisions own TechZone reservation and runs recipe end-to-end
 - [ ] Validate all 9 demo use cases work on RHEL 9.4 / ppc64le
-- [ ] Write `deploy-carbon-genai-power` SKILL.md
-- [ ] Write seller mode persona
-- [ ] Write collection README
-- [ ] Determine correct marketplace repo target (EMEA or default CE marketplace)
-- [ ] Decide whether to keep both repos in sync or consolidate to `ibm-power-demos-with-bob`
-- [ ] Add `yarn.lock` to the repository to prevent future version resolution surprises
-- [ ] Move Granite model download to a persistent path (not `/tmp/models`) — `/tmp` may be cleared on reboot
-- [ ] Revisit v2 TechZone migration when/if the collection is upgraded
+- [ ] Write seller mode persona (pre-sales demo mode)
+- [ ] Determine correct marketplace repo target (EMEA or default CE marketplace) and submit
+- [ ] **Post-submission optimisations (not blockers):**
+- [ ] &nbsp;&nbsp;Investigate Ollama as llama.cpp replacement (~8–10 min clean deploy vs ~20 min)
+- [ ] &nbsp;&nbsp;Decide whether to keep both repos in sync or consolidate to `ibm-power-demos-with-bob`
+- [ ] &nbsp;&nbsp;Add `yarn.lock` to prevent future version resolution surprises
+- [ ] &nbsp;&nbsp;Revisit v2 TechZone migration when/if the collection is upgraded
 
 ---
 
