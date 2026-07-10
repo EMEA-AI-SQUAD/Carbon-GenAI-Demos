@@ -436,7 +436,8 @@ install_node_dependencies() {
     run_command "npm install cors" "CORS package installed"
     run_command "npm install express@^4.21.2" "Express package installed"
     run_command "npm install http-proxy-middleware@^2.0.7" "HTTP proxy middleware installed"
-    run_command "yarn add typescript@^5.8.3" "TypeScript added"
+    # TypeScript version is pinned exactly in package.json (5.9.3) — no yarn add needed here.
+    # Adding it again via yarn add risks yarn resolving a newer incompatible version.
     
     # Install proxy server dependencies
     print_info "Installing proxy server dependencies..."
