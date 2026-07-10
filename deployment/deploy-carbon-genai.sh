@@ -654,7 +654,13 @@ start_proxy_server() {
 # Phase 8: Start Production Server
 start_dev_server() {
     print_step "🚀 Starting Next.js production server..."
-    
+
+    # Ensure we're in the app directory (build was done here; start must be too)
+    cd "${WORK_DIR}/${REPO_DIR}/${APP_DIR}" || {
+        print_error "Failed to navigate to app directory"
+        cleanup_on_error
+    }
+
     # Start production server in background
     log_message "INFO" "Starting production server with: nohup yarn start"
     nohup yarn start >> "$LOG_FILE" 2>&1 &
