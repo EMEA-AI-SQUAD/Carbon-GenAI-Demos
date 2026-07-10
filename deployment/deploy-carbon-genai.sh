@@ -46,7 +46,7 @@ NC='\033[0m' # No Color
 
 # Step tracking
 CURRENT_STEP=0
-TOTAL_STEPS=16
+TOTAL_STEPS=15
 
 # ============================================================================
 # LOGGING FUNCTIONS
@@ -497,6 +497,7 @@ EOF
         print_error "Failed to build application"
         cleanup_on_error
     fi
+}
 
 # Phase 7: Configure Proxy and Web App
 configure_proxy() {
@@ -565,8 +566,6 @@ configure_proxy() {
     done
     
     print_success "All hostname configurations updated successfully"
-}
-
 }
 
 
@@ -651,28 +650,9 @@ start_proxy_server() {
     fi
 }
 
-# Phase 8: Build and Start Production Server
+# Phase 8: Start Production Server
 start_dev_server() {
-    print_step "🏗️  Building Next.js application..."
-    
-    # Ensure we're in the app directory
-    cd "${WORK_DIR}/${REPO_DIR}/${APP_DIR}" || {
-        print_error "Failed to navigate to app directory"
-        cleanup_on_error
-    }
-    
-    # Build the application first to avoid on-demand compilation
-    log_message "INFO" "Building application with: yarn build"
-    print_info "This may take a few minutes..."
-    if yarn build >> "$LOG_FILE" 2>&1; then
-        print_success "Application built successfully"
-        log_message "INFO" "Next.js build completed"
-    else
-        print_error "Build failed. Check log file: $LOG_FILE"
-        cleanup_on_error
-    fi
-    
-    print_step "🚀 Starting production server..."
+    print_step "🚀 Starting Next.js production server..."
     
     # Start production server in background
     log_message "INFO" "Starting production server with: nohup yarn start"
