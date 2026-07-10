@@ -3,7 +3,14 @@
 # Safe to run multiple times — kills any prior deploy run first.
 
 pkill -f deploy-carbon-genai.sh 2>/dev/null || true
-sleep 1
+
+# Stop any previously deployed services so ports are free for the new run
+pkill -f "llama-server" 2>/dev/null || true
+pkill -f "node server_final.js" 2>/dev/null || true
+pkill -f "next start" 2>/dev/null || true
+pkill -f "next-server" 2>/dev/null || true
+pkill -f "passporteye\|passport_service" 2>/dev/null || true
+sleep 2
 
 mkdir -p ~/deployment
 rm -rf ~/Carbon-GenAI-Demos
