@@ -175,6 +175,16 @@ IBM VPN must be active. The demo runs in any modern browser.
 
 ## Known Failure Modes and Fixes
 
+### LLM calls fail in browser with `ERR_NAME_NOT_RESOLVED` or `Connection error`
+**Cause:** historic bug — old FQDN was hardcoded in source files and baked
+into the Next.js build. Fully resolved: all API URLs are now derived from
+`window.location.hostname` at browser runtime. No hostname is compiled
+into the built JS. This error should not recur on any new reservation.
+If it does, check for hardcoded hostnames:
+```bash
+grep -r "cecc.ihost.com" ~/Carbon-GenAI-Demos/carbon-ui/src
+```
+
 ### `yarn build` fails with `ERR_INVALID_ARG_TYPE` / TypeScript error
 **Cause:** yarn resolved TypeScript 7.x instead of 5.9.3.
 **Fix:** `yarn.lock` is now committed and pins TypeScript to 5.9.3 exactly.

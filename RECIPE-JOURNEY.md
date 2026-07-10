@@ -174,6 +174,10 @@ is the "one page" a seller reads to understand what they are deploying and why.
 | 2026-07-10 | **Full end-to-end deployment succeeded** — all 15 steps green, elapsed time 3m 18s (on environment with cached packages/model) |
 | 2026-07-10 | All four services confirmed listening: `:8080` llama-server, `:3001` proxy, `:3000` Next.js, `:5000` PassportEye |
 | 2026-07-10 | Demo accessible at `http://p1294-pvm1.p1294.cecc.ihost.com:3000` (IBM VPN required) |
+| 2026-07-10 | **CORS / FQDN bug discovered:** UI loaded but all LLM calls failed with `ERR_NAME_NOT_RESOLVED` — old `p1362` FQDN baked into built JS. Root cause: FQDN substitution ran *after* `yarn build`, so the old hostname was compiled into the `.next/` output. |
+| 2026-07-10 | **Fix — eliminate hardcoded FQDNs entirely:** all 7 `page.js` files and `passporteye-extraction.js` now derive the proxy URL from `window.location.hostname` at browser runtime. `server_final.js` CORS origin changed from hardcoded hostname to `origin: true`. `configure_proxy()` in deploy script gutted — no sed substitution needed. Zero FQDNs in source. |
+| 2026-07-10 | **Fix — `remote-launch.sh` now kills running services** before redeploying, preventing `EADDRINUSE` on port 3000 on re-runs. |
+| 2026-07-10 | All 15 steps green again (3m 9s). Demo confirmed loading correctly. |
 
 ---
 
