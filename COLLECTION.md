@@ -1,4 +1,4 @@
-# Carbon GenAI Demo on IBM Power
+# IBM Power GenAI Demo
 
 Deploy a fully self-contained AI demo — IBM Granite running **on-prem on IBM Power**, no cloud APIs, no watsonx.ai SaaS, no data leaving the client's environment — in under 25 minutes from a fresh TechZone reservation.
 
@@ -8,13 +8,13 @@ IBM Client Engineering sellers and technical pre-sales engineers who need to sho
 
 ## The demo
 
-A Carbon Design System web application with **9 real CE use cases**, all powered by IBM Granite 4.0 Micro running locally via llama.cpp on ppc64le:
+A web application with **9 real CE use cases**, all powered by IBM Granite 4.0 Micro running locally via llama.cpp on ppc64le:
 
 | Use Case | What it shows |
 |----------|--------------|
-| 📚 Book Review Analysis | Entity extraction from unstructured text |
+| 📦 Component Catalogue Entry | Entity extraction from unstructured product descriptions |
 | 🌍 Multilingual IT Ops | Translation + priority classification from French/Italian emails |
-| 🚚 German Logistics Quote | Structured data extraction + calculation from logistics text |
+| 🚚 German Logistics Quote (Hans Geis) | Structured data extraction + calculation — real IBM customer case study |
 | 🔒 Fraud Complaint PII | PII detection and redaction across 8 entity types |
 | 🛂 Passport Verification | OCR-based identity data extraction (PassportEye) |
 | 📄 Document Discovery | Risk classification (HIGH / MEDIUM / LOW) |
@@ -29,7 +29,7 @@ The client story: *your data stays on your Power infrastructure, the model runs 
 Installing this collection bundles the following into your workspace:
 
 ### Skills
-- **deploy-carbon-genai-power** — everything Bob needs to deploy, verify, and troubleshoot the demo on a fresh IBM Power TechZone environment; covers SSH key authentication, the automated 15-step deployment script, service verification, and all known failure modes.
+- **deploy-ibm-power-genai** — everything Bob needs to deploy, verify, and troubleshoot the demo on a fresh IBM Power TechZone environment; covers SSH key authentication, the automated 15-step deployment script, service verification, and all known failure modes.
 
 ## Architecture
 
@@ -37,7 +37,7 @@ Installing this collection bundles the following into your workspace:
 Browser (port 3000)
     │
     ▼
-Next.js app  (Carbon Design System UI)
+Next.js app  (IBM Design System UI)
     │
     ▼ port 3001
 Node.js proxy  (CORS + routing)
@@ -52,7 +52,36 @@ PassportEye OCR service (port 5000)
 
 No watsonx.ai. No API keys. No external dependencies.
 
-## Get started
+---
+
+## Recommended workflow — using this with the Pre-Sales Demo Builder mode
+
+This demo delivers the most impact when used alongside Bob's **Pre-Sales Demo Builder mode** and a customer intelligence step before deployment. The pattern below takes 30–45 minutes of preparation and meaningfully improves what happens in the room.
+
+### Step 0 — Gather customer intelligence with IBM Consulting Advantage
+
+Before deploying, use [IBM Consulting Advantage](https://w3.ibm.com/#/apps/consulting-advantage) (IBM VPN required) to generate a client intelligence summary:
+
+1. Open ICA and start a new chat
+2. Ask it to focus on the customer's country/region context
+3. Upload the customer's **annual report** and most recent **earnings or financial presentation** (PDF)
+4. Ask: *"Summarise this company's key business priorities, operational challenges, and technology investment themes relevant to an IBM Power / IBM i conversation"*
+5. Copy the ICA response — this becomes your tailoring prompt for Bob
+
+This step is valuable because it translates large documents (often 100+ pages) into a focused intelligence brief that Bob can act on directly, without loading raw reports into context.
+
+### Step 0b — Tailor the demo with Bob (Pre-Sales Demo Builder mode)
+
+Switch Bob to **Pre-Sales Demo Builder** mode, then paste your ICA summary and say:
+
+> *"Using this customer intelligence summary, tailor the IBM Power GenAI demo for [customer name]. My audience includes [e.g. Head of Infrastructure, Head of Development, IBM i team]. Keep the real customer reference scenarios (Hans Geis, Mr. Bean passport) as they are — those are useful icebreakers. Update the generic scenarios to reflect this customer's world."*
+
+Bob will:
+- Identify which of the 9 demo scenarios are generic (safe to tailor)
+- Identify which are anchored to real customers (leave untouched)
+- Rewrite the sample data and scenario framing for your customer
+- Create a customer-specific branch so `main` stays clean for future engagements
+- Update the deployment scripts to deploy from that branch
 
 ### Step 1 — Reserve a TechZone environment (~5 min effort, ~20 min wait)
 
@@ -70,7 +99,7 @@ Fill in the reservation form and wait for status **Ready**. Once ready, from the
 
 With this collection installed, simply tell Bob:
 
-> *"Deploy the Carbon GenAI demo. My FQDN is `p<NNNN>-pvm1.p<NNNN>.cecc.ihost.com` and my SSH key is at `<path-to-key.pem>`."*
+> *"Deploy the IBM Power GenAI demo. My FQDN is `p<NNNN>-pvm1.p<NNNN>.cecc.ihost.com` and my SSH key is at `<path-to-key.pem>`."*
 
 Bob will:
 1. Verify SSH connectivity
@@ -99,5 +128,5 @@ IBM VPN must be active. The demo runs in any modern browser.
 
 ---
 
-*Maintained by the EMEA AI on IBM Power Squad.*
+*Maintained by the EMEA AI on IBM Power Squad.*  
 *Built with Bob (Roo-Cline AI Assistant).*

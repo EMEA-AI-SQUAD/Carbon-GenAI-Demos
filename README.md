@@ -1,4 +1,4 @@
-# Carbon GenAI Demos — IBM Power + IBM Granite
+# IBM Power GenAI Demo
 
 > **A quick-win demo built with Bob (Roo-Cline AI Assistant) to showcase IBM Granite AI running on IBM Power**
 >
@@ -14,7 +14,7 @@
 
 ## 🎯 What This Is
 
-A **Carbon Design System web application** that demonstrates real-world AI use cases powered by **IBM Granite 4.0 Micro** running locally on **IBM Power (PPC64LE)**. No cloud API keys needed — the model runs entirely on-prem.
+A web application that demonstrates real-world AI use cases powered by **IBM Granite 4.0 Micro** running locally on **IBM Power (PPC64LE)**. No cloud API keys needed — the model runs entirely on-prem.
 
 ### Demos included
 
@@ -150,7 +150,7 @@ This demo was built through collaboration between the **EMEA AI on IBM Power Squ
 
 It is shared here in `ibm-power-demos-with-bob` as a **reference example** — something others can point at, run, and customise. The longer-term plan for this organisation is to host demos that are fully _recipe-driven_: you describe what you need to Bob using the Pre-Sales Demo Builder mode, and Bob builds the whole thing using structured skills targeting IBM Power capabilities.
 
-This demo predates those skills and mode, but it shows the end result and deployment pipeline clearly.
+This demo was built before those skills and mode existed, but it shows the end result and deployment pipeline clearly. The tailoring workflow (ICA → Bob → customer branch) is now part of the recipe and documented in `COLLECTION.md`.
 
 ---
 

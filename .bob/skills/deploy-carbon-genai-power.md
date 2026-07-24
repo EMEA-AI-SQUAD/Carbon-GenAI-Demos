@@ -1,16 +1,17 @@
 ---
-name: deploy-carbon-genai-power
+name: deploy-ibm-power-genai
 description: >
   Everything Bob needs to know to deploy, verify, and troubleshoot the
-  Carbon GenAI demo on a fresh IBM Power TechZone environment. Covers
+  IBM Power GenAI demo on a fresh IBM Power TechZone environment. Covers
   the one manual step (TechZone reservation), SSH key authentication,
-  the automated deployment script, service verification, and all known
-  failure modes discovered during recipe development.
-version: 1.0.0
+  the automated deployment script, service verification, all known
+  failure modes, and the recommended ICA tailoring workflow for
+  customer-specific engagements.
+version: 1.1.0
 author: EMEA AI on IBM Power Squad
 ---
 
-# Skill: Deploy Carbon GenAI Demo on IBM Power
+# Skill: Deploy IBM Power GenAI Demo
 
 ## What This Deploys
 
@@ -21,7 +22,7 @@ APIs, no watsonx.ai SaaS — Granite 4.0 Micro runs on the hardware itself:
 Browser (port 3000)
     │
     ▼
-Next.js app  (Carbon Design System UI — 9 demo use cases)
+Next.js app  (IBM Design System UI — 9 demo use cases)
     │
     ▼ port 3001
 Node.js proxy  (CORS + routing)
@@ -105,7 +106,7 @@ ssh -i "<key.pem>" -o StrictHostKeyChecking=no cecuser@<fqdn> "bash ~/remote-lau
 The launcher:
 - Kills any prior deploy process
 - Removes any existing `~/Carbon-GenAI-Demos` clone
-- Clones fresh from `https://github.com/ibm-power-demos-with-bob/Carbon-GenAI-Demos`
+- Clones fresh from the configured branch of `https://github.com/ibm-power-demos-with-bob/Carbon-GenAI-Demos`
 - Starts `deploy-carbon-genai.sh` under `nohup` with output to `~/deployment/deploy-live.log`
 - Returns the PID immediately
 
@@ -244,6 +245,41 @@ kill $(cat ~/llama-server.pid)        # llama-server
 
 ---
 
+## Customer Tailoring Workflow
+
+Before deploying for a specific client engagement, it is strongly recommended
+to tailor the demo sample data. The generic `main` branch ships with realistic
+but industry-neutral defaults. Customer-tailored versions live on separate
+branches (e.g. `farnell-demo`) so `main` stays clean for reuse.
+
+### How to tailor using ICA and Pre-Sales Demo Builder
+
+1. **Switch Bob to Pre-Sales Demo Builder mode**
+2. **Gather intelligence via IBM Consulting Advantage** (IBM VPN required):
+   - Go to https://w3.ibm.com/#/apps/consulting-advantage
+   - Start a new chat — ask it to focus on the customer's country/region
+   - Upload the customer's annual report and most recent earnings presentation (PDF)
+   - Ask: *"Summarise this company's key business priorities, operational challenges, and technology investment themes relevant to an IBM Power / IBM i conversation"*
+   - Copy the ICA response
+3. **Paste the ICA summary into Bob** and say:
+   > *"Using this customer intelligence summary, tailor the IBM Power GenAI demo for [customer name]. My audience includes [roles]. Keep the real customer reference scenarios (Hans Geis, Mr. Bean passport) as they are — those are useful icebreakers. Update the generic scenarios to reflect this customer's world."*
+4. Bob will create a customer-specific branch and update the deployment scripts automatically.
+5. Deploy from the customer branch — `main` is untouched.
+
+### Which scenarios are safe to tailor
+
+| Demo | Status | Notes |
+|------|--------|-------|
+| Entity Extraction — Book Review / Component Entry | ✅ Tailor freely | Generic by default |
+| Entity Extraction — IT Ops emails (Italian/French) | ✅ Tailor freely | Generic by default |
+| Entity Extraction — German Logistics (Hans Geis) | 🔒 Leave as-is | Real IBM customer case study |
+| PII — Fraud Complaint | ✅ Tailor freely | Generic by default |
+| PII — Passport Verification (Mr. Bean) | 🔒 Leave as-is | Crowd-pleaser, intentionally light-hearted |
+| PII — Document Discovery | ✅ Tailor freely | Generic by default |
+| Brief Builder | ✅ Tailor freely | Generic by default |
+| RFP Assistant | ✅ Tailor freely | Generic by default |
+| Talent Acquisition | ✅ Tailor freely | Generic by default |
+
 ## Repository and Architecture Notes
 
 **Two GitHub remotes are kept in sync — always push to both:**
@@ -276,7 +312,7 @@ a structured AI response:
 
 | Tab | Use Case | What to submit |
 |-----|----------|----------------|
-| Entity Extraction | 📚 Book Review Analysis | Short book review text |
+| Entity Extraction | 📦 Component / Product Entry | Product description text |
 | Entity Extraction | 🌍 Multilingual IT Ops | Italian or French support email |
 | Entity Extraction | 🚚 German Logistics Quote | Hans Geis sample logistics text |
 | PII Extraction | 🔒 Fraud Complaint | Text with name/address/card number |
