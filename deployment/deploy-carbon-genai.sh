@@ -405,6 +405,15 @@ install_node_dependencies() {
         print_error "Failed to install Yarn"
         cleanup_on_error
     fi
+
+    # Install pm2 globally — used to keep all three services alive after SSH session ends
+    if run_command "sudo npm install --global pm2" "pm2 installed globally"; then
+        local pm2_version=$(pm2 --version 2>/dev/null)
+        print_info "pm2 version: $pm2_version"
+    else
+        print_error "Failed to install pm2"
+        cleanup_on_error
+    fi
     
     # Navigate to app directory
     cd "${REPO_DIR}/${APP_DIR}" || {
@@ -539,18 +548,15 @@ start_proxy_server() {
     log_message "INFO" "Starting proxy server with: node server_final.js"
     log_message "INFO" "Proxy log file: $proxy_log"
     
-    # Use setsid to properly detach the process
-    setsid node server_final.js > "$proxy_log" 2>&1 < /dev/null &
-    local proxy_pid=$!
-    
-    # Disown the process to prevent it from being killed when shell exits
-    disown $proxy_pid 2>/dev/null || true
-    
-    # Save PID
+    # Use pm2 so the process survives SSH session end and auto-restarts on crash
+    pm2 start node --name proxy -- server_final.js
+    local proxy_pid=$(pm2 pid proxy 2>/dev/null || echo "unknown")
+
+    # Save PID (best-effort; pm2 manages the real lifecycle)
     local proxy_pid_file="${WORK_DIR}/proxy-server.pid"
     echo "$proxy_pid" > "$proxy_pid_file"
-    print_success "Proxy server started (initial PID: $proxy_pid)"
-    print_info "Proxy log: $proxy_log"
+    print_success "Proxy server started via pm2 (PID: $proxy_pid)"
+    print_info "Proxy log: pm2 logs proxy"
     
     # Wait and verify the proxy is listening on port 3001
     print_info "Waiting for proxy to start listening on port 3001..."
@@ -605,23 +611,23 @@ start_dev_server() {
         cleanup_on_error
     }
 
-    # Start production server in background
-    log_message "INFO" "Starting production server with: nohup yarn start"
-    nohup yarn start >> "$LOG_FILE" 2>&1 &
-    local server_pid=$!
-    
-    # Save PID
+    # Start production server via pm2 — survives SSH session end and auto-restarts on crash
+    log_message "INFO" "Starting production server with: pm2 start yarn -- start"
+    pm2 start yarn --name nextjs -- start
+    local server_pid=$(pm2 pid nextjs 2>/dev/null || echo "unknown")
+
+    # Save PID (best-effort; pm2 manages the real lifecycle)
     echo "$server_pid" > "$PID_FILE"
-    print_success "Production server started (PID: $server_pid)"
-    
+    print_success "Production server started via pm2 (PID: $server_pid)"
+
     # Wait a moment and verify it's still running
     sleep 3
-    if kill -0 "$server_pid" 2>/dev/null; then
+    if pm2 list | grep -q "nextjs.*online"; then
         print_success "Production server is running"
-        log_message "INFO" "Production server verified running with PID: $server_pid"
+        log_message "INFO" "Production server verified running via pm2"
     else
         print_error "Production server failed to start"
-        log_message "ERROR" "Production server process died immediately"
+        log_message "ERROR" "Production server process not online in pm2"
         cleanup_on_error
     fi
 }
@@ -803,23 +809,24 @@ start_llm_server() {
         cleanup_on_error
     }
     
-    # Start llama-server in background
+    # Start llama-server via pm2 — survives SSH session end and auto-restarts on crash
     log_message "INFO" "Starting llama-server with model: ${MODEL_DIR}/${MODEL_FILE}"
-    nohup ./build/bin/llama-server -m "${MODEL_DIR}/${MODEL_FILE}" --host 0.0.0.0 >> "$LOG_FILE" 2>&1 &
-    local server_pid=$!
-    
-    # Save PID
+    pm2 start ./build/bin/llama-server --name llama-server \
+        -- -m "${MODEL_DIR}/${MODEL_FILE}" --host 0.0.0.0
+    local server_pid=$(pm2 pid llama-server 2>/dev/null || echo "unknown")
+
+    # Save PID (best-effort; pm2 manages the real lifecycle)
     echo "$server_pid" > "$LLM_PID_FILE"
-    print_success "LLM server started (PID: $server_pid)"
-    
+    print_success "LLM server started via pm2 (PID: $server_pid)"
+
     # Wait a moment and verify it's still running
     sleep 5
-    if kill -0 "$server_pid" 2>/dev/null; then
+    if pm2 list | grep -q "llama-server.*online"; then
         print_success "LLM server is running"
-        log_message "INFO" "LLM server verified running with PID: $server_pid"
+        log_message "INFO" "LLM server verified running via pm2"
     else
         print_error "LLM server failed to start"
-        log_message "ERROR" "LLM server process died immediately"
+        log_message "ERROR" "LLM server process not online in pm2"
         cleanup_on_error
     fi
 }
@@ -945,7 +952,11 @@ main() {
     setup_passporteye
     start_proxy_server
     start_dev_server
-    
+
+    # Persist pm2 process list so all three services survive a server reboot
+    pm2 save
+    print_success "pm2 process list saved (survives reboot)"
+
     # Print summary
     print_summary
     
