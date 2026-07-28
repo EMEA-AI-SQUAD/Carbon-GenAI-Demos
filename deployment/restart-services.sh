@@ -20,7 +20,7 @@ HOME_DIR="$HOME"
 REPO_DIR="Carbon-GenAI-Demos"
 APP_DIR="carbon-ui"
 LLAMA_DIR="llama.cpp"
-MODEL_DIR="/tmp/models"
+MODEL_DIR="${HOME_DIR}/models"
 MODEL_FILE="granite-4.0-micro-Q4_K_M.gguf"
 
 PID_FILE="${HOME_DIR}/carbon-dev-server.pid"
@@ -28,7 +28,7 @@ PROXY_PID_FILE="${HOME_DIR}/proxy-server.pid"
 LLM_PID_FILE="${HOME_DIR}/llama-server.pid"
 
 echo -e "${BOLD}${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${BOLD}${CYAN}Carbon GenAI Demo - Service Restart${NC}"
+echo -e "${BOLD}${CYAN}IBM Power GenAI Demo (Premier Farnell) - Service Restart${NC}"
 echo -e "${BOLD}${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 
@@ -56,7 +56,7 @@ if [ -d "${HOME_DIR}/.passporteye-venv" ]; then
     nohup python3 deployment/passport_service.py > "$PASSPORT_LOG" 2>&1 &
     PASSPORT_PID=$!
     echo "$PASSPORT_PID" > "${HOME_DIR}/passporteye-server.pid"
-    
+
     sleep 3
     if curl -s http://localhost:5000/health > /dev/null 2>&1; then
         echo -e "${GREEN}✓${NC} PassportEye service started (PID: $PASSPORT_PID, port 5000)"
@@ -91,13 +91,18 @@ if [ ! -f "${MODEL_DIR}/${MODEL_FILE}" ]; then
     exit 1
 fi
 
-echo -e "${BLUE}ℹ${NC} Starting llama-server..."
-nohup ./build/bin/llama-server -m "${MODEL_DIR}/${MODEL_FILE}" --host 0.0.0.0 > /dev/null 2>&1 &
-LLM_PID=$!
+echo -e "${BLUE}ℹ${NC} Starting llama-server via pm2..."
+if pm2 list | grep -q "llama-server"; then
+    pm2 restart llama-server
+else
+    pm2 start ./build/bin/llama-server --name llama-server \
+        -- -m "${MODEL_DIR}/${MODEL_FILE}" --host 0.0.0.0
+fi
+LLM_PID=$(pm2 pid llama-server 2>/dev/null || echo "unknown")
 echo "$LLM_PID" > "$LLM_PID_FILE"
 
 sleep 3
-if kill -0 "$LLM_PID" 2>/dev/null; then
+if pm2 list | grep -q "llama-server.*online"; then
     echo -e "${GREEN}✓${NC} LLM server started (PID: $LLM_PID)"
 else
     echo -e "${RED}✗${NC} LLM server failed to start"
@@ -129,29 +134,24 @@ if [ ! -d "node_modules" ]; then
     cd "${HOME_DIR}/${REPO_DIR}/${APP_DIR}/src/llama-proxy"
 fi
 
-echo -e "${BLUE}ℹ${NC} Starting proxy server..."
-# Create a log file for proxy output
-PROXY_LOG="${HOME_DIR}/proxy-server.log"
-nohup node server_final.js > "$PROXY_LOG" 2>&1 &
-PROXY_PID=$!
+echo -e "${BLUE}ℹ${NC} Starting proxy server via pm2..."
+if pm2 list | grep -q "^.*proxy"; then
+    pm2 restart proxy
+else
+    pm2 start server_final.js --name proxy --interpreter node
+fi
+PROXY_PID=$(pm2 pid proxy 2>/dev/null || echo "unknown")
 echo "$PROXY_PID" > "$PROXY_PID_FILE"
 
-# Wait and check if port 3001 is listening instead of checking PID
 sleep 3
-if netstat -tln 2>/dev/null | grep -q ":3001 " || ss -tln 2>/dev/null | grep -q ":3001 "; then
+if pm2 list | grep -q "proxy.*online"; then
     echo -e "${GREEN}✓${NC} Proxy server started and listening on port 3001"
     echo -e "${BLUE}ℹ${NC} Proxy PID: $PROXY_PID"
-    echo -e "${BLUE}ℹ${NC} Proxy logs: $PROXY_LOG"
-elif kill -0 "$PROXY_PID" 2>/dev/null; then
-    echo -e "${GREEN}✓${NC} Proxy server process running (PID: $PROXY_PID)"
-    echo -e "${BLUE}ℹ${NC} Proxy logs: $PROXY_LOG"
+    echo -e "${BLUE}ℹ${NC} Proxy logs: pm2 logs proxy"
 else
     echo -e "${RED}✗${NC} Proxy server failed to start"
-    if [ -f "$PROXY_LOG" ]; then
-        echo -e "${YELLOW}⚠${NC} Last few lines from proxy log:"
-        tail -5 "$PROXY_LOG"
-    fi
-    echo -e "${YELLOW}⚠${NC} Try starting manually: cd ~/Carbon-GenAI-Demos/carbon-ui/src/llama-proxy && node server_final.js"
+    echo -e "${YELLOW}⚠${NC} Check logs: pm2 logs proxy"
+    echo -e "${YELLOW}⚠${NC} Try starting manually: cd ~/Carbon-GenAI-Demos/carbon-ui/src/llama-proxy && pm2 start server_final.js --name proxy"
     exit 1
 fi
 echo ""
@@ -172,17 +172,22 @@ if [ ! -d ".next" ]; then
     fi
 fi
 
-echo -e "${BLUE}ℹ${NC} Starting web server..."
-nohup yarn start > /dev/null 2>&1 &
-WEB_PID=$!
+echo -e "${BLUE}ℹ${NC} Starting web server via pm2..."
+if pm2 list | grep -q "nextjs"; then
+    pm2 restart nextjs
+else
+    pm2 start yarn --name nextjs -- start
+fi
+WEB_PID=$(pm2 pid nextjs 2>/dev/null || echo "unknown")
 echo "$WEB_PID" > "$PID_FILE"
 
 sleep 5
-if kill -0 "$WEB_PID" 2>/dev/null; then
+if pm2 list | grep -q "nextjs.*online"; then
     echo -e "${GREEN}✓${NC} Web server started (PID: $WEB_PID)"
 else
     echo -e "${RED}✗${NC} Web server failed to start"
-    echo -e "${YELLOW}⚠${NC} Try starting manually: cd ~/Carbon-GenAI-Demos/carbon-ui && yarn start"
+    echo -e "${YELLOW}⚠${NC} Check logs: pm2 logs nextjs"
+    echo -e "${YELLOW}⚠${NC} Try starting manually: cd ~/Carbon-GenAI-Demos/carbon-ui && pm2 start yarn --name nextjs -- start"
     exit 1
 fi
 echo ""
@@ -204,7 +209,7 @@ echo -e "  Web Server:   PID $WEB_PID (port 3000)"
 echo ""
 echo -e "${BOLD}Next Steps:${NC}"
 echo -e "  Check status:  ./check-status.sh"
-echo -e "  View logs:     tail -f carbon-deployment-*.log"
+echo -e "  View pm2 logs: pm2 logs"
 echo -e "  Test LLM API:  curl http://localhost:8080/health"
 echo -e "  Test Proxy:    curl http://localhost:3001/health"
 echo -e "  Access Web:    http://$(hostname -f):3000"
