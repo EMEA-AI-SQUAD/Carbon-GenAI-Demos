@@ -4,6 +4,9 @@ const nextConfig = {};
 module.exports = nextConfig;
 
 module.exports = {
+  experimental: {
+    instrumentationHook: true,
+  },
   images: {
     remotePatterns: [
       {
