@@ -1,4 +1,4 @@
----
+﻿---
 name: deploy-carbon-genai-power
 description: >
   Everything Bob needs to know to deploy, verify, and troubleshoot the
@@ -15,23 +15,23 @@ author: EMEA AI on IBM Power Squad
 ## What This Deploys
 
 A four-service stack running entirely on IBM Power (ppc64le), no cloud
-APIs, no watsonx.ai SaaS — Granite 4.0 Micro runs on the hardware itself:
+APIs, no watsonx.ai SaaS â€” Granite 4.0 Micro runs on the hardware itself:
 
 ```
 Browser (port 3000)
-    │
-    ▼
-Next.js app  (Carbon Design System UI — 9 demo use cases)
-    │
-    ▼ port 3001
+    â”‚
+    â–¼
+Next.js app  (Carbon Design System UI â€” 9 demo use cases)
+    â”‚
+    â–¼ port 3001
 Node.js proxy  (CORS + routing)
-    │
-    ▼ port 8080  (OpenAI-compatible API)
+    â”‚
+    â–¼ port 8080  (OpenAI-compatible API)
 llama-server
-  └── IBM Granite 4.0 Micro (GGUF Q4_K_M, ~2.5 GB)
+  â””â”€â”€ IBM Granite 4.0 Micro (GGUF Q4_K_M, ~2.5 GB)
        running on IBM Power10 (ppc64le)
 
-PassportEye OCR service (port 5000) — for passport verification demo
+PassportEye OCR service (port 5000) â€” for passport verification demo
 ```
 
 The client story: *your data stays on your Power infrastructure, the
@@ -39,22 +39,29 @@ model runs on your hardware, there is no external API dependency.*
 
 ---
 
-## Step 1 — Reserve a TechZone Environment (Manual — ~5 minutes effort)
+## Step 1 â€” Reserve a TechZone Environment (Manual â€” ~5 minutes effort)
 
-Bob cannot make this reservation automatically. The TechZone collection
-is a v1 environment; the TechZone MCP only supports v2 API collections.
+Bob cannot make this reservation automatically. The environment uses
+infrastructure type `systems-2` with the `Systems V1 Provisioner` - the TechZone MCP
+only supports v2 API collections.
+
+> **Known blocker (confirmed 2026-08-13):** The TechZone environment is currently
+> **DISABLED**. New reservations will fail until the collection owner re-enables it.
+> Owner: `sebastian.lehrig1@ibm.com` (on holiday until end of August 2026).
+> Fallback contact: `techzone.help@ibm.com`.
+
 
 1. Go to: https://techzone.ibm.com/collection/generative-ai-demos-on-ibm-power
 2. Select: **RHEL 9 ready for AI on IBM Power10 (IaaS)**
-3. Fill in the reservation form — go slowly (2–3 seconds between fields)
+3. Fill in the reservation form â€” go slowly (2â€“3 seconds between fields)
    to avoid the "Checking availability" hang
 4. Purpose: **Test** or **Demo** as appropriate
-5. Duration: 1–2 weeks is sufficient
-6. Wait for status **Ready** — provisioning takes ~15–30 minutes
+5. Duration: 1â€“2 weeks is sufficient
+6. Wait for status **Ready** â€” provisioning takes ~15â€“30 minutes
 
 Once ready, from the reservation details page collect:
-- **FQDN** — format: `p<NNNN>-pvm1.p<NNNN>.cecc.ihost.com`
-- **Private SSH key** — click "User Private SSH Key" button to download
+- **FQDN** â€” format: `p<NNNN>-pvm1.p<NNNN>.cecc.ihost.com`
+- **Private SSH key** â€” click "User Private SSH Key" button to download
   the `.pem` file. Use this key, not the password. The password contains
   `!` characters which break automated SSH pipelines on Windows.
 
@@ -66,7 +73,7 @@ Once ready, from the reservation details page collect:
 
 ---
 
-## Step 2 — Verify SSH Connectivity
+## Step 2 â€” Verify SSH Connectivity
 
 Ask the seller to confirm with:
 
@@ -77,18 +84,18 @@ ssh -i "<path-to-key.pem>" -o StrictHostKeyChecking=no cecuser@<fqdn> "uname -m"
 Expected response: `ppc64le`
 
 The username is always `cecuser` on CE TechZone environments.
-IBM VPN must be active — `cecc.ihost.com` hosts are not reachable
+IBM VPN must be active â€” `cecc.ihost.com` hosts are not reachable
 from the public internet.
 
 Minimum environment requirements:
 - Architecture: `ppc64le` (IBM Power)
 - OS: RHEL 9.x
-- Free disk: ≥ 10 GB (`df -h /`)
-- RAM: ≥ 4 GB free (`free -h`) — 123 GB is typical on these reservations
+- Free disk: â‰¥ 10 GB (`df -h /`)
+- RAM: â‰¥ 4 GB free (`free -h`) â€” 123 GB is typical on these reservations
 
 ---
 
-## Step 3 — Run the Deployment Script
+## Step 3 â€” Run the Deployment Script
 
 The deployment is fully automated from this point. Bob drives it over SSH.
 
@@ -98,7 +105,7 @@ The deployment is fully automated from this point. Bob drives it over SSH.
 # Copy the launcher to the server
 scp -i "<key.pem>" deployment/remote-launch.sh cecuser@<fqdn>:/home/cecuser/remote-launch.sh
 
-# Launch — this starts the deploy in the background and returns immediately
+# Launch â€” this starts the deploy in the background and returns immediately
 ssh -i "<key.pem>" -o StrictHostKeyChecking=no cecuser@<fqdn> "bash ~/remote-launch.sh"
 ```
 
@@ -117,38 +124,38 @@ Tail the live log to show the seller what is happening:
 ssh -i "<key.pem>" -o StrictHostKeyChecking=no cecuser@<fqdn> "tail -30 ~/deployment/deploy-live.log"
 ```
 
-Call this every 30–60 seconds. The 15 steps and their expected durations:
+Call this every 30â€“60 seconds. The 15 steps and their expected durations:
 
 | Step | Description | Typical duration |
 |------|-------------|-----------------|
 | 1 | Pre-flight checks | < 10s |
-| 2 | System update (`dnf -y update`) | 3–8 min |
-| 3 | Install system dependencies | 1–3 min |
+| 2 | System update (`dnf -y update`) | 3â€“8 min |
+| 3 | Install system dependencies | 1â€“3 min |
 | 4 | Python virtual environment | < 30s |
 | 5 | Clone repository | < 30s |
-| 6 | Node.js dependencies (yarn install) | 3–5 min |
+| 6 | Node.js dependencies (yarn install) | 3â€“5 min |
 | 7 | Next.js build (`yarn build`) | ~60s |
 | 8 | Configure proxy + FQDN substitution | < 10s |
-| 9 | LLM Python environment + PyTorch | 2–4 min |
-| 10 | Build llama.cpp from source | 15–20 min |
-| 11 | Download Granite 4.0 Micro model (~2.5 GB) | 5–10 min |
+| 9 | LLM Python environment + PyTorch | 2â€“4 min |
+| 10 | Build llama.cpp from source | 15â€“20 min |
+| 11 | Download Granite 4.0 Micro model (~2.5 GB) | 5â€“10 min |
 | 12 | Start llama-server (port 8080) | < 15s |
-| 13 | Install + start PassportEye (port 5000) | 1–2 min |
+| 13 | Install + start PassportEye (port 5000) | 1â€“2 min |
 | 14 | Start Node.js proxy (port 3001) | < 10s |
 | 15 | Start Next.js production server (port 3000) | < 10s |
 
-**Total on a clean instance:** ~35–50 minutes
+**Total on a clean instance:** ~35â€“50 minutes
 **Total on re-run (cached packages, model, llama.cpp):** ~5 minutes
 
 ---
 
-## Step 4 — Verify All Services Are Running
+## Step 4 â€” Verify All Services Are Running
 
 ```powershell
 ssh -i "<key.pem>" -o StrictHostKeyChecking=no cecuser@<fqdn> "ss -tlnp | grep -E ':(3000|3001|5000|8080)'"
 ```
 
-Expected output — all four ports listening:
+Expected output â€” all four ports listening:
 ```
 LISTEN  0.0.0.0:5000   python3    (PassportEye)
 LISTEN  0.0.0.0:8080   llama-server
@@ -163,7 +170,7 @@ ssh -i "<key.pem>" -o StrictHostKeyChecking=no cecuser@<fqdn> "grep -E 'ERROR|ST
 
 ---
 
-## Step 5 — Open the Demo
+## Step 5 â€” Open the Demo
 
 ```
 http://<fqdn>:3000
@@ -176,7 +183,7 @@ IBM VPN must be active. The demo runs in any modern browser.
 ## Known Failure Modes and Fixes
 
 ### LLM calls fail in browser with `ERR_NAME_NOT_RESOLVED` or `Connection error`
-**Cause:** historic bug — old FQDN was hardcoded in source files and baked
+**Cause:** historic bug â€” old FQDN was hardcoded in source files and baked
 into the Next.js build. Fully resolved: all API URLs are now derived from
 `window.location.hostname` at browser runtime. No hostname is compiled
 into the built JS. This error should not recur on any new reservation.
@@ -195,7 +202,7 @@ If this recurs, check that `yarn.lock` is present in the cloned repo.
 **Fix:** resolved in commit `e5a03d1`. If this recurs, check the
 `start_dev_server()` function has a `cd` to the app directory.
 
-### Node.js version too old — Express/package version errors
+### Node.js version too old â€” Express/package version errors
 **Cause:** RHEL 9 AppStream defaults to Node 16. NodeSource does not
 support ppc64le.
 **Fix:** the script uses `dnf module enable nodejs:20` then
@@ -203,7 +210,7 @@ support ppc64le.
 Never use NodeSource on ppc64le.
 
 ### `configure_proxy` does not run / FQDN not substituted
-**Cause:** historic bug — `configure_proxy()` was nested inside
+**Cause:** historic bug â€” `configure_proxy()` was nested inside
 `build_application()`. Fixed in commit `cd804f8`.
 
 ### llama-server dies immediately after start
@@ -215,7 +222,7 @@ reboots. Check with:
 ls -lh ~/models/granite-4.0-micro-Q4_K_M.gguf
 # expected: ~2.5 GB
 ```
-If missing, re-run the deployment script — it will skip all already-complete
+If missing, re-run the deployment script â€” it will skip all already-complete
 steps and only re-download the model.
 
 ### SSH connection times out before reaching the server
@@ -227,7 +234,7 @@ reachable on the IBM intranet.
 **Cause:** `tesseract` may not be available in RHEL 9 AppStream for
 ppc64le, or pip dependencies may fail to build.
 **Status:** PassportEye setup has a soft-fail wrapper in the main script
-— if it fails, the rest of the deployment continues. The Passport
+â€” if it fails, the rest of the deployment continues. The Passport
 Verification use case will not work but all other 8 demos will.
 **Fix:** run `bash ~/Carbon-GenAI-Demos/deployment/setup-passporteye.sh`
 manually after deployment and inspect the output.
@@ -246,21 +253,21 @@ kill $(cat ~/llama-server.pid)        # llama-server
 
 ## Repository and Architecture Notes
 
-**Two GitHub remotes are kept in sync — always push to both:**
-- `origin` — `https://github.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos`
-- `power-demos` — `https://github.com/ibm-power-demos-with-bob/Carbon-GenAI-Demos`
+**Two GitHub remotes are kept in sync â€” always push to both:**
+- `origin` â€” `https://github.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos`
+- `power-demos` â€” `https://github.com/ibm-power-demos-with-bob/Carbon-GenAI-Demos`
 
 The deploy script clones from `ibm-power-demos-with-bob`. If fixes are
 committed only to `EMEA-AI-SQUAD`, the deployed code will be stale.
 
 **Key ppc64le constraints:**
-- NodeSource does not support ppc64le — use `dnf module enable nodejs:20`
+- NodeSource does not support ppc64le â€” use `dnf module enable nodejs:20`
 - PyTorch and OpenBLAS must come from IBM's wheels repo:
   `https://wheels.developerfirst.ibm.com/ppc64le/linux`
-- llama.cpp must be built from source — no ppc64le binary releases
+- llama.cpp must be built from source â€” no ppc64le binary releases
 - All npm package versions are pinned for Node 20 compatibility;
   `http-proxy-middleware`, `openai`, and `express` all have recent
-  major versions that require Node ≥22
+  major versions that require Node â‰¥22
 
 **No watsonx.ai, no API keys:**
 This deployment is intentionally self-contained. The LLM runs locally
@@ -276,16 +283,19 @@ a structured AI response:
 
 | Tab | Use Case | What to submit |
 |-----|----------|----------------|
-| Entity Extraction | 📚 Book Review Analysis | Short book review text |
-| Entity Extraction | 🌍 Multilingual IT Ops | Italian or French support email |
-| Entity Extraction | 🚚 German Logistics Quote | Hans Geis sample logistics text |
-| PII Extraction | 🔒 Fraud Complaint | Text with name/address/card number |
-| PII Extraction | 🛂 Passport Verification | Sample passport MRZ text |
-| PII Extraction | 📄 Document Discovery | Any document text |
-| Other | 📝 Brief Builder | Campaign launch notes |
-| Other | 📋 RFP Assistant | RFP extract |
-| Other | 👔 Talent Acquisition | Job title and description |
+| Entity Extraction | ðŸ“š Book Review Analysis | Short book review text |
+| Entity Extraction | ðŸŒ Multilingual IT Ops | Italian or French support email |
+| Entity Extraction | ðŸšš German Logistics Quote | Hans Geis sample logistics text |
+| PII Extraction | ðŸ”’ Fraud Complaint | Text with name/address/card number |
+| PII Extraction | ðŸ›‚ Passport Verification | Sample passport MRZ text |
+| PII Extraction | ðŸ“„ Document Discovery | Any document text |
+| Other | ðŸ“ Brief Builder | Campaign launch notes |
+| Other | ðŸ“‹ RFP Assistant | RFP extract |
+| Other | ðŸ‘” Talent Acquisition | Job title and description |
 
 A healthy response is structured JSON or formatted text returned within
-~5–15 seconds. A spinner that never resolves indicates the llama-server
+~5â€“15 seconds. A spinner that never resolves indicates the llama-server
 is not running or the proxy is misconfigured.
+
+
+
