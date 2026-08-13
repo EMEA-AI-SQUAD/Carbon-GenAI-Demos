@@ -1,8 +1,8 @@
-# From Demo to Recipe — Carbon GenAI on IBM Power
+﻿# From Demo to Recipe â€” Carbon GenAI on IBM Power
 
 > This document captures the journey of turning the Carbon GenAI Demos project into a
-> Client Engineering Bob Marketplace recipe. It is a living record — written as decisions
-> are made, constraints discovered, and steps completed — so the rationale is preserved
+> Client Engineering Bob Marketplace recipe. It is a living record â€” written as decisions
+> are made, constraints discovered, and steps completed â€” so the rationale is preserved
 > for anyone who picks this up later.
 
 ---
@@ -21,7 +21,7 @@ fresh IBM Power TechZone environment with minimal manual steps. The end state is
 
 ## Why This Demo, Why IBM Power
 
-The demo was built to show IBM Granite AI running **entirely on-prem on IBM Power (PPC64LE)** —
+The demo was built to show IBM Granite AI running **entirely on-prem on IBM Power (PPC64LE)** â€”
 no cloud API keys, no watsonx.ai SaaS, no data leaving the client's environment. This is a
 deliberate and important differentiation for certain client conversations, particularly in
 regulated industries and clients already running IBM Power infrastructure.
@@ -37,7 +37,7 @@ The demos included cover real CE use cases:
 
 ## Key Constraints and Decisions
 
-### 1. watsonx.ai is not used — and that is intentional
+### 1. watsonx.ai is not used â€” and that is intentional
 
 The CE marketplace recipes generally assume watsonx.ai as the LLM backend. This recipe
 deliberately does not. IBM Granite 4.0 Micro runs via **llama.cpp** on the IBM Power
@@ -47,7 +47,7 @@ This is a feature, not a gap. The story for the client is: *your data stays on y
 Power infrastructure, the model runs on your hardware, and there is no external API
 dependency.*
 
-### 2. TechZone v1 — automated reservation is not possible today
+### 2. TechZone v1 â€” automated reservation is not possible today
 
 The TechZone collection used (`Generative AI demos on IBM Power`, platform ID
 `66479c385e3bbb001e089937`) is a **v1 TechZone environment**. The Bob TechZone MCP
@@ -55,7 +55,7 @@ only supports v2 API collections. This means Bob cannot make the reservation on 
 seller's behalf.
 
 **Decision:** The manual reservation step is explicitly documented and kept short
-(~5 minutes of actual effort, ~15–30 minutes of provisioning wait). The recipe's
+(~5 minutes of actual effort, ~15â€“30 minutes of provisioning wait). The recipe's
 instructions make this the one human gate, with everything else automated by Bob.
 
 This constraint should be revisited when / if this collection is migrated to v2.
@@ -75,15 +75,15 @@ Password-based SSH is not used in the automated path.
 ## How the Recipe Works (Seller Experience)
 
 1. **Seller activates** the Carbon GenAI IBM Power collection in Bob
-2. **Seller goes to TechZone** — Bob provides the direct link and exact environment name
+2. **Seller goes to TechZone** â€” Bob provides the direct link and exact environment name
 3. **Seller reserves** `RHEL 9 ready for AI on IBM Power10 (IaaS)` manually (~5 min form)
-4. **Seller waits** for provisioning (~15–30 min — Bob can be doing other things)
+4. **Seller waits** for provisioning (~15â€“30 min â€” Bob can be doing other things)
 5. **Seller provides** the FQDN and the downloaded private SSH key path to Bob
 6. **Bob connects** via SSH and runs the deployment script remotely
 7. **Bob monitors** progress and reports when the demo is live
-8. **Seller opens** `http://<fqdn>:3000` — demo is running
+8. **Seller opens** `http://<fqdn>:3000` â€” demo is running
 
-Total human effort: ~15 minutes. Total elapsed time: ~35–50 minutes (mostly waiting).
+Total human effort: ~15 minutes. Total elapsed time: ~35â€“50 minutes (mostly waiting).
 
 ---
 
@@ -91,16 +91,16 @@ Total human effort: ~15 minutes. Total elapsed time: ~35–50 minutes (mostly wa
 
 ```
 Browser (port 3000)
-    │
-    ▼
+    â”‚
+    â–¼
 Next.js app  (Carbon Design System UI)
-    │
-    ▼ port 3001
+    â”‚
+    â–¼ port 3001
 Node.js proxy  (CORS + routing)
-    │
-    ▼ port 8080  (OpenAI-compatible API)
+    â”‚
+    â–¼ port 8080  (OpenAI-compatible API)
 llama.cpp server
-  └── IBM Granite 4.0 Micro (GGUF Q4_K_M)
+  â””â”€â”€ IBM Granite 4.0 Micro (GGUF Q4_K_M)
        running on IBM Power (PPC64LE)
 ```
 
@@ -148,7 +148,7 @@ is the "one page" a seller reads to understand what they are deploying and why.
 
 ---
 
-## Deployment Log — First Recipe Run
+## Deployment Log â€” First Recipe Run
 
 | Date | Event |
 |------|-------|
@@ -156,49 +156,54 @@ is the "one page" a seller reads to understand what they are deploying and why.
 | 2026-07-09 | Environment: `p1294-pvm1.p1294.cecc.ihost.com` (RHEL 9.4, ppc64le, 123GB RAM, 43GB free disk) |
 | 2026-07-09 | SSH key authentication confirmed working via `ssh -i <pem>` |
 | 2026-07-09 | PuTTY registry corruption issue discovered and resolved (corrupt dummy key from automation attempts) |
-| 2026-07-09 | **Build failure 1:** RHEL 9 AppStream provides Node 16 by default; Express 5 requires ≥18. Fix: `dnf module enable nodejs:20`. NodeSource does not support ppc64le. |
-| 2026-07-09 | **Build failure 2:** `http-proxy-middleware@4.x` requires Node ≥22; `openai@5.x` and `typescript@7.x` similarly too new. Fix: pin to `http-proxy-middleware@^2.0.7`, `openai@^4.104.0`, `typescript@^5.8.3`, `express@^4.21.2` in deploy script. |
-| 2026-07-09 | **Build failure 3:** `tsconfig.json` contained `"ignoreDeprecations": "6.0"` — only valid in TypeScript 6+. Fix: remove that line. |
-| 2026-07-09 | Next.js build **succeeded** — all 9 routes compiled cleanly |
+| 2026-07-09 | **Build failure 1:** RHEL 9 AppStream provides Node 16 by default; Express 5 requires â‰¥18. Fix: `dnf module enable nodejs:20`. NodeSource does not support ppc64le. |
+| 2026-07-09 | **Build failure 2:** `http-proxy-middleware@4.x` requires Node â‰¥22; `openai@5.x` and `typescript@7.x` similarly too new. Fix: pin to `http-proxy-middleware@^2.0.7`, `openai@^4.104.0`, `typescript@^5.8.3`, `express@^4.21.2` in deploy script. |
+| 2026-07-09 | **Build failure 3:** `tsconfig.json` contained `"ignoreDeprecations": "6.0"` â€” only valid in TypeScript 6+. Fix: remove that line. |
+| 2026-07-09 | Next.js build **succeeded** â€” all 9 routes compiled cleanly |
 | 2026-07-09 | FQDN configured across all 8 files via `update-all-fqdns.sh` |
 | 2026-07-09 | Proxy server (port 3001) confirmed running |
-| 2026-07-09 | **Paused here** — Next.js web app, llama.cpp build, Granite model download, PassportEye still to complete |
+| 2026-07-09 | **Paused here** â€” Next.js web app, llama.cpp build, Granite model download, PassportEye still to complete |
 | 2026-07-09 | All fixes committed and pushed to GitHub (commits: `a0dc915`, `2322333`, `b99cceb`) |
 | 2026-07-10 | Resumed work. Diagnosed three bugs in `deploy-carbon-genai.sh` via re-run on live server: |
-| 2026-07-10 | **Script bug 1:** `configure_proxy()` was nested inside `build_application()` — missing closing brace caused the entire script to abort at step 7 on every run. Fixed: `cd804f8` |
+| 2026-07-10 | **Script bug 1:** `configure_proxy()` was nested inside `build_application()` â€” missing closing brace caused the entire script to abort at step 7 on every run. Fixed: `cd804f8` |
 | 2026-07-10 | **Script bug 2:** `start_dev_server()` ran `yarn build` a second time. Removed duplicate build. Fixed: `cd804f8` |
 | 2026-07-10 | **Script bug 3:** `TOTAL_STEPS` was 16, corrected to 15. Fixed: `cd804f8` |
-| 2026-07-10 | **Script bug 4:** `package.json` had `"typescript": "^5.9.3"` (caret) and deploy script ran `yarn add typescript` with no lock file — yarn resolved TypeScript 7.x which crashes Next.js 13's `verifyTypeScriptSetup`. Fix: pin to exact `"typescript": "5.9.3"` in `package.json`, remove `yarn add typescript` from deploy script. Fixed: `5a06595` |
+| 2026-07-10 | **Script bug 4:** `package.json` had `"typescript": "^5.9.3"` (caret) and deploy script ran `yarn add typescript` with no lock file â€” yarn resolved TypeScript 7.x which crashes Next.js 13's `verifyTypeScriptSetup`. Fix: pin to exact `"typescript": "5.9.3"` in `package.json`, remove `yarn add typescript` from deploy script. Fixed: `5a06595` |
 | 2026-07-10 | **Script bug 5:** `start_dev_server()` was missing `cd` to app directory after the build step was removed. `yarn start` ran from wrong directory. Fixed: `e5a03d1` |
 | 2026-07-10 | **Repo mismatch discovered:** fixes pushed to `EMEA-AI-SQUAD/Carbon-GenAI-Demos` but deploy script clones from `ibm-power-demos-with-bob/Carbon-GenAI-Demos`. Both remotes now kept in sync on every commit. |
-| 2026-07-10 | **Full end-to-end deployment succeeded** — all 15 steps green, elapsed time 3m 18s (on environment with cached packages/model) |
+| 2026-07-10 | **Full end-to-end deployment succeeded** â€” all 15 steps green, elapsed time 3m 18s (on environment with cached packages/model) |
 | 2026-07-10 | All four services confirmed listening: `:8080` llama-server, `:3001` proxy, `:3000` Next.js, `:5000` PassportEye |
 | 2026-07-10 | Demo accessible at `http://p1294-pvm1.p1294.cecc.ihost.com:3000` (IBM VPN required) |
-| 2026-07-10 | **CORS / FQDN bug discovered:** UI loaded but all LLM calls failed with `ERR_NAME_NOT_RESOLVED` — old `p1362` FQDN baked into built JS. Root cause: FQDN substitution ran *after* `yarn build`, so the old hostname was compiled into the `.next/` output. |
-| 2026-07-10 | **Fix — eliminate hardcoded FQDNs entirely:** all 7 `page.js` files and `passporteye-extraction.js` now derive the proxy URL from `window.location.hostname` at browser runtime. `server_final.js` CORS origin changed from hardcoded hostname to `origin: true`. `configure_proxy()` in deploy script gutted — no sed substitution needed. Zero FQDNs in source. |
-| 2026-07-10 | **Fix — `remote-launch.sh` now kills running services** before redeploying, preventing `EADDRINUSE` on port 3000 on re-runs. |
+| 2026-07-10 | **CORS / FQDN bug discovered:** UI loaded but all LLM calls failed with `ERR_NAME_NOT_RESOLVED` â€” old `p1362` FQDN baked into built JS. Root cause: FQDN substitution ran *after* `yarn build`, so the old hostname was compiled into the `.next/` output. |
+| 2026-07-10 | **Fix â€” eliminate hardcoded FQDNs entirely:** all 7 `page.js` files and `passporteye-extraction.js` now derive the proxy URL from `window.location.hostname` at browser runtime. `server_final.js` CORS origin changed from hardcoded hostname to `origin: true`. `configure_proxy()` in deploy script gutted â€” no sed substitution needed. Zero FQDNs in source. |
+| 2026-07-10 | **Fix â€” `remote-launch.sh` now kills running services** before redeploying, preventing `EADDRINUSE` on port 3000 on re-runs. |
 | 2026-07-10 | All 15 steps green again (3m 9s). Demo confirmed loading correctly. |
-| 2026-07-10 | **New clean environment** — `p1279-pvm1.p1279.cecc.ihost.com` (RHEL 9.4, ppc64le, 123 GB RAM, 43 GB free disk) |
+| 2026-07-10 | **New clean environment** â€” `p1279-pvm1.p1279.cecc.ihost.com` (RHEL 9.4, ppc64le, 123 GB RAM, 43 GB free disk) |
 | 2026-07-10 | **Bug discovered in `remote-launch.sh`:** script calls `git clone` before `git` is installed on a clean RHEL instance. Fix: added `sudo dnf install -y git` before the clone step. |
-| 2026-07-10 | **Full clean deployment succeeded** — all 15 steps green, elapsed time 19m 14s on a completely fresh instance (nothing pre-cached). |
+| 2026-07-10 | **Full clean deployment succeeded** â€” all 15 steps green, elapsed time 19m 14s on a completely fresh instance (nothing pre-cached). |
 | 2026-07-10 | All four services confirmed listening: `:8080` llama-server, `:3001` proxy, `:3000` Next.js, `:5000` PassportEye |
 | 2026-07-10 | Demo accessible at `http://p1279-pvm1.p1279.cecc.ihost.com:3000` (IBM VPN required) |
 
 ---
 
+| 2026-08-13 | **TechZone environment status confirmed: DISABLED** — Checked platform ID `66479c385e3bbb001e089937` via TechZone API. Environment status is `Disabled`. New reservations are blocked until collection owner re-enables it. |
+| 2026-08-13 | **TechZone provisioner confirmed: v1** — Infrastructure type is `systems-2`, provisioner is `Systems V1 Provisioner`. Bob TechZone MCP cannot make reservations automatically for this environment. Manual reservation remains required. |
+| 2026-08-13 | **Collection owner on holiday** — `sebastian.lehrig1@ibm.com` is on holiday until end of August 2026. Fallback contact for re-enabling the environment is `techzone.help@ibm.com`. Blocker logged in RECIPE.md, RECIPE-JOURNEY.md, and deploy skill. |
+| 2026-08-13 | **RECIPE.md added** — Marketplace frontmatter entry point created at repo root. Reflects accurate v1/disabled status. |
+
 ## Open Items
 
 - [x] Complete first end-to-end deployment on this environment
-- [x] Confirm recipe deploys cleanly on a second, completely fresh environment (19m 14s — `p1279`, 2026-07-10)
-- [x] Fix `remote-launch.sh` — added `sudo dnf install -y git` before clone (clean RHEL 9 has no git)
+- [x] Confirm recipe deploys cleanly on a second, completely fresh environment (19m 14s â€” `p1279`, 2026-07-10)
+- [x] Fix `remote-launch.sh` â€” added `sudo dnf install -y git` before clone (clean RHEL 9 has no git)
 - [x] Write `deploy-carbon-genai-power` skill (`.bob/skills/deploy-carbon-genai-power.md`)
 - [x] Write collection README (`COLLECTION.md`)
-- [ ] **Handoff test** — tester provisions own TechZone reservation and runs recipe end-to-end
+- [ ] **Handoff test** â€” tester provisions own TechZone reservation and runs recipe end-to-end
 - [ ] Validate all 9 demo use cases work on RHEL 9.4 / ppc64le
 - [ ] Write seller mode persona (pre-sales demo mode)
 - [ ] Determine correct marketplace repo target (EMEA or default CE marketplace) and submit
 - [ ] **Post-submission optimisations (not blockers):**
-- [ ] &nbsp;&nbsp;Investigate Ollama as llama.cpp replacement (~8–10 min clean deploy vs ~20 min)
+- [ ] &nbsp;&nbsp;Investigate Ollama as llama.cpp replacement (~8â€“10 min clean deploy vs ~20 min)
 - [ ] &nbsp;&nbsp;Decide whether to keep both repos in sync or consolidate to `ibm-power-demos-with-bob`
 - [ ] &nbsp;&nbsp;Add `yarn.lock` to prevent future version resolution surprises
 - [ ] &nbsp;&nbsp;Revisit v2 TechZone migration when/if the collection is upgraded
@@ -215,12 +220,12 @@ is the "one page" a seller reads to understand what they are deploying and why.
 This checklist is for the team member doing the first full test. Work through it in order.
 If anything fails, note it in the **Deployment Log** section below and open a GitHub issue.
 
-### Phase 1 — Environment
+### Phase 1 â€” Environment
 
 > **Note on FQDNs:** Every TechZone reservation gets a unique FQDN. The one used during
 > initial development (`p1294-pvm1.p1294.cecc.ihost.com`) is tied to a reservation that
 > will expire and be deleted. **You need your own reservation and your own FQDN.**
-> FQDNs are sometimes reused across reservations — if SSH complains about a host key
+> FQDNs are sometimes reused across reservations â€” if SSH complains about a host key
 > conflict, clear the stale entry first:
 > ```powershell
 > ssh-keygen -R <old-fqdn>
@@ -230,53 +235,53 @@ If anything fails, note it in the **Deployment Log** section below and open a Gi
 
 - [ ] New TechZone reservation created at [techzone.ibm.com/collection/generative-ai-demos-on-ibm-power](https://techzone.ibm.com/collection/generative-ai-demos-on-ibm-power)
 - [ ] Environment selected: **RHEL 9 ready for AI on IBM Power10 (IaaS)**
-- [ ] Reservation form filled slowly (2–3 seconds between fields to avoid "Checking availability" hang)
-- [ ] Environment status is **Ready** (provisioning takes ~15–30 minutes)
+- [ ] Reservation form filled slowly (2â€“3 seconds between fields to avoid "Checking availability" hang)
+- [ ] Environment status is **Ready** (provisioning takes ~15â€“30 minutes)
 - [ ] FQDN noted from reservation details page (format: `p<NNNN>-pvm1.p<NNNN>.cecc.ihost.com`)
-- [ ] Private SSH key downloaded from reservation details page ("User Private SSH Key" button) — **do not use the password, use the key**
+- [ ] Private SSH key downloaded from reservation details page ("User Private SSH Key" button) â€” **do not use the password, use the key**
 - [ ] SSH connectivity confirmed: `ssh -i <keyfile> cecuser@<your-fqdn> "uname -m"` returns `ppc64le`
-      *(username is always `cecuser` on CE TechZone environments — the password changes per reservation but is not needed)*
-- [ ] Disk space ≥ 10GB free: `df -h /`
-- [ ] RAM ≥ 4GB: `free -h`
+      *(username is always `cecuser` on CE TechZone environments â€” the password changes per reservation but is not needed)*
+- [ ] Disk space â‰¥ 10GB free: `df -h /`
+- [ ] RAM â‰¥ 4GB: `free -h`
 
-### Phase 2 — Deployment
+### Phase 2 â€” Deployment
 
 - [ ] Deployment script staged and launched in background (see skill for exact commands)
 - [ ] Log confirms all 16 steps completed with no ERRORs: `tail ~/deployment/deploy-live.log`
 - [ ] All four ports listening:
-  - [ ] `:8080` — llama-server (LLM)
-  - [ ] `:3001` — Node.js proxy
-  - [ ] `:3000` — Next.js web app
-  - [ ] `:5000` — PassportEye OCR
+  - [ ] `:8080` â€” llama-server (LLM)
+  - [ ] `:3001` â€” Node.js proxy
+  - [ ] `:3000` â€” Next.js web app
+  - [ ] `:5000` â€” PassportEye OCR
 
-### Phase 3 — Demo Use Cases
+### Phase 3 â€” Demo Use Cases
 
 Open `http://<fqdn>:3000` in a browser and test each use case. For each one: submit a
 sample input and confirm you get a structured AI response back (not an error or spinner
 that never resolves).
 
 **Entity Extraction tab:**
-- [ ] 📚 Book Review Analysis — paste a short book review, confirm entities extracted
-- [ ] 🌍 Multilingual IT Ops — paste an Italian or French support email, confirm translation + priority
-- [ ] 🚚 German Logistics Quote — paste the Hans Geis sample text, confirm data + pallet calculation
+- [ ] ðŸ“š Book Review Analysis â€” paste a short book review, confirm entities extracted
+- [ ] ðŸŒ Multilingual IT Ops â€” paste an Italian or French support email, confirm translation + priority
+- [ ] ðŸšš German Logistics Quote â€” paste the Hans Geis sample text, confirm data + pallet calculation
 
 **PII Extraction tab:**
-- [ ] 🔒 Fraud Complaint PII — paste a complaint with name/address/card number, confirm 8 PII types detected and redacted text generated
-- [ ] 🛂 Passport Verification — use the sample OCR text, confirm structured identity data returned
-- [ ] 📄 Document Discovery — upload or paste a document, confirm risk classification (HIGH/MEDIUM/LOW)
+- [ ] ðŸ”’ Fraud Complaint PII â€” paste a complaint with name/address/card number, confirm 8 PII types detected and redacted text generated
+- [ ] ðŸ›‚ Passport Verification â€” use the sample OCR text, confirm structured identity data returned
+- [ ] ðŸ“„ Document Discovery â€” upload or paste a document, confirm risk classification (HIGH/MEDIUM/LOW)
 
 **Other demos:**
-- [ ] 📝 Brief Builder — paste campaign launch notes, confirm structured brief generated
-- [ ] 📋 RFP Assistant — paste an RFP extract, confirm proposal framework generated
-- [ ] 👔 Talent Acquisition — enter a job title/description, confirm job description and candidate summary
+- [ ] ðŸ“ Brief Builder â€” paste campaign launch notes, confirm structured brief generated
+- [ ] ðŸ“‹ RFP Assistant â€” paste an RFP extract, confirm proposal framework generated
+- [ ] ðŸ‘” Talent Acquisition â€” enter a job title/description, confirm job description and candidate summary
 
-### Phase 4 — Recipe Assets
+### Phase 4 â€” Recipe Assets
 
-- [ ] [`RECIPE-JOURNEY.md`](RECIPE-JOURNEY.md) — readable and accurate
-- [ ] [`.bob/skills/deploy-carbon-genai-power.md`](.bob/skills/deploy-carbon-genai-power.md) — skill loads correctly in Bob (`use_skill`)
-- [ ] Deployment skill instructions match actual experience — note any gaps
+- [ ] [`RECIPE-JOURNEY.md`](RECIPE-JOURNEY.md) â€” readable and accurate
+- [ ] [`.bob/skills/deploy-carbon-genai-power.md`](.bob/skills/deploy-carbon-genai-power.md) â€” skill loads correctly in Bob (`use_skill`)
+- [ ] Deployment skill instructions match actual experience â€” note any gaps
 
-### Phase 5 — Sign-off
+### Phase 5 â€” Sign-off
 
 - [ ] All 9 demo use cases pass
 - [ ] No errors in deployment log

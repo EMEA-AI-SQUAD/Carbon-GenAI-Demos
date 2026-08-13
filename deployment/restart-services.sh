@@ -1,4 +1,4 @@
-#!/bin/bash
+﻿#!/bin/bash
 
 ################################################################################
 # Script: restart-services.sh
@@ -27,9 +27,9 @@ PID_FILE="${HOME_DIR}/carbon-dev-server.pid"
 PROXY_PID_FILE="${HOME_DIR}/proxy-server.pid"
 LLM_PID_FILE="${HOME_DIR}/llama-server.pid"
 
-echo -e "${BOLD}${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${BOLD}${CYAN}IBM Power GenAI Demo (Premier Farnell) - Service Restart${NC}"
-echo -e "${BOLD}${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${BOLD}${CYAN}â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”${NC}"
+echo -e "${BOLD}${CYAN}IBM Power GenAI Demo - Service Restart${NC}"
+echo -e "${BOLD}${CYAN}â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”${NC}"
 echo ""
 
 # Step 1: Stop all services
@@ -38,7 +38,7 @@ echo -e "${BOLD}Step 1: Stopping all services...${NC}"
 
 # Stop PassportEye service if running
 if pgrep -f "passport_service.py" > /dev/null; then
-    echo -e "${BLUE}ℹ${NC} Stopping PassportEye service..."
+    echo -e "${BLUE}â„¹${NC} Stopping PassportEye service..."
     pkill -f "passport_service.py"
     sleep 2
 fi
@@ -47,7 +47,7 @@ echo ""
 # Step 2: Start PassportEye Service (Optional)
 echo -e "${BOLD}Step 2: Starting PassportEye Service (Optional)...${NC}"
 if [ -d "${HOME_DIR}/.passporteye-venv" ]; then
-    echo -e "${BLUE}ℹ${NC} PassportEye is installed, starting service..."
+    echo -e "${BLUE}â„¹${NC} PassportEye is installed, starting service..."
     cd "${HOME_DIR}/${REPO_DIR}"
     
     # Activate venv and start service (use absolute path to venv)
@@ -59,39 +59,39 @@ if [ -d "${HOME_DIR}/.passporteye-venv" ]; then
 
     sleep 3
     if curl -s http://localhost:5000/health > /dev/null 2>&1; then
-        echo -e "${GREEN}✓${NC} PassportEye service started (PID: $PASSPORT_PID, port 5000)"
-        echo -e "${BLUE}ℹ${NC} PassportEye logs: $PASSPORT_LOG"
+        echo -e "${GREEN}âœ“${NC} PassportEye service started (PID: $PASSPORT_PID, port 5000)"
+        echo -e "${BLUE}â„¹${NC} PassportEye logs: $PASSPORT_LOG"
     else
-        echo -e "${YELLOW}⚠${NC} PassportEye service may not have started properly"
-        echo -e "${BLUE}ℹ${NC} Check logs: tail -f $PASSPORT_LOG"
-        echo -e "${BLUE}ℹ${NC} Demo will use LLM fallback for passport extraction"
+        echo -e "${YELLOW}âš ${NC} PassportEye service may not have started properly"
+        echo -e "${BLUE}â„¹${NC} Check logs: tail -f $PASSPORT_LOG"
+        echo -e "${BLUE}â„¹${NC} Demo will use LLM fallback for passport extraction"
     fi
 else
-    echo -e "${YELLOW}⚠${NC} PassportEye not installed (optional service)"
-    echo -e "${BLUE}ℹ${NC} Install with: ./deployment/setup-passporteye.sh"
-    echo -e "${BLUE}ℹ${NC} Demo will use LLM fallback for passport extraction"
+    echo -e "${YELLOW}âš ${NC} PassportEye not installed (optional service)"
+    echo -e "${BLUE}â„¹${NC} Install with: ./deployment/setup-passporteye.sh"
+    echo -e "${BLUE}â„¹${NC} Demo will use LLM fallback for passport extraction"
 fi
 echo ""
 
 # Step 3: Start LLM Server
 echo -e "${BOLD}Step 2: Starting LLM Server...${NC}"
 cd "${HOME_DIR}/${LLAMA_DIR}" || {
-    echo -e "${RED}✗${NC} Failed to navigate to llama.cpp directory"
+    echo -e "${RED}âœ—${NC} Failed to navigate to llama.cpp directory"
     exit 1
 }
 
 if [ ! -f "build/bin/llama-server" ]; then
-    echo -e "${RED}✗${NC} llama-server binary not found at: ${HOME_DIR}/${LLAMA_DIR}/build/bin/llama-server"
-    echo -e "${YELLOW}⚠${NC} You may need to build llama.cpp first"
+    echo -e "${RED}âœ—${NC} llama-server binary not found at: ${HOME_DIR}/${LLAMA_DIR}/build/bin/llama-server"
+    echo -e "${YELLOW}âš ${NC} You may need to build llama.cpp first"
     exit 1
 fi
 
 if [ ! -f "${MODEL_DIR}/${MODEL_FILE}" ]; then
-    echo -e "${RED}✗${NC} Model file not found at: ${MODEL_DIR}/${MODEL_FILE}"
+    echo -e "${RED}âœ—${NC} Model file not found at: ${MODEL_DIR}/${MODEL_FILE}"
     exit 1
 fi
 
-echo -e "${BLUE}ℹ${NC} Starting llama-server via pm2..."
+echo -e "${BLUE}â„¹${NC} Starting llama-server via pm2..."
 if pm2 list | grep -q "llama-server"; then
     pm2 restart llama-server
 else
@@ -103,9 +103,9 @@ echo "$LLM_PID" > "$LLM_PID_FILE"
 
 sleep 3
 if pm2 list | grep -q "llama-server.*online"; then
-    echo -e "${GREEN}✓${NC} LLM server started (PID: $LLM_PID)"
+    echo -e "${GREEN}âœ“${NC} LLM server started (PID: $LLM_PID)"
 else
-    echo -e "${RED}✗${NC} LLM server failed to start"
+    echo -e "${RED}âœ—${NC} LLM server failed to start"
     exit 1
 fi
 echo ""
@@ -113,28 +113,28 @@ echo ""
 # Step 4: Start Proxy Server
 echo -e "${BOLD}Step 3: Starting Proxy Server...${NC}"
 cd "${HOME_DIR}/${REPO_DIR}/${APP_DIR}/src/llama-proxy" || {
-    echo -e "${RED}✗${NC} Failed to navigate to proxy directory"
+    echo -e "${RED}âœ—${NC} Failed to navigate to proxy directory"
     exit 1
 }
 
 if [ ! -f "server_final.js" ]; then
-    echo -e "${RED}✗${NC} Proxy server file not found"
+    echo -e "${RED}âœ—${NC} Proxy server file not found"
     exit 1
 fi
 
 # Check if node_modules exist in proxy directory
 if [ ! -d "node_modules" ]; then
-    echo -e "${YELLOW}⚠${NC} Installing proxy dependencies..."
+    echo -e "${YELLOW}âš ${NC} Installing proxy dependencies..."
     npm install --legacy-peer-deps > /dev/null 2>&1
     
     # Update FQDN after npm install (in case it restored original file)
-    echo -e "${BLUE}ℹ${NC} Updating FQDN in proxy configuration..."
+    echo -e "${BLUE}â„¹${NC} Updating FQDN in proxy configuration..."
     cd "${HOME_DIR}/${REPO_DIR}/deployment"
     ./update-fqdn.sh > /dev/null 2>&1
     cd "${HOME_DIR}/${REPO_DIR}/${APP_DIR}/src/llama-proxy"
 fi
 
-echo -e "${BLUE}ℹ${NC} Starting proxy server via pm2..."
+echo -e "${BLUE}â„¹${NC} Starting proxy server via pm2..."
 if pm2 list | grep -q "^.*proxy"; then
     pm2 restart proxy
 else
@@ -145,13 +145,13 @@ echo "$PROXY_PID" > "$PROXY_PID_FILE"
 
 sleep 3
 if pm2 list | grep -q "proxy.*online"; then
-    echo -e "${GREEN}✓${NC} Proxy server started and listening on port 3001"
-    echo -e "${BLUE}ℹ${NC} Proxy PID: $PROXY_PID"
-    echo -e "${BLUE}ℹ${NC} Proxy logs: pm2 logs proxy"
+    echo -e "${GREEN}âœ“${NC} Proxy server started and listening on port 3001"
+    echo -e "${BLUE}â„¹${NC} Proxy PID: $PROXY_PID"
+    echo -e "${BLUE}â„¹${NC} Proxy logs: pm2 logs proxy"
 else
-    echo -e "${RED}✗${NC} Proxy server failed to start"
-    echo -e "${YELLOW}⚠${NC} Check logs: pm2 logs proxy"
-    echo -e "${YELLOW}⚠${NC} Try starting manually: cd ~/Carbon-GenAI-Demos/carbon-ui/src/llama-proxy && pm2 start server_final.js --name proxy"
+    echo -e "${RED}âœ—${NC} Proxy server failed to start"
+    echo -e "${YELLOW}âš ${NC} Check logs: pm2 logs proxy"
+    echo -e "${YELLOW}âš ${NC} Try starting manually: cd ~/Carbon-GenAI-Demos/carbon-ui/src/llama-proxy && pm2 start server_final.js --name proxy"
     exit 1
 fi
 echo ""
@@ -159,20 +159,20 @@ echo ""
 # Step 5: Start Web Server
 echo -e "${BOLD}Step 4: Starting Web Server...${NC}"
 cd "${HOME_DIR}/${REPO_DIR}/${APP_DIR}" || {
-    echo -e "${RED}✗${NC} Failed to navigate to app directory"
+    echo -e "${RED}âœ—${NC} Failed to navigate to app directory"
     exit 1
 }
 
 if [ ! -d ".next" ]; then
-    echo -e "${YELLOW}⚠${NC} Application not built. Building now..."
+    echo -e "${YELLOW}âš ${NC} Application not built. Building now..."
     yarn build
     if [ $? -ne 0 ]; then
-        echo -e "${RED}✗${NC} Build failed"
+        echo -e "${RED}âœ—${NC} Build failed"
         exit 1
     fi
 fi
 
-echo -e "${BLUE}ℹ${NC} Starting web server via pm2..."
+echo -e "${BLUE}â„¹${NC} Starting web server via pm2..."
 if pm2 list | grep -q "nextjs"; then
     pm2 restart nextjs
 else
@@ -183,25 +183,25 @@ echo "$WEB_PID" > "$PID_FILE"
 
 sleep 5
 if pm2 list | grep -q "nextjs.*online"; then
-    echo -e "${GREEN}✓${NC} Web server started (PID: $WEB_PID)"
+    echo -e "${GREEN}âœ“${NC} Web server started (PID: $WEB_PID)"
 else
-    echo -e "${RED}✗${NC} Web server failed to start"
-    echo -e "${YELLOW}⚠${NC} Check logs: pm2 logs nextjs"
-    echo -e "${YELLOW}⚠${NC} Try starting manually: cd ~/Carbon-GenAI-Demos/carbon-ui && pm2 start yarn --name nextjs -- start"
+    echo -e "${RED}âœ—${NC} Web server failed to start"
+    echo -e "${YELLOW}âš ${NC} Check logs: pm2 logs nextjs"
+    echo -e "${YELLOW}âš ${NC} Try starting manually: cd ~/Carbon-GenAI-Demos/carbon-ui && pm2 start yarn --name nextjs -- start"
     exit 1
 fi
 echo ""
 
 # Summary
-echo -e "${BOLD}${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${BOLD}${GREEN}✓ All services started successfully!${NC}"
-echo -e "${BOLD}${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${BOLD}${CYAN}â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”${NC}"
+echo -e "${BOLD}${GREEN}âœ“ All services started successfully!${NC}"
+echo -e "${BOLD}${CYAN}â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”${NC}"
 echo ""
 echo -e "${BOLD}Service Status:${NC}"
 if [ -n "$PASSPORT_PID" ] && kill -0 "$PASSPORT_PID" 2>/dev/null; then
-    echo -e "  PassportEye:  PID $PASSPORT_PID (port 5000) ${GREEN}✓${NC}"
+    echo -e "  PassportEye:  PID $PASSPORT_PID (port 5000) ${GREEN}âœ“${NC}"
 else
-    echo -e "  PassportEye:  Not running (using LLM fallback) ${YELLOW}⚠${NC}"
+    echo -e "  PassportEye:  Not running (using LLM fallback) ${YELLOW}âš ${NC}"
 fi
 echo -e "  LLM Server:   PID $LLM_PID (port 8080)"
 echo -e "  Proxy Server: PID $PROXY_PID (port 3001)"
