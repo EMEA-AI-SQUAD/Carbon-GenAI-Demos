@@ -1,4 +1,4 @@
-﻿# From Demo to Recipe â€” Carbon GenAI on IBM Power
+# From Demo to Recipe â€” Carbon GenAI on IBM Power
 
 > This document captures the journey of turning the Carbon GenAI Demos project into a
 > Client Engineering Bob Marketplace recipe. It is a living record â€” written as decisions
@@ -191,6 +191,23 @@ is the "one page" a seller reads to understand what they are deploying and why.
 | 2026-08-13 | **Collection owner on holiday** — `sebastian.lehrig1@ibm.com` is on holiday until end of August 2026. Fallback contact for re-enabling the environment is `techzone.help@ibm.com`. Blocker logged in RECIPE.md, RECIPE-JOURNEY.md, and deploy skill. |
 | 2026-08-13 | **RECIPE.md added** — Marketplace frontmatter entry point created at repo root. Reflects accurate v1/disabled status. |
 
+---
+
+| 2026-08-XX | **v2 TechZone migration — new platform confirmed.** Old platform `66479c385e3bbb001e089937` ("Generative AI demos on IBM Power") is permanently disabled and superseded. New platform `6a7aba1916c56f06e4b1e910` ("AI-Ready RHEL on IBM Power On-Premises") is v2, Enabled, `base-onpremise-powervc-vm` provisioner, collection `6261d3584670d7001e3d483a`. |
+| 2026-08-XX | **Manual v2 reservation validated** — request `6a9ac0a0692864ccdf51d47d` provisioned in ~15 min. FQDN: `pvm1-13218m1k.p1298.pok-systems.techzone.ibm.com` (RHEL 10.2, Power10 ppc64le). Expires 2026-09-05 01:20 UTC. New FQDN format: `pvm1-<key>.p<NNNN>.pok-systems.techzone.ibm.com`. |
+| 2026-08-XX | **MCP auto-reservation root cause identified** — Bob TechZone MCP fails because it does not pass `userVariables` (including `powervc_image_name`). Default alias `TZ-FS5200_` is absent from Poughkeepsie PowerVC inventory; manual reservation passes `RHEL_10.2` explicitly. Evidence: failed requests `6a9ab558f920404955f890a1` and `6a9ab864c1a0571dc9285fd4`. Bug to be reported to `techzone.help@ibm.com`. |
+| 2026-08-XX | **PowerVS reservations failed (separate issue)** — Two `ibmcloud-2` reservations at Madrid (`mad02`) failed silently with `power_private_network.py` error. Unrelated to v2 on-prem platform. |
+| 2026-08-XX | **Recipe fully re-aligned to v2.** All files updated: `RECIPE.md`, `COLLECTION.md`, `GETTING-STARTED.md`, `README.md`, `.bob/skills/deploy-carbon-genai-power.md`. Bob auto-reservation now Option A (primary); manual is Option B fallback. Old v1/DISABLED blocker language removed throughout. |
+| 2026-08-XX | **Full recipe brief created** (`01-Carbon-GenAI-IBM-Power.md`) — aligned to new Bob Recipe Template (published 2026-08-15 by florin-manaila). All 10 use cases documented with sample inputs. PROMPT #0 through PROMPT #3 with stop points and expected outputs. |
+| 2026-08-XX | **10th use case confirmed** — `convintel` (Conversation Intelligence) tab exists in base repo with 3 sub-tabs: Sales Call Analysis, Multilingual Customer Service Sentiment, Meeting Intelligence & Action Items. All documentation updated 9 -> 10 use cases. |
+| 2026-08-XX | **RECIPE-CONTEXT-FOR-BARRY.md created** — one-page factual summary for Barry's management conversations: 4 recipes in flight, 3 reasons for delay, current status table. |
+| 2026-08-XX | **Default image is RHEL 10.2** — deployment script validated on RHEL 9.4 only. RHEL 10.2 compatibility not yet tested. Next required step before handoff test. |
+
+| 2026-09-04 | **RHEL 10.2 deployment validated on v2 platform.** Full 15-step deployment succeeded on pvm1-13218m1k.p1298.pok-systems.techzone.ibm.com (RHEL 10.2, Power10 ppc64le, user U5PYAWA). Elapsed: **38m 2s** on a clean instance. All 4 services confirmed: :8080 llama-server (2.3 GB RAM, Granite loaded), :3001 proxy, :5000 PassportEye, :3000 Next.js (node-22). LLM smoke test passed — Granite 4.0 Micro responded correctly via OpenAI-compatible API. |
+
+
+
+
 ## Open Items
 
 - [x] Complete first end-to-end deployment on this environment
@@ -198,15 +215,19 @@ is the "one page" a seller reads to understand what they are deploying and why.
 - [x] Fix `remote-launch.sh` â€” added `sudo dnf install -y git` before clone (clean RHEL 9 has no git)
 - [x] Write `deploy-carbon-genai-power` skill (`.bob/skills/deploy-carbon-genai-power.md`)
 - [x] Write collection README (`COLLECTION.md`)
-- [ ] **Handoff test** â€” tester provisions own TechZone reservation and runs recipe end-to-end
-- [ ] Validate all 9 demo use cases work on RHEL 9.4 / ppc64le
-- [ ] Write seller mode persona (pre-sales demo mode)
-- [ ] Determine correct marketplace repo target (EMEA or default CE marketplace) and submit
+- [x] Migrate to v2 TechZone platform — new platform `6a7aba1916c56f06e4b1e910` validated and all docs updated
+- [x] Write full recipe brief aligned to Bob Recipe Template (`01-Carbon-GenAI-IBM-Power.md`)
+- [ ] **Raise TechZone bug** — report `TZ-FS5200_` / `userVariables` issue to `techzone.help@ibm.com` with request IDs `6a9ab558f920404955f890a1` and `6a9ab864c1a0571dc9285fd4`
+- [x] **RHEL 10.2 compatibility** — validated 2026-09-04. Node 22 ships directly in RHEL 10 AppStream (no module stream needed). All 15 deploy steps green in 38m 2s. Granite model responded. Script updated with RHEL version detection.
+- [ ] **Handoff test** — second person provisions own TechZone reservation and runs PROMPT #2 -> PROMPT #3 from `01-Carbon-GenAI-IBM-Power.md` only
+- [ ] Write seller mode persona (pre-sales demo mode) — deferred, not blocking PR
+- [ ] Submit PR to CE marketplace with `Carbon-GenAI-IBM-Power/01-Carbon-GenAI-IBM-Power.md` structure
 - [ ] **Post-submission optimisations (not blockers):**
-- [ ] &nbsp;&nbsp;Investigate Ollama as llama.cpp replacement (~8â€“10 min clean deploy vs ~20 min)
+- [ ] &nbsp;&nbsp;Investigate Ollama as llama.cpp replacement (~8-10 min clean deploy vs ~20 min)
 - [ ] &nbsp;&nbsp;Decide whether to keep both repos in sync or consolidate to `ibm-power-demos-with-bob`
 - [ ] &nbsp;&nbsp;Add `yarn.lock` to prevent future version resolution surprises
-- [ ] &nbsp;&nbsp;Revisit v2 TechZone migration when/if the collection is upgraded
+
+
 
 ---
 
@@ -233,14 +254,14 @@ If anything fails, note it in the **Deployment Log** section below and open a Gi
 > Remove-ItemProperty 'HKCU:\Software\SimonTatham\PuTTY\SshHostKeys' -Name "ssh-ed25519@22:<old-fqdn>"
 > ```
 
-- [ ] New TechZone reservation created at [techzone.ibm.com/collection/generative-ai-demos-on-ibm-power](https://techzone.ibm.com/collection/generative-ai-demos-on-ibm-power)
-- [ ] Environment selected: **RHEL 9 ready for AI on IBM Power10 (IaaS)**
+- [ ] New TechZone reservation created at [techzone.ibm.com/collection/ai-ready-rhel-on-ibm-power-on-premises](https://techzone.ibm.com/collection/ai-ready-rhel-on-ibm-power-on-premises)
+- [ ] Environment selected: **AI-Ready RHEL on IBM Power On-Premises** (RHEL 10.2, Power10 ppc64le)
 - [ ] Reservation form filled slowly (2â€“3 seconds between fields to avoid "Checking availability" hang)
 - [ ] Environment status is **Ready** (provisioning takes ~15â€“30 minutes)
-- [ ] FQDN noted from reservation details page (format: `p<NNNN>-pvm1.p<NNNN>.cecc.ihost.com`)
+- [ ] FQDN noted from reservation details page (format: `pvm1-<key>.p<NNNN>.pok-systems.techzone.ibm.com`)
 - [ ] Private SSH key downloaded from reservation details page ("User Private SSH Key" button) â€” **do not use the password, use the key**
-- [ ] SSH connectivity confirmed: `ssh -i <keyfile> cecuser@<your-fqdn> "uname -m"` returns `ppc64le`
-      *(username is always `cecuser` on CE TechZone environments â€” the password changes per reservation but is not needed)*
+- [ ] SSH connectivity confirmed: `ssh -i <keyfile> <username>@<your-fqdn> "uname -m"` returns `ppc64le`
+      *(The OS username is on the reservation details page as "OS User Name" — on v2 it is generated per-reservation, e.g. `U5PYAWA`, not the fixed `cecuser` from v1 â€” the password changes per reservation but is not needed)*
 - [ ] Disk space â‰¥ 10GB free: `df -h /`
 - [ ] RAM â‰¥ 4GB: `free -h`
 

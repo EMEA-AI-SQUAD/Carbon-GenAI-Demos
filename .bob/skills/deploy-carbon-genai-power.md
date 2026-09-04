@@ -21,7 +21,7 @@ APIs, no watsonx.ai SaaS â€” Granite 4.0 Micro runs on the hardware itself:
 Browser (port 3000)
     â”‚
     â–¼
-Next.js app  (Carbon Design System UI â€” 9 demo use cases)
+Next.js app  (Carbon Design System UI - 10 demo use cases)
     â”‚
     â–¼ port 3001
 Node.js proxy  (CORS + routing)
@@ -39,31 +39,35 @@ model runs on your hardware, there is no external API dependency.*
 
 ---
 
-## Step 1 â€” Reserve a TechZone Environment (Manual â€” ~5 minutes effort)
+## Step 1 — Reserve a TechZone Environment (~15 minutes total)
 
-Bob cannot make this reservation automatically. The environment uses
-infrastructure type `systems-2` with the `Systems V1 Provisioner` - the TechZone MCP
-only supports v2 API collections.
+**Bob can reserve this automatically.** The environment uses platform `6a7aba1916c56f06e4b1e910`
+("AI-Ready RHEL on IBM Power On-Premises") with the v2 `base-onpremise-powervc-vm` provisioner.
 
-> **Known blocker (confirmed 2026-08-13):** The TechZone environment is currently
-> **DISABLED**. New reservations will fail until the collection owner re-enables it.
-> Owner: `sebastian.lehrig1@ibm.com` (on holiday until end of August 2026).
-> Fallback contact: `techzone.help@ibm.com`.
+**Option A — Automated (recommended):**
 
+Use the TechZone MCP to reserve:
+```
+Reserve a TechZone IBM Power environment for the Carbon GenAI demo.
+Platform ID: 6a7aba1916c56f06e4b1e910
+Purpose: Test
+Start: now
+```
 
-1. Go to: https://techzone.ibm.com/collection/generative-ai-demos-on-ibm-power
-2. Select: **RHEL 9 ready for AI on IBM Power10 (IaaS)**
-3. Fill in the reservation form â€” go slowly (2â€“3 seconds between fields)
-   to avoid the "Checking availability" hang
-4. Purpose: **Test** or **Demo** as appropriate
-5. Duration: 1â€“2 weeks is sufficient
-6. Wait for status **Ready** â€” provisioning takes ~15â€“30 minutes
+Bob will call `techzone-create-request` and monitor until Ready. Once Ready, read the
+FQDN and SSH key from the reservation output and proceed to Step 2.
+
+**Option B — Manual:**
+
+1. Go to: https://techzone.ibm.com/collection/on-premises-power-systems-aix-ibm-i-and-linux-base-images
+2. Select: **AI-Ready RHEL on IBM Power On-Premises**
+3. RHEL version: **RHEL 9.6** or **9.8** · Power architecture: **Power10** · 8 CPUs · 50GB RAM
+4. Purpose: **Test** (12h max) or **Demo** (needs opportunity code)
+5. Wait for status **Ready** (~15 minutes)
 
 Once ready, from the reservation details page collect:
-- **FQDN** â€” format: `p<NNNN>-pvm1.p<NNNN>.cecc.ihost.com`
-- **Private SSH key** â€” click "User Private SSH Key" button to download
-  the `.pem` file. Use this key, not the password. The password contains
-  `!` characters which break automated SSH pipelines on Windows.
+- **FQDN** — format: `pvm1-<key>.p<NNNN>.pok-systems.techzone.ibm.com`
+- **Private SSH key** — click "User Private SSH Key" to download the `.pem` file
 
 > **Note on FQDNs:** TechZone sometimes reuses FQDNs across reservations.
 > If SSH complains about a host key conflict, clear the stale entry:
@@ -78,18 +82,17 @@ Once ready, from the reservation details page collect:
 Ask the seller to confirm with:
 
 ```powershell
-ssh -i "<path-to-key.pem>" -o StrictHostKeyChecking=no cecuser@<fqdn> "uname -m"
+ssh -i "<path-to-key.pem>" -o StrictHostKeyChecking=no <username>@<fqdn> "uname -m"
 ```
 
 Expected response: `ppc64le`
 
-The username is always `cecuser` on CE TechZone environments.
-IBM VPN must be active â€” `cecc.ihost.com` hosts are not reachable
-from the public internet.
+The OS username is shown on the TechZone reservation details page as "OS User Name". On v2 environments it is generated per-reservation (e.g. `U5PYAWA`), not the fixed `cecuser` used by v1 environments. Always copy it from the reservation page.
+IBM VPN must be active — `pok-systems.techzone.ibm.com` hosts (v2) are not reachable from the public internet.
 
 Minimum environment requirements:
 - Architecture: `ppc64le` (IBM Power)
-- OS: RHEL 9.x
+- OS: RHEL 9.x or RHEL 10.2 (v2 default is RHEL 10.2)
 - Free disk: â‰¥ 10 GB (`df -h /`)
 - RAM: â‰¥ 4 GB free (`free -h`) â€” 123 GB is typical on these reservations
 
@@ -103,10 +106,10 @@ The deployment is fully automated from this point. Bob drives it over SSH.
 
 ```powershell
 # Copy the launcher to the server
-scp -i "<key.pem>" deployment/remote-launch.sh cecuser@<fqdn>:/home/cecuser/remote-launch.sh
+scp -i "<key.pem>" deployment/remote-launch.sh <username>@<fqdn>:/home/cecuser/remote-launch.sh
 
 # Launch â€” this starts the deploy in the background and returns immediately
-ssh -i "<key.pem>" -o StrictHostKeyChecking=no cecuser@<fqdn> "bash ~/remote-launch.sh"
+ssh -i "<key.pem>" -o StrictHostKeyChecking=no <username>@<fqdn> "bash ~/remote-launch.sh"
 ```
 
 The launcher:
@@ -121,7 +124,7 @@ The launcher:
 Tail the live log to show the seller what is happening:
 
 ```powershell
-ssh -i "<key.pem>" -o StrictHostKeyChecking=no cecuser@<fqdn> "tail -30 ~/deployment/deploy-live.log"
+ssh -i "<key.pem>" -o StrictHostKeyChecking=no <username>@<fqdn> "tail -30 ~/deployment/deploy-live.log"
 ```
 
 Call this every 30â€“60 seconds. The 15 steps and their expected durations:
@@ -152,7 +155,7 @@ Call this every 30â€“60 seconds. The 15 steps and their expected durations:
 ## Step 4 â€” Verify All Services Are Running
 
 ```powershell
-ssh -i "<key.pem>" -o StrictHostKeyChecking=no cecuser@<fqdn> "ss -tlnp | grep -E ':(3000|3001|5000|8080)'"
+ssh -i "<key.pem>" -o StrictHostKeyChecking=no <username>@<fqdn> "ss -tlnp | grep -E ':(3000|3001|5000|8080)'"
 ```
 
 Expected output â€” all four ports listening:
@@ -165,7 +168,7 @@ LISTEN  *:3000         node       (Next.js)
 
 If any port is missing, check the deployment log:
 ```powershell
-ssh -i "<key.pem>" -o StrictHostKeyChecking=no cecuser@<fqdn> "grep -E 'ERROR|STEP' ~/deployment/deploy-live.log"
+ssh -i "<key.pem>" -o StrictHostKeyChecking=no <username>@<fqdn> "grep -E 'ERROR|STEP' ~/deployment/deploy-live.log"
 ```
 
 ---

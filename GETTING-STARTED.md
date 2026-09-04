@@ -43,21 +43,28 @@ code Carbon-GenAI-Demos
 
 ---
 
-## Step 3 — Reserve a TechZone environment (~5 min, then ~20 min wait)
+## Step 3 — Reserve a TechZone environment (~15 min total)
 
-Go to this link on IBM VPN:
+**Option A — Let Bob do it (recommended):**
 
-**https://techzone.ibm.com/collection/generative-ai-demos-on-ibm-power**
+In Bob, say: *"Reserve a TechZone AI-Ready RHEL on IBM Power environment for me. Platform ID: `6a7aba1916c56f06e4b1e910`. Purpose: Test."*
 
-- Select: **RHEL 9 ready for AI on IBM Power10 (IaaS)**
-- Fill in the reservation form (go slowly — 2–3 seconds between fields)
-- Purpose: **Test** or **Demo**
-- Duration: 2 weeks is fine
-- Submit and wait for the status to show **Ready** (~20 minutes)
+Bob will reserve it via the TechZone MCP and notify you when it's Ready (~15 min provisioning). Once Ready, Bob can read the FQDN and SSH key directly from the reservation.
 
-Once it shows Ready, from the reservation details page:
-- **Copy the FQDN** — it looks like `p1234-pvm1.p1234.cecc.ihost.com`
-- **Download the SSH key** — click the **"User Private SSH Key"** button and save the `.pem` file somewhere you can find it (e.g. your Downloads folder)
+**Option B — Reserve manually** (IBM VPN required):
+
+Go to: **https://techzone.ibm.com/collection/on-premises-power-systems-aix-ibm-i-and-linux-base-images**
+
+- Select: **AI-Ready RHEL on IBM Power On-Premises**
+- RHEL version: **RHEL 9.6** or **9.8** (recommended for compatibility)
+- Power architecture: **Power10**
+- CPUs: **8**, RAM: **50GB**
+- Purpose: **Test** (12 hour max) or **Demo** (needs opportunity code, longer duration)
+- Submit and wait for status **Ready** (~15 minutes)
+
+Once Ready:
+- **Copy the FQDN** — it looks like `pvm1-<key>.p<NNNN>.pok-systems.techzone.ibm.com`
+- **Download the SSH key** — click **"User Private SSH Key"** and save the `.pem` file
 
 ---
 

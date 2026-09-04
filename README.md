@@ -14,7 +14,7 @@
 
 ## 🎯 What This Is
 
-A **Carbon Design System web application** that demonstrates real-world AI use cases powered by **IBM Granite 4.0 Micro** running locally on **IBM Power (PPC64LE)**. No cloud API keys needed — the model runs entirely on-prem.
+A **Carbon Design System web application** that demonstrates real-world AI use cases powered by **IBM Granite 4.0 Micro** running on **IBM Power10 or Power11 (PPC64LE)**. No cloud API keys needed — the model runs on the Power hardware itself, using the Matrix Math Accelerator (MMA) built into Power10/Power11 for AI acceleration without a GPU.
 
 ### Demos included
 

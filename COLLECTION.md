@@ -1,28 +1,29 @@
 # Carbon GenAI Demo on IBM Power
 
-Deploy a fully self-contained AI demo — IBM Granite running **on-prem on IBM Power**, no cloud APIs, no watsonx.ai SaaS, no data leaving the client's environment — in under 25 minutes from a fresh TechZone reservation.
+Deploy a fully self-contained AI demo — IBM Granite running on **IBM Power10 or Power11**, no cloud APIs, no watsonx.ai SaaS, no data leaving the client's environment — in under 25 minutes from a fresh TechZone reservation.
 
 ## Who this is for
 
-IBM Client Engineering sellers and technical pre-sales engineers who need to show **IBM Granite AI running entirely on IBM Power infrastructure**, particularly for clients in regulated industries or clients already running IBM Power who want to understand the on-prem AI story.
+IBM Client Engineering sellers and technical pre-sales engineers who need to show **IBM Granite AI running entirely on IBM Power10 or Power11 infrastructure**, particularly for clients in regulated industries or clients already running IBM Power who want to understand the private AI story. Power10 and Power11 include the Matrix Math Accelerator (MMA) which provides the hardware-level AI acceleration that makes practical LLM inference viable without a GPU.
 
 ## The demo
 
-A Carbon Design System web application with **9 real CE use cases**, all powered by IBM Granite 4.0 Micro running locally via llama.cpp on ppc64le:
+A Carbon Design System web application with **10 use cases across 4 tabs**, all powered by IBM Granite 4.0 Micro running locally via llama.cpp on ppc64le. The generic scenarios are a starting point — the Pre-Sales Demo Builder mode can tailor them to a specific client before deployment.
 
 | Use Case | What it shows |
 |----------|--------------|
-| 📚 Book Review Analysis | Entity extraction from unstructured text |
+| 📦 Entity Extraction (customisable) | Structured extraction from unstructured text — defaults to book review, easily tailored to client's domain (e.g. component catalogue, product data) |
 | 🌍 Multilingual IT Ops | Translation + priority classification from French/Italian emails |
-| 🚚 German Logistics Quote | Structured data extraction + calculation from logistics text |
+| 🚚 German Logistics Quote (Hans Geis) | Structured data extraction + calculation — real IBM customer reference |
 | 🔒 Fraud Complaint PII | PII detection and redaction across 8 entity types |
 | 🛂 Passport Verification | OCR-based identity data extraction (PassportEye) |
-| 📄 Document Discovery | Risk classification (HIGH / MEDIUM / LOW) |
+| 📄 Document Discovery | Risk classification (HIGH / MEDIUM / LOW) — scenario customisable |
 | 📝 Brief Builder | Structured campaign brief from rough notes |
-| 📋 RFP Assistant | Proposal framework from an RFP extract |
+| 📋 RFP Assistant | Proposal framework from an RFP extract — scenario customisable |
 | 👔 Talent Acquisition | Job description and candidate summary generation |
+| 🎙️ Conversation Intelligence | 3 sub-tabs: sales call analysis, multilingual customer service sentiment, meeting intelligence & action items |
 
-The client story: *your data stays on your Power infrastructure, the model runs on your hardware, there is no external API dependency.*
+The client story: *your data stays on your Power infrastructure, the model runs on your hardware, there is no external API dependency — and the demo is tailored to your world before you walk in the room.*
 
 ## What you get
 
@@ -54,14 +55,22 @@ No watsonx.ai. No API keys. No external dependencies.
 
 ## Get started
 
-### Step 1 — Reserve a TechZone environment (~5 min effort, ~20 min wait)
+### Step 1 — Reserve a TechZone environment (~2 min effort, ~15 min wait)
 
-Go to: **https://techzone.ibm.com/collection/generative-ai-demos-on-ibm-power**
+**Option A — Let Bob reserve automatically (recommended):**
 
-Select: **RHEL 9 ready for AI on IBM Power10 (IaaS)**
+Tell Bob: *"Reserve a TechZone AI-Ready RHEL on IBM Power environment for me. Platform ID: `6a7aba1916c56f06e4b1e910`. Purpose: Test."*
 
-Fill in the reservation form and wait for status **Ready**. Once ready, from the reservation details page:
-- Note the **FQDN** (format: `p<NNNN>-pvm1.p<NNNN>.cecc.ihost.com`)
+Bob will book the environment via the TechZone MCP and tell you when it's Ready.
+
+**Option B — Reserve manually:**
+
+Go to: **https://techzone.ibm.com/collection/on-premises-power-systems-aix-ibm-i-and-linux-base-images**
+
+Select: **AI-Ready RHEL on IBM Power On-Premises**
+
+Fill in the form: RHEL version (9.6 or 9.8 recommended), Power10, 8 CPUs, 50GB RAM. Once Ready:
+- Note the **FQDN** (format: `pvm1-<key>.p<NNNN>.pok-systems.techzone.ibm.com`)
 - Download the **private SSH key** (click "User Private SSH Key") — use this key, not the password
 
 > IBM VPN must be active throughout. The `cecc.ihost.com` domain is only reachable on the IBM intranet.
