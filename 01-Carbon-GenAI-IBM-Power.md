@@ -1,4 +1,4 @@
-﻿# Use Case — IBM Power / GenAI / "On-Prem Granite AI for Regulated Clients"
+# Use Case — IBM Power / GenAI / "On-Prem Granite AI for Regulated Clients"
 Bob MODE: pre-sales-demo (Pre-Sales Demo Builder mode)
 
 **Build Path:** Platform Reality Demo — IBM Power infrastructure + live model inference
@@ -39,8 +39,8 @@ The architecture is deliberately minimal — three services, no orchestration la
 
 - **IBM Granite 4.0 Micro (GGUF Q4_K_M)** — the model, running via llama.cpp on ppc64le with OpenBLAS optimisation. Exposed as an OpenAI-compatible REST API on port 8080.
 - **Node.js proxy (port 3001)** — handles CORS between the browser and llama.cpp. All API calls resolve from `window.location.hostname` at runtime — zero hardcoded FQDNs in the source.
-- **Next.js + Carbon Design System UI (port 3000)** — the demo interface. 9 use case tabs, structured prompt engineering per use case, clean IBM design language.
-- **PassportEye OCR service (port 5000)** — optional Python service for the Passport Verification use case. Soft-fail wrapped — if it fails, all other 8 demos continue working.
+- **Next.js + Carbon Design System UI (port 3000)** — the demo interface. 10 use case tabs, structured prompt engineering per use case, clean IBM design language.
+- **PassportEye OCR service (port 5000)** — optional Python service for the Passport Verification use case. Soft-fail wrapped — if it fails, all other 9 demos continue working.
 
 The land-and-expand line: this architecture slots directly into a client's IBM Power10 or Power11 environment. The same pattern — model on Power, proxy, UI — is the foundation for a production AI inference layer. Note: Power9 and older do not include MMA and are not suitable for this workload. As PowerVS transitions its fleet to Power10/Power11 over time, cloud-hosted deployments will also become viable.
 
