@@ -46,13 +46,9 @@ if ! command -v tesseract &> /dev/null; then
     
     # Detect OS and install accordingly
     if [[ -f /etc/redhat-release ]]; then
-        echo "Detected RHEL/CentOS - installing via yum..."
-        # Check if dnf is available (RHEL 8+)
-        if command -v dnf &> /dev/null; then
-            sudo dnf install -y tesseract
-        else
-            sudo yum install -y tesseract
-        fi
+        echo "Detected RHEL/CentOS - installing via dnf..."
+        # tesseract-langpack-eng provides the English OCR data (required for MRZ reading)
+        sudo dnf install -y tesseract tesseract-langpack-eng
     elif [[ -f /etc/debian_version ]]; then
         echo "Detected Debian/Ubuntu - installing via apt-get..."
         sudo apt-get update
@@ -106,7 +102,9 @@ pip install --upgrade pip
 if [[ "${ARCH}" == "ppc64le" ]]; then
     echo "Using IBM wheel repository for ppc64le architecture..."
     echo "Installing scientific packages from IBM wheels..."
-    pip install --prefer-binary numpy scipy opencv-python pillow scikit-image --extra-index-url=https://wheels.developerfirst.ibm.com/ppc64le/linux
+    # opencv-python (GUI) has no ppc64le wheel and fails to build from source.
+    # opencv-python-headless is available from IBM's wheel repo and is sufficient for PassportEye.
+    pip install --prefer-binary numpy scipy opencv-python-headless pillow scikit-image --extra-index-url=https://wheels.developerfirst.ibm.com/ppc64le/linux
     echo "Installing PassportEye (without dependencies to avoid conflicts)..."
     pip install --no-deps PassportEye
     echo "Installing additional dependencies..."
