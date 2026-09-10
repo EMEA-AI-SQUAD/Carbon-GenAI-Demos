@@ -29,7 +29,7 @@ The goal is to show that IBM Power already has the compute to run IBM's own foun
 
 **The pitch in one line:**
 
-> "Ten use cases covering entity extraction, conversation intelligence, PII redaction, KYC, document discovery, brief building, RFP assistance, and talent acquisition — running on IBM Granite 4.0 Micro on your IBM Power hardware, tailored to your client's industry, with no data leaving the building."
+> "Eighteen use cases across 6 pages covering entity extraction, conversation intelligence, PII redaction, KYC, document discovery, brief building, RFP assistance, and talent acquisition — running on IBM Granite 4.0 Micro on your IBM Power hardware, tailored to your client's industry, with no data leaving the building."
 
 This is a platform reality demo, not a conceptual slide. It is a running Carbon Design System web application connecting to a live llama.cpp inference server on IBM Power10 (ppc64le). The model is IBM Granite 4.0 Micro in GGUF Q4_K_M quantisation (~2.5 GB). The demo loads in a browser. The client can type their own text — or the Pre-Sales Demo Builder mode can pre-load client-specific scenario data before deployment.
 
