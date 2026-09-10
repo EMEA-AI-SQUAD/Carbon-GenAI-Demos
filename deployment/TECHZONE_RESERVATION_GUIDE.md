@@ -1,4 +1,4 @@
-# TechZone Environment Reservation Guide
+﻿# TechZone Environment Reservation Guide
 
 ## Overview
 
@@ -98,7 +98,7 @@ Once provisioned (status: "Ready"):
 
 ### Method 2: Using Bob's TechZone MCP (Advanced)
 
-If you have Bob (Roo-Cline) with TechZone MCP configured:
+If you have IBM Bob with TechZone MCP configured:
 
 ```bash
 # Bob can help you reserve via MCP tools

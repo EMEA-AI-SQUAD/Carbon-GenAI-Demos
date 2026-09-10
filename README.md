@@ -1,6 +1,6 @@
-# IBM Power GenAI Demo
+﻿# Carbon GenAI Demos — IBM Power + IBM Granite
 
-> **A quick-win demo built with Bob (Roo-Cline AI Assistant) to showcase IBM Granite AI running on IBM Power**
+> **A quick-win demo built with IBM Bob to showcase IBM Granite AI running on IBM Power**
 >
 > This repo lives in **[ibm-power-demos-with-bob](https://github.com/ibm-power-demos-with-bob)** as an example of what you can build by telling Bob what you need. It was originally developed for the [EMEA AI on IBM Power Squad](https://github.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos) and is shared here so others can point at it, use it, and customise it.
 
@@ -8,13 +8,12 @@
 [![Carbon Design System](https://img.shields.io/badge/Carbon-Design%20System-161616?logo=ibm)](https://carbondesignsystem.com/)
 [![Next.js](https://img.shields.io/badge/Next.js-13-black?logo=next.js)](https://nextjs.org/)
 [![IBM Granite](https://img.shields.io/badge/IBM-Granite%204.0-blue?logo=ibm)](https://huggingface.co/ibm-granite)
-[![Built with Bob](https://img.shields.io/badge/Built%20with-Bob%20(Roo--Cline)-purple)](https://github.com/RooVetGit/Roo-Cline)
 
 ---
 
 ## 🎯 What This Is
 
-A web application that demonstrates real-world AI use cases powered by **IBM Granite 4.0 Micro** running locally on **IBM Power (PPC64LE)**. No cloud API keys needed — the model runs entirely on-prem.
+A **Carbon Design System web application** that demonstrates real-world AI use cases powered by **IBM Granite 4.0 Micro** running on **IBM Power10 or Power11 (PPC64LE)**. No cloud API keys needed — the model runs on the Power hardware itself, using the Matrix Math Accelerator (MMA) built into Power10/Power11 for AI acceleration without a GPU.
 
 ### Demos included
 
@@ -141,16 +140,16 @@ Carbon-GenAI-Demos/
 
 ## 🤖 About This Demo and "Built with Bob"
 
-This demo was built through collaboration between the **EMEA AI on IBM Power Squad** and **Bob (Roo-Cline AI Assistant)**:
+This demo was built through collaboration between the **EMEA AI on IBM Power Squad** and **IBM Bob**:
 
 - **David Spurway (Squad Lead)** — vision, requirements, architecture, testing
 - **Henrik Mader** — Node.js proxy server and API integration
 - **Rinah-Jayne Nuamah** — IT Ops demo foundation and user testing
-- **Bob (Roo-Cline)** — Next.js app, deployment script, documentation, prompts
+- **IBM Bob** — Next.js app, deployment script, documentation, prompts
 
 It is shared here in `ibm-power-demos-with-bob` as a **reference example** — something others can point at, run, and customise. The longer-term plan for this organisation is to host demos that are fully _recipe-driven_: you describe what you need to Bob using the Pre-Sales Demo Builder mode, and Bob builds the whole thing using structured skills targeting IBM Power capabilities.
 
-This demo was built before those skills and mode existed, but it shows the end result and deployment pipeline clearly. The tailoring workflow (ICA → Bob → customer branch) is now part of the recipe and documented in `COLLECTION.md`.
+This demo predates those skills and mode, but it shows the end result and deployment pipeline clearly.
 
 ---
 
@@ -161,7 +160,6 @@ This demo was built before those skills and mode existed, but it shows the end r
 - [Carbon Design System](https://carbondesignsystem.com/)
 - [TechZone — Generative AI on IBM Power collection](https://techzone.ibm.com/collection/generative-ai-demos-on-ibm-power)
 - [Hans Geis logistics IBM case study](https://www.ibm.com/downloads/documents/us-en/1443d5dc5ecf4367)
-- [Roo-Cline / Bob](https://github.com/RooVetGit/Roo-Cline)
 
 ---
 
@@ -174,4 +172,4 @@ Provided as-is for demonstration purposes.
 
 ---
 
-*Built by the EMEA AI on IBM Power Squad with Bob (Roo-Cline AI Assistant)*
+*Built by the EMEA AI on IBM Power Squad with IBM Bob*

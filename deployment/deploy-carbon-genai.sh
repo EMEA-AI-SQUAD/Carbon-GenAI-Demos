@@ -1,4 +1,4 @@
-#!/bin/bash
+!/bin/bash
 
 ################################################################################
 # Script: deploy-carbon-genai.sh
@@ -293,7 +293,7 @@ install_dependencies() {
     print_step "🔧 Installing system dependencies..."
 
     # Install base packages (without nodejs — installed via dnf module below)
-    local packages="python3.12 python3.12-pip python3.12-devel git gcc gcc-c++ make cmake automake llvm-toolset ninja-build gfortran curl-devel wget"
+    local packages="python3.12 python3.12-pip python3.12-devel git gcc gcc-c++ make cmake automake llvm-toolset ninja-build gfortran curl-devel wget lsof"
 
     if run_command "sudo dnf install -y $packages" "Base system dependencies installed"; then
         print_success "Base packages installed"
@@ -302,20 +302,33 @@ install_dependencies() {
         cleanup_on_error
     fi
 
-    # Install Node.js 20 via RHEL dnf module stream
-    # Note: NodeSource does not support ppc64le — use the RHEL AppStream module instead
-    # RHEL 9 default stream is Node 16 which is too old (Express 5 requires >=18)
-    print_info "Enabling Node.js 20 module stream..."
-    if run_command "sudo dnf module enable -y nodejs:20" "Node.js 20 module enabled"; then
-        if run_command "sudo dnf install -y nodejs" "Node.js 20 installed"; then
+    # Install Node.js
+    # RHEL 10: Node 22 ships directly in AppStream (modularity deprecated in RHEL 10)
+    # RHEL 9:  Default stream is Node 16 (too old) — enable nodejs:20 stream first
+    local rhel_major
+    rhel_major=$(rpm -q --qf '%{VERSION}' redhat-release 2>/dev/null | cut -d. -f1)
+    print_info "Detected RHEL major version: ${rhel_major}"
+    if [ "${rhel_major}" -ge 10 ] 2>/dev/null; then
+        print_info "RHEL 10+: installing Node.js directly from AppStream (Node 22)..."
+        if run_command "sudo dnf install -y nodejs" "Node.js installed"; then
             print_success "Node.js $(node --version) installed"
         else
-            print_error "Failed to install Node.js 20"
+            print_error "Failed to install Node.js"
             cleanup_on_error
         fi
     else
-        print_error "Failed to enable Node.js 20 module stream"
-        cleanup_on_error
+        print_info "RHEL 9: enabling Node.js 20 module stream..."
+        if run_command "sudo dnf module enable -y nodejs:20" "Node.js 20 module enabled"; then
+            if run_command "sudo dnf install -y nodejs" "Node.js 20 installed"; then
+                print_success "Node.js $(node --version) installed"
+            else
+                print_error "Failed to install Node.js 20"
+                cleanup_on_error
+            fi
+        else
+            print_error "Failed to enable Node.js 20 module stream"
+            cleanup_on_error
+        fi
     fi
 
     # Verify installations
@@ -440,7 +453,7 @@ install_node_dependencies() {
     # Install npm packages — versions pinned for Node 20 compatibility on ppc64le
     # express 5.x requires Node >=18 but http-proxy-middleware 3.x+ requires Node >=22
     # openai 5.x requires Node >=18; typescript 7.x requires Node >=22
-    print_info "Installing additional npm packages (Node 20 compatible versions)..."
+    print_info "Installing additional npm packages (pinned versions, compatible with Node 20 and 22)..."
     run_command "npm install openai@^4.104.0" "OpenAI package installed"
     run_command "npm install cors" "CORS package installed"
     run_command "npm install express@^4.21.2" "Express package installed"

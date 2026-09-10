@@ -1,4 +1,4 @@
-# Carbon GenAI Demo - Automated Deployment
+﻿# Carbon GenAI Demo - Automated Deployment
 
 Automated deployment script for the Carbon GenAI Demo application on RHEL/PPC64LE systems.
 
@@ -371,7 +371,7 @@ rm -rf /tmp/models
 
 ## Contributing
 
-This project was built with assistance from Bob (Roo-Cline AI Assistant). Contributions are welcome!
+This project was built with assistance from IBM Bob. Contributions are welcome!
 
 ## License
 
@@ -381,4 +381,4 @@ See LICENSE file in the repository root.
 
 **Made with ❤️ by the EMEA AI on IBM Power Squad**
 
-**Built with 🤖 Bob (Roo-Cline AI Assistant)**
+**Built with 🤖 IBM Bob**

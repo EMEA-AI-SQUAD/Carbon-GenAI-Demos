@@ -1,4 +1,4 @@
-# IT Ops Entity Extraction - Analysis Document
+﻿# IT Ops Entity Extraction - Analysis Document
 
 ## 🎯 What Can Be Extracted from Each Email
 
@@ -246,6 +246,6 @@ The **English Summary** entity is particularly valuable for demos because:
 
 ---
 
-**Created by Bob (Roo-Cline AI Assistant)**  
+**Created by IBM Bob**  
 **Date:** 2026-03-09  
 **Status:** ✅ Enhanced Entity Extraction Ready for Testing

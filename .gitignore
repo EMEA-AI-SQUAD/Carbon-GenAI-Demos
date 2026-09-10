@@ -13,6 +13,7 @@ __pycache__/
 *.pyc
 .llama.cpp.venv/
 .venv/
+.carbonvenv/
 
 # Pip cache
 .cache/pip/

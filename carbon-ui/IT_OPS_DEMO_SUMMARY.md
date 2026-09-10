@@ -1,4 +1,4 @@
-# IT Ops Email Demo - Implementation Summary
+﻿# IT Ops Email Demo - Implementation Summary
 
 ## 🎯 Overview
 Multilingual entity extraction demo showcasing Granite 4.0's ability to:
@@ -235,6 +235,6 @@ Demo successfully demonstrates:
 
 ---
 
-**Created by Bob (Roo-Cline AI Assistant)**
+**Created by IBM Bob**
 **Date:** 2026-03-09
 **Status:** ✅ Ready for Testing

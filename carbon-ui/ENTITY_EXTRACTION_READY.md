@@ -1,4 +1,4 @@
-# ✅ Entity Extraction Demo - Ready to Test
+﻿# ✅ Entity Extraction Demo - Ready to Test
 
 ## Status: READY FOR TESTING
 
@@ -182,4 +182,4 @@ If you want to enhance further:
 
 **Status:** ✅ READY FOR TESTING  
 **Created:** 2026-03-09  
-**By:** Bob (Roo-Cline AI Assistant)
+**By:** IBM Bob
