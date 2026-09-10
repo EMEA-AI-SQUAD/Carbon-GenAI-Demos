@@ -6,9 +6,10 @@ description: >
   Power10 or Power11, no cloud APIs, no watsonx.ai SaaS, no data leaving the
   client environment - in under 25 minutes from a fresh TechZone reservation.
   Requires Power10 or Power11 for the Matrix Math Accelerator (MMA). Includes
-  10 use cases built with Carbon Design System: entity extraction, conversation
-  intelligence, PII redaction, multilingual IT ops, document discovery, passport
-  verification, brief building, RFP assistance, and talent acquisition.
+  18 use cases across 6 pages built with Carbon Design System: entity extraction,
+  conversation intelligence, PII redaction, multilingual IT ops, document
+  discovery, passport verification, brief building, RFP assistance, and talent
+  acquisition.
 author: EMEA AI on IBM Power Squad
 version: 1.0.0
 repository: https://github.com/ibm-power-demos-with-bob/Carbon-GenAI-Demos
@@ -63,6 +64,6 @@ For a one-page getting started guide, see [GETTING-STARTED.md](GETTING-STARTED.m
 2. **Deploy** — Tell Bob your FQDN and SSH key path:
    *"Deploy the Carbon GenAI demo. My FQDN is pvm1-<key>.p<NNNN>.pok-systems.techzone.ibm.com
    and my SSH key is at <path>."*
-3. **Demo** — Open `http://<fqdn>:3000` (IBM VPN required). All 10 use cases ready to run.
+3. **Demo** — Open `http://<fqdn>:3000` (IBM VPN required). All 18 use cases ready to run.
 
 **Total human effort:** ~10 minutes. **Total elapsed:** ~30 minutes.

@@ -8,7 +8,7 @@ IBM Client Engineering sellers and technical pre-sales engineers who need to sho
 
 ## The demo
 
-A Carbon Design System web application with **10 use cases across 4 tabs**, all powered by IBM Granite 4.0 Micro running locally via llama.cpp on ppc64le. The generic scenarios are a starting point — the Pre-Sales Demo Builder mode can tailor them to a specific client before deployment.
+A Carbon Design System web application with **18 use cases across 6 pages** (3 scenarios each), all powered by IBM Granite 4.0 Micro running locally via llama.cpp on ppc64le. The generic scenarios are a starting point — the Pre-Sales Demo Builder mode can tailor them to a specific client before deployment.
 
 | Use Case | What it shows |
 |----------|--------------|

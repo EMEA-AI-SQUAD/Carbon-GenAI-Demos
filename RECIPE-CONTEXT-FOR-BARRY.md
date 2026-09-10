@@ -14,7 +14,7 @@ The work exists. Four recipes are in various stages of readiness. None have been
 
 | Recipe | What it does | Readiness |
 |---|---|---|
-| **Carbon GenAI on IBM Power** *(David)* | IBM Granite 4.0 running on Power10/11 — 10 use cases, Carbon Design System UI, deployed in ~38 min on a clean instance. Already customised for Premier Farnell. | ✅ **Recipe brief complete. Deployed and validated on RHEL 10.2 (2026-09-04).** Awaiting handoff test, then PR. |
+| **Carbon GenAI on IBM Power** *(David)* | IBM Granite 4.0 running on Power10/11 — 18 use cases across 6 pages, Carbon Design System UI, deployed in ~38 min on a clean instance. Already customised for Premier Farnell. | ✅ **Recipe brief complete. Deployed and validated on RHEL 10.2 (2026-09-04).** Awaiting handoff test, then PR. |
 | **PowerSC + HashiCorp Vault** *(David)* | Before/after certificate security demo on real PowerSC infrastructure — 150 certificates replaced, live compliance score improvement. | Close to submission. Needs final testing against the new template. |
 | **watsonx.data on IBM Power** *(David)* | Live federated data demo across IBM i, PostgreSQL/EDB, and Iceberg — cyber and logistics signal detection. Two variants: IBM i path and Oracle-on-AIX path. | Work in progress. Recipe structure in place, aligning to template as development continues. |
 | **IBM i Ansible Lab** *(Joris)* | Hands-on lab: Bob drives Ansible automation against a live IBM i TechZone environment. Health checks, PTF discovery. | Pre-run review done, issues logged. Classifies as a **Lab** (not a Recipe) — submission path is `LABs/` in the CE marketplace. Joris resolving template access. Will be a demo with an outcome, not just a lab step-through. |
