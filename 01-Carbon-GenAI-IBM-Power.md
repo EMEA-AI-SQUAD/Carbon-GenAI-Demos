@@ -5,7 +5,7 @@ Bob MODE: pre-sales-demo (Pre-Sales Demo Builder mode)
 
 **Why this is a strong platform reality demo:** IBM Granite 4.0 Micro running on IBM Power10 or Power11 — no cloud API, no watsonx.ai SaaS, no data leaving the client's environment — is the clearest possible answer to "but what about our data sovereignty requirements?" The "aha" moment is the first time a client pastes a document containing names, passport numbers, or financial data and watches it get processed entirely on their own Power hardware. The model is local. The answer comes back. No network call left the room. The Matrix Math Accelerator (MMA) in Power10/Power11 is what makes this practical — hardware-level AI acceleration without a separate GPU.
 
-**Cluster:** GenAI & Foundation Models · **Industry:** Customisable per engagement (default: cross-industry; has been tailored for Electronics Distribution / Manufacturing) · **Output shape:** Live Carbon Design System web app + 10 interactive use cases + IBM Granite inference on Power10/Power11 + client-specific scenario data
+**Cluster:** GenAI & Foundation Models · **Industry:** Customisable per engagement (default: cross-industry; has been tailored for Electronics Distribution / Manufacturing) · **Output shape:** Live Carbon Design System web app + 18 interactive use cases across 6 pages + IBM Granite inference on Power10/Power11 + client-specific scenario data
 
 > **Build path guardrail.** The deliverable is IBM Granite running on IBM Power hardware via llama.cpp. If the only IBM touchpoint is a cloud API call or a watsonx.ai SaaS endpoint, the build is WRONG. The entire value proposition is that the model runs on the client's own Power infrastructure. An x86 laptop mock cannot represent this story faithfully — see PROMPT #1 for the honest adaptation.
 
@@ -39,7 +39,7 @@ The architecture is deliberately minimal — three services, no orchestration la
 
 - **IBM Granite 4.0 Micro (GGUF Q4_K_M)** — the model, running via llama.cpp on ppc64le with OpenBLAS optimisation. Exposed as an OpenAI-compatible REST API on port 8080.
 - **Node.js proxy (port 3001)** — handles CORS between the browser and llama.cpp. All API calls resolve from `window.location.hostname` at runtime — zero hardcoded FQDNs in the source.
-- **Next.js + Carbon Design System UI (port 3000)** — the demo interface. 10 use case tabs, structured prompt engineering per use case, clean IBM design language.
+- **Next.js + Carbon Design System UI (port 3000)** — the demo interface. 18 use case tabs across 6 pages, structured prompt engineering per use case, clean IBM design language.
 - **PassportEye OCR service (port 5000)** — optional Python service for the Passport Verification use case. Soft-fail wrapped — if it fails, all other 9 demos continue working.
 
 The land-and-expand line: this architecture slots directly into a client's IBM Power10 or Power11 environment. The same pattern — model on Power, proxy, UI — is the foundation for a production AI inference layer. Note: Power9 and older do not include MMA and are not suitable for this workload. As PowerVS transitions its fleet to Power10/Power11 over time, cloud-hosted deployments will also become viable.
@@ -48,7 +48,7 @@ The land-and-expand line: this architecture slots directly into a client's IBM P
 
 ## PRE-LOADED USE CASES
 
-The demo ships with 10 use cases across 4 navigation tabs. The sample data in each is the generic baseline — it should be replaced with client-relevant content using the Pre-Sales Demo Builder mode before a client-facing presentation (see PROMPT #0 below).
+The demo ships with 18 use cases across 6 pages (entity extraction, PII extraction, brief building, RFP assistant, talent acquisition, conversation intelligence — 3 live scenarios each). The sample data in each is the generic baseline — it should be replaced with client-relevant content using the Pre-Sales Demo Builder mode before a client-facing presentation (see PROMPT #0 below).
 
 **Entity Extraction tab:**
 
@@ -141,7 +141,7 @@ Client context:
 - IBM products they already use: [e.g. IBM i, IBM Power, specific software]
 
 Using this context, tailor the demo for this client:
-1. Identify which of the 10 use cases map most naturally to their world
+1. Identify which of the 18 use cases map most naturally to their world
 2. For the generic use cases (Book Review, Document Discovery, RFP Assistant,
    Conversation Intelligence), rewrite the pre-loaded sample data to use
    this client's industry, terminology, and plausible scenarios
@@ -178,17 +178,17 @@ I don't have my TechZone environment yet, so I want to do two things:
 1. Walk me through the architecture — what are the four services, why each one
    exists, and what would break if any one of them were missing.
 
-2. For the 10 use cases in this demo, generate a briefing card for each:
+2. For the 18 use cases in this demo, generate a briefing card for each:
    - Use case name and tab location in the UI
    - What the client types in (give me a concrete example input)
    - What the model returns (describe the structure of the output)
    - Which client persona / industry this resonates with most
    - One sentence I can say out loud to the client before they type
 
-Format as a DEMO_PREP.md file I can open on a second monitor during the demo. Include all 10 use cases.
+Format as a DEMO_PREP.md file I can open on a second monitor during the demo. Include all 18 use cases.
 ```
 
-**Stop point:** You should now have `DEMO_PREP.md` on disk with a briefing card for each of the 10 use cases, concrete example inputs, and a speaker line for each. Read through it. If any use case description surprises you, go back and ask Bob to clarify before you're in front of a client.
+**Stop point:** You should now have `DEMO_PREP.md` on disk with a briefing card for each of the 18 use cases, concrete example inputs, and a speaker line for each. Read through it. If any use case description surprises you, go back and ask Bob to clarify before you're in front of a client.
 
 ---
 
@@ -342,7 +342,7 @@ Hand the keyboard to the client. Let them type their own text into any use case.
 
 **Step — Close**
 
-*"This is what IBM Power can do today. Nine use cases, one model, your data centre. The same architecture that deployed this demo in 20 minutes can be the foundation of your production AI inference layer."*
+*"This is what IBM Power can do today. Eighteen use cases, one model, your data centre. The same architecture that deployed this demo in 20 minutes can be the foundation of your production AI inference layer."*
 
 ---
 
