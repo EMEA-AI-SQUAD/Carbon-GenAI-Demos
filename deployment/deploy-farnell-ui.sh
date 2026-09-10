@@ -24,7 +24,7 @@ echo "[$(date)] Clone complete." | tee -a "$LOG"
 # --- Install Node dependencies ---
 echo "[$(date)] Running yarn install..." | tee -a "$LOG"
 cd "$FARNELL_DIR/carbon-ui"
-yarn install --frozen-lockfile >> "$LOG" 2>&1
+yarn install >> "$LOG" 2>&1
 echo "[$(date)] yarn install complete." | tee -a "$LOG"
 
 # --- Build ---
