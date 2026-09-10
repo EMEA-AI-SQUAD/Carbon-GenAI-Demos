@@ -21,7 +21,7 @@ WORK_DIR="$(dirname "$REPO_DIR")"
 # Configuration
 SERVICE_PORT=5000
 LOG_FILE="${WORK_DIR}/deployment/passporteye-service.log"
-VENV_DIR="${WORK_DIR}/.passporteye-venv"
+VENV_DIR="${REPO_DIR}/.passporteye-venv"
 SERVICE_FILE="${REPO_DIR}/deployment/passport_service.py"
 
 echo -e "${GREEN}================================${NC}"
@@ -60,35 +60,31 @@ fi
 echo -e "${GREEN}✓ PassportEye is installed${NC}"
 echo ""
 
-# Start service
-echo -e "${YELLOW}Starting PassportEye service...${NC}"
+# Start service via pm2 (survives SSH disconnects and auto-restarts on crash)
+echo -e "${YELLOW}Starting PassportEye service via pm2...${NC}"
 echo "Port: ${SERVICE_PORT}"
-echo "Log: ${LOG_FILE}"
 echo ""
 
-nohup python3 "${SERVICE_FILE}" > "${LOG_FILE}" 2>&1 &
-SERVICE_PID=$!
-echo "Service PID: ${SERVICE_PID}"
+# Stop any existing instance
+pm2 delete passporteye 2>/dev/null || true
+
+# Start under pm2 using the venv python directly
+pm2 start "${VENV_DIR}/bin/python3" --name passporteye -- "${SERVICE_FILE}"
+pm2 save
 
 # Wait for service to start
 echo -e "${YELLOW}Waiting for service to start...${NC}"
-sleep 3
+sleep 5
 
 # Check if service is running
 if curl -s http://localhost:${SERVICE_PORT}/health > /dev/null 2>&1; then
     echo -e "${GREEN}✓ PassportEye service is running on port ${SERVICE_PORT}${NC}"
     echo ""
-    echo "Test with:"
-    echo "  curl http://localhost:${SERVICE_PORT}/health"
-    echo ""
-    echo "View logs:"
-    echo "  tail -f ${LOG_FILE}"
-    echo ""
-    echo "Stop service:"
-    echo "  pkill -f 'passport_service.py'"
+    echo "Test with:  curl http://localhost:${SERVICE_PORT}/health"
+    echo "View logs:  pm2 logs passporteye"
+    echo "Stop:       pm2 delete passporteye"
 else
-    echo -e "${RED}✗ Service failed to start${NC}"
-    echo "Check logs: tail -f ${LOG_FILE}"
+    echo -e "${RED}✗ Service failed to start — check: pm2 logs passporteye${NC}"
     exit 1
 fi
 
