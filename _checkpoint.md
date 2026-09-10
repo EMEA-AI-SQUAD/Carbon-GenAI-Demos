@@ -6,7 +6,7 @@
 
 ## Status
 
-**Deploy in progress on fresh RHEL 10.2 environment to validate recipe before CE Marketplace PR. Both base demo (port 3000) and Farnell-tailored demo (port 3002) being deployed to a single server.**
+**CE Marketplace PR submitted. Both demos live on TechZone. Ready for tomorrow's call.**
 
 ---
 
@@ -18,7 +18,8 @@
 | Aug 2026 | v1 TechZone platform found disabled. RECIPE.md created. Barry doc started. |
 | Aug 2026 | Full gap analysis vs. new Bob Recipe Template (published 2026-08-15). Recipe brief (`01-Carbon-GenAI-IBM-Power.md`) written — all 10 use cases, PROMPT #0–#3, demo script, sample inputs, known issues. All docs updated for v2 platform. |
 | Sep 2026 | v2 TechZone platform (`6a7aba1916c56f06e4b1e910`) validated. RHEL 10.2 full deployment confirmed (38m 2s clean). All 4 services running. Granite 4.0 Micro LLM verified. Username handling fixed (`cecuser` → per-reservation). Barry doc updated. TechZone bug report drafted. Everything committed (`d639457`). |
-| Sep 2026 (10th) | MCP reservation tested — confirmed `userVariables` bug (empty array → `TZ-FS5200_` image not found). Manual reservation works. Bug report updated with full API comparison evidence. `.carbonvenv` purged from all git history (175 commits, both remotes). `.gitattributes` added to prevent CRLF on shell scripts. New Farnell dual-deploy scripts added (`deploy-farnell-ui.sh`, `remote-launch-farnell.sh`). Deploy in progress on `pvm1-sqqsd52k.p1210.pok-systems.techzone.ibm.com` (U3KAJZD, RHEL 10.2, reservation `6aa286be`, expires 2026-09-14). |
+| Sep 2026 (10th) | MCP reservation tested — confirmed `userVariables` bug (empty array → `TZ-FS5200_` image not found). Manual reservation works. Bug report updated with full API comparison evidence. `.carbonvenv` purged from all git history (175 commits, both remotes). `.gitattributes` added to prevent CRLF on shell scripts. New Farnell dual-deploy scripts added (`deploy-farnell-ui.sh`, `remote-launch-farnell.sh`). Both demos deployed and verified on `pvm1-sqqsd52k.p1210.pok-systems.techzone.ibm.com` (U3KAJZD, RHEL 10.2, reservation `6aa286be`, expires 2026-09-14). All 5 ports confirmed live. |
+| Sep 2026 (10th, cont.) | All use case counts corrected to 18 across all docs. CE Marketplace PR opened: `github.ibm.com/ClientEngineering/bob/pull/231` — `Recipes/IBM-Power-GenAI/` with `README.md` and `01-IBM-Power-GenAI.md`. |
 
 ---
 
@@ -56,15 +57,14 @@
 
 ## Next steps
 
-1. **Complete today's deploy** — verify all 5 ports (3000, 3001, 3002, 5000, 8080), smoke test both demos
+1. **Tomorrow's demo** — both demos live and ready:
    - Base demo: `http://pvm1-sqqsd52k.p1210.pok-systems.techzone.ibm.com:3000`
    - Farnell demo: `http://pvm1-sqqsd52k.p1210.pok-systems.techzone.ibm.com:3002`
+   - IBM VPN required. Reservation expires 2026-09-14.
 
-2. **Open the CE Marketplace PR** — target: `ClientEngineering/bob` → `Recipes/Carbon-GenAI-IBM-Power/`
-   - `01-Carbon-GenAI-IBM-Power.md`
-   - `README.md` (content from `RECIPE-README.md`)
+2. **CE Marketplace PR** — awaiting review: `github.ibm.com/ClientEngineering/bob/pull/231`
 
-3. **Send TechZone bug report** — copy [`TECHZONE-BUG-REPORT.md`](TECHZONE-BUG-REPORT.md) to `techzone.help@ibm.com`
+3. **Send TechZone bug report** (optional / when time allows) — copy [`TECHZONE-BUG-REPORT.md`](TECHZONE-BUG-REPORT.md) to `techzone.help@ibm.com`
 
 ---
 
@@ -76,5 +76,5 @@ Paste this into the first message:
 We are working on the Carbon GenAI IBM Power recipe for the CE Marketplace.
 Read _checkpoint.md for full context.
 
-Current status: deploy in progress on pvm1-sqqsd52k.p1210.pok-systems.techzone.ibm.com (U3KAJZD, RHEL 10.2, key at C:\Users\029878866\Downloads\techzone-power-key.pem, reservation expires 2026-09-14). Base demo deploys to port 3000, Farnell-tailored demo to port 3002 via deploy-farnell-ui.sh. Next step: verify both demos running, then open CE Marketplace PR.
+Current status: both demos live on pvm1-sqqsd52k.p1210.pok-systems.techzone.ibm.com (U3KAJZD, RHEL 10.2, key at C:\Users\029878866\Downloads\techzone-power-key.pem, reservation expires 2026-09-14). Base demo on port 3000, Farnell-tailored demo on port 3002. CE Marketplace PR open at github.ibm.com/ClientEngineering/bob/pull/231. IBM VPN required to access demos.
 ```
