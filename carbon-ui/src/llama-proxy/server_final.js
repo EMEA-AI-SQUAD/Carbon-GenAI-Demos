@@ -3,9 +3,11 @@ import cors from 'cors';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 
 const app = express();
-const PORT = 3001;
-const LLAMA_URL = 'http://localhost:8080';
-const PASSPORTEYE_URL = 'http://localhost:5000';
+// Ports are read from env vars so instance-specific overrides never need to
+// touch this file or get committed to git.
+const PORT           = parseInt(process.env.PORT           || '3001', 10);
+const LLAMA_URL      = process.env.LLAMA_URL      || 'http://localhost:8080';
+const PASSPORTEYE_URL = process.env.PASSPORTEYE_URL || 'http://localhost:5000';
 
 /**
  * CORS must be first
