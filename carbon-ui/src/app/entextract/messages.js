@@ -26,14 +26,14 @@ export function buildMessages(values) {
   const system = {
     role: "system",
     content:
-      "You are an AI Entity Extractor. You help extract entities from text about books. " +
+      "You are an AI Entity Extractor. You extract structured entities from IT operations emails and support requests. " +
       "You must return a JSON object with the extracted entities only — no explanations.",
   };
 
   const user = {
     role: "user",
     content:
-`Analyze the following books and extract these entities:
+`Analyze the following IT operations email and extract these entities:
 
 ${schemaJson}
 
@@ -41,8 +41,9 @@ Rules:
 - Output must be valid JSON with key-value pairs only.
 - If an entity is missing, output "Data not available" for that key.
 - Do not hallucinate or include explanations.
+- Base your assessment strictly on the entity definitions provided — do not allow emotional language in the email to inflate priority ratings.
 
-Books:
+Email:
 ${values.free_form_text}`,
   };
 

@@ -75,7 +75,7 @@ P.S. - HO DAVVERO BISOGNO DI AIUTO URGENTE!!!`,
       },
       {
         label: "True Priority",
-        definition: "Objective assessment of priority: Low (no immediate business impact), Medium (business inconvenience), High (business disruption), Critical (safety/major financial risk)"
+        definition: "Objective assessment of business priority based solely on organisational impact — ignore the sender's emotional state entirely. Use: Low (no business impact, cosmetic or personal inconvenience only), Medium (a business task is delayed or inconvenienced but the organisation continues to operate normally — e.g. a report cannot be generated for a meeting), High (a business process is disrupted — revenue, compliance, or a key delivery is at risk), Critical (immediate risk to human safety, or a failure that threatens significant financial loss or regulatory breach at organisational scale). A reporting tool being unavailable for a VP meeting is Medium, not Critical."
       },
       {
         label: "Suggested Solution Area",
