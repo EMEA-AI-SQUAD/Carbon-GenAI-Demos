@@ -55,6 +55,8 @@ For the development journey, decisions, and deployment log, see [RECIPE-JOURNEY.
 
 For a one-page getting started guide, see [GETTING-STARTED.md](GETTING-STARTED.md).
 
+For guidance on tailoring the demo for a specific customer or country, see [TAILORING.md](TAILORING.md).
+
 ## Quick Start
 
 1. **Reserve** — Tell Bob: *"Reserve a TechZone AI-Ready RHEL on IBM Power environment for me."*
