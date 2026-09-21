@@ -57,14 +57,40 @@
 
 ## Next steps
 
-1. **Tomorrow's demo** — both demos live and ready:
-   - Base demo: `http://pvm1-sqqsd52k.p1210.pok-systems.techzone.ibm.com:3000`
-   - Farnell demo: `http://pvm1-sqqsd52k.p1210.pok-systems.techzone.ibm.com:3002`
-   - IBM VPN required. Reservation expires 2026-09-14.
+1. **Before Thursday** — deploy is running on the Denmark VM. Once complete (~38 min from start),
+   push the Danish-tailored files and rebuild. You are currently on the `denmark-2026` local branch.
+   Run these scp commands from the repo root:
+   ```
+   KEY="C:\Users\029878866\Downloads\techzone-power-key-denmark.pem"
+   HOST="UY32QEF@pvm1-fso8l13k.p651.pok-systems.techzone.ibm.com"
+   BASE="carbon-ui/src/app"
+   scp -i "$KEY" $BASE/entextract/defaults.js         "$HOST:~/Carbon-GenAI-Demos/$BASE/entextract/defaults.js"
+   scp -i "$KEY" $BASE/entextract/it-ops-emails.js    "$HOST:~/Carbon-GenAI-Demos/$BASE/entextract/it-ops-emails.js"
+   scp -i "$KEY" $BASE/entextract/logistics-quote.js  "$HOST:~/Carbon-GenAI-Demos/$BASE/entextract/logistics-quote.js"
+   scp -i "$KEY" $BASE/convintel/defaults.js           "$HOST:~/Carbon-GenAI-Demos/$BASE/convintel/defaults.js"
+   scp -i "$KEY" $BASE/home/page.js                    "$HOST:~/Carbon-GenAI-Demos/$BASE/home/page.js"
+   ssh -i "$KEY" "$HOST" "cd ~/Carbon-GenAI-Demos/carbon-ui && yarn build && pm2 restart nextjs-app"
+   ```
+   Demo at: `http://pvm1-fso8l13k.p651.pok-systems.techzone.ibm.com:3000` (IBM VPN required)
 
-2. **CE Marketplace PR** — awaiting review: `github.ibm.com/ClientEngineering/bob/pull/231`
+2. **After Thursday** — return local working copy to the generic demo:
+   ```
+   git checkout main
+   ```
+   The `denmark-2026` branch is preserved locally. See [`TAILORING.md`](TAILORING.md) for the full pattern.
 
-3. **Send TechZone bug report** (optional / when time allows) — copy [`TECHZONE-BUG-REPORT.md`](TECHZONE-BUG-REPORT.md) to `techzone.help@ibm.com`
+3. **CE Marketplace PR** — awaiting review: `github.ibm.com/ClientEngineering/bob/pull/231`
+
+4. **Send TechZone bug report** (optional / when time allows) — copy [`TECHZONE-BUG-REPORT.md`](TECHZONE-BUG-REPORT.md) to `techzone.help@ibm.com`
+
+---
+
+## Branch state
+
+| Branch | State | Purpose |
+|---|---|---|
+| `main` | Clean, in sync with GitHub | Generic reusable demo |
+| `denmark-2026` | Local only, never push | Danish tailoring for Thursday session |
 
 ---
 
@@ -76,5 +102,8 @@ Paste this into the first message:
 We are working on the Carbon GenAI IBM Power recipe for the CE Marketplace.
 Read _checkpoint.md for full context.
 
-Current status: both demos live on pvm1-sqqsd52k.p1210.pok-systems.techzone.ibm.com (U3KAJZD, RHEL 10.2, key at C:\Users\029878866\Downloads\techzone-power-key.pem, reservation expires 2026-09-14). Base demo on port 3000, Farnell-tailored demo on port 3002. CE Marketplace PR open at github.ibm.com/ClientEngineering/bob/pull/231. IBM VPN required to access demos.
+Current status: Denmark VM deploying — pvm1-fso8l13k.p651.pok-systems.techzone.ibm.com (UY32QEF, RHEL 10.2,
+key at C:\Users\029878866\Downloads\techzone-power-key-denmark.pem). Danish tailoring on local branch
+denmark-2026 (not pushed). After Thursday run: git checkout main. CE Marketplace PR open at
+github.ibm.com/ClientEngineering/bob/pull/231. IBM VPN required.
 ```
