@@ -73,7 +73,7 @@ echo ""
 
 # Create virtual environment if it doesn't exist
 echo -e "${YELLOW}[4/5] Setting up Python virtual environment...${NC}"
-VENV_DIR=".passporteye-venv"
+VENV_DIR="${HOME}/.passporteye-venv"
 
 if [ ! -d "${VENV_DIR}" ]; then
     echo "Creating virtual environment..."

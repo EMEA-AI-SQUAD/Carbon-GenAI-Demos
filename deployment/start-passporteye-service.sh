@@ -13,15 +13,14 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-# Get script directory and set absolute paths
+# Canonical paths — always relative to $HOME, regardless of how this script is invoked
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(dirname "$SCRIPT_DIR")"
-WORK_DIR="$(dirname "$REPO_DIR")"
 
 # Configuration
 SERVICE_PORT=5000
-LOG_FILE="${WORK_DIR}/deployment/passporteye-service.log"
-VENV_DIR="${REPO_DIR}/.passporteye-venv"
+LOG_FILE="${HOME}/deployment/passporteye-service.log"
+VENV_DIR="${HOME}/.passporteye-venv"
 SERVICE_FILE="${REPO_DIR}/deployment/passport_service.py"
 
 echo -e "${GREEN}================================${NC}"
@@ -72,19 +71,25 @@ pm2 delete passporteye 2>/dev/null || true
 pm2 start "${VENV_DIR}/bin/python3" --name passporteye -- "${SERVICE_FILE}"
 pm2 save
 
-# Wait for service to start
+# Wait for service to start — retry for up to 20 seconds
 echo -e "${YELLOW}Waiting for service to start...${NC}"
-sleep 5
+READY=false
+for i in $(seq 1 20); do
+    sleep 1
+    if curl -s http://localhost:${SERVICE_PORT}/health > /dev/null 2>&1; then
+        READY=true
+        break
+    fi
+done
 
-# Check if service is running
-if curl -s http://localhost:${SERVICE_PORT}/health > /dev/null 2>&1; then
+if [ "$READY" = true ]; then
     echo -e "${GREEN}✓ PassportEye service is running on port ${SERVICE_PORT}${NC}"
     echo ""
     echo "Test with:  curl http://localhost:${SERVICE_PORT}/health"
     echo "View logs:  pm2 logs passporteye"
     echo "Stop:       pm2 delete passporteye"
 else
-    echo -e "${RED}✗ Service failed to start — check: pm2 logs passporteye${NC}"
+    echo -e "${RED}✗ Service failed to start after 20s — check: pm2 logs passporteye${NC}"
     exit 1
 fi
 

@@ -878,12 +878,21 @@ setup_passporteye() {
             if bash "$service_script" >> "$LOG_FILE" 2>&1; then
                 print_success "PassportEye service started on port 5000"
             else
-                print_warning "Failed to start PassportEye service (can be started manually later)"
+                # Surface the tail of the passporteye log so the failure is visible
+                print_error "PassportEye service failed to start — last log lines:"
+                tail -20 "$LOG_FILE" | grep -i "passport\|error\|fail\|warn" || true
+                print_error "Run manually: bash ~/Carbon-GenAI-Demos/deployment/start-passporteye-service.sh"
+                print_error "Then check:   pm2 logs passporteye"
+                cleanup_on_error
             fi
+        else
+            print_error "PassportEye start script not found: $service_script"
+            cleanup_on_error
         fi
     else
-        print_warning "PassportEye setup failed (optional feature)"
-        print_info "You can set it up manually later using: ./deployment/setup-passporteye.sh"
+        print_error "PassportEye setup failed — check log: $LOG_FILE"
+        print_error "Run manually: bash ~/Carbon-GenAI-Demos/deployment/setup-passporteye.sh"
+        cleanup_on_error
     fi
 }
 
