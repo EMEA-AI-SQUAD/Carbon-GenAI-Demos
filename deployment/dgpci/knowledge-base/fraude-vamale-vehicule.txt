@@ -1,0 +1,60 @@
+FRAUDE VAMALE LA IMPORTUL DE VEHICULE — GHID DE INVESTIGARE
+Sursa: DGPCI — Direcția Generală Poliție Criminalitică și Investigații
+
+=== TIPURI DE FRAUDE IDENTIFICATE ===
+
+1. SUBDECLARAREA VALORII ÎN VAMĂ
+Cea mai frecventă fraudă: importatorul declară o valoare mai mică decât 
+valoarea reală de tranzacție pentru a reduce baza de calcul a taxelor vamale.
+
+Indicatori de risc:
+- Valoare declarată semnificativ sub prețul mediu de piață pentru modelul respectiv
+- Facturi „pro forma" sau duplicate cu valori diferite
+- Prețuri de transfer intracompany nejustificate
+- Discrepanță între valoarea asigurată și valoarea declarată
+
+Penalități aplicabile:
+- Amendă: 50-100% din valoarea taxelor evazionate
+- Confiscarea vehiculului
+- Urmărire penală conform art. 270 Cod Vamal
+
+2. FALSIFICAREA DOCUMENTELOR DE ORIGINE
+Declararea unei origini false pentru a evita taxele antidumping/compensatorii.
+Exemple: vehicule fabricate în China declarate ca provenind din altă țară.
+
+Verificare origine:
+- Prefixul WMI din VIN confirmă țara de fabricație
+- Certificatul de Origine trebuie emis de Camera de Comerț din țara de fabricație
+- Sistemul TRACES/TRACES-NT pentru verificare electronică
+
+3. MODIFICAREA NUMĂRULUI VIN
+Infracțiune gravă: modificarea, ștergerea sau înlocuirea numărului de identificare.
+
+Metode de detecție:
+- Examinare fizică a zonei de ștanțare VIN (caroserie A-pillar, plăcuță bord)
+- Comparare cu VIN pe motore și cutia de viteze
+- Verificare în bazele de date internaționale EUCARIS și Interpol I-24/7
+- Identificare prin RFID pentru vehicule post-2019 (Regulamentul UE 2019/2144)
+
+=== PRAGURI DE ALERTĂ ===
+
+Valoare declarată sub aceste praguri justifică investigație suplimentară:
+- Sedan electric clasa medie (BYD Han, Nio ET5): sub 25.000 EUR
+- SUV electric compact (BYD Atto 3, MG4): sub 18.000 EUR
+- Sedan electric entry (Seres SF5, Hongqi E-QM5): sub 15.000 EUR
+
+=== BAZE DE DATE PENTRU VERIFICARE ===
+
+1. EUCARIS (European Car and Driving Licence Information System)
+   - Verificare VIN la nivel european
+   - Acces: punctele de contact naționale EUCARIS
+
+2. VINCHECKUP / CARFAX International
+   - Istoricul vehiculului la nivel global
+   - Identificare vehicule cu antecedente (accidente, furt, kilometraj manipulat)
+
+3. Baza NHTSA (SUA) și baza ICPO/Interpol
+   - Vehicule furate la nivel internațional
+
+4. Registrul de Evidență a Vehiculelor (REV) — România
+   - Înmatriculări anterioare pe teritoriul național

@@ -1,0 +1,72 @@
+PRODUCĂTORI DE VEHICULE ELECTRICE CHINEZI — REFERINȚĂ RAPIDĂ
+Sursa: DGPCI / RAR — Actualizat 2024
+
+=== PRODUCĂTORI MAJORI ȘI PREFIXE WMI ===
+
+BYD (Build Your Dreams)
+  WMI: LVVDB, LB2, LS5
+  Modele principale: Atto 3, Han, Tang, Seal, Dolphin, Seagull
+  Fabrica: Shenzhen, Changsha, Xi'an
+  Nota: BYD deține și producție în Europa (Ungaria, 2025)
+
+SAIC Motor
+  WMI: LSG, LSJ, LFP
+  Modele: MG4, MG5, MG ZS EV, Roewe (sub brandul MG în Europa)
+  Fabrica: Shanghai
+
+Geely / Zeekr / Volvo China
+  WMI: LGT, LB2, LHG
+  Modele: Geely Galaxy, Zeekr 001, Zeekr X
+  Fabrica: Hangzhou, Chengdu
+
+Nio
+  WMI: LWB
+  Modele: ET5, ET7, EL6, ES6
+  Fabrica: Hefei
+
+Xpeng (XPEV)
+  WMI: LPA
+  Modele: P7, G6, G9, X9
+  Fabrica: Guangzhou, Zhaoqing
+
+Chery Automobile
+  WMI: LVV, LS5
+  Modele: Omoda 5, Jaecoo 7, Tiggo 8
+  Fabrica: Wuhu, Anhui
+
+Great Wall Motors (Haval / ORA / Tank)
+  WMI: LGW, LS5
+  Modele: Haval H6, ORA Good Cat, Tank 300
+  Fabrica: Baoding
+
+=== CODURI AN DE FABRICAȚIE (Poziția 10 din VIN) ===
+
+Litera/cifra → An de fabricație:
+  N = 2022
+  P = 2023
+  R = 2024
+  S = 2025
+  T = 2026
+  V = 2027
+
+=== IDENTIFICARE RAPIDĂ ORIGINE VEHICUL ===
+
+Primul caracter VIN:
+  L = China, Hong Kong, Macao (toate vehiculele fabricate în China)
+  W = Germania
+  V = Franța, Spania
+  Z = Italia
+  J = Japonia
+  K = Coreea de Sud
+  1-5 = SUA
+  6 = Australia
+  9 = Brazilia
+
+Al doilea și al treilea caracter VIN (WMI):
+  LS = SAIC (Shanghai)
+  LV = VW-FAW (Changchun)
+  LB = BYD (diverse uzine)
+  LG = Geely sau Great Wall
+  LP = Xpeng
+  LW = Nio
+  LH = Honda China / Hongqi / Haval

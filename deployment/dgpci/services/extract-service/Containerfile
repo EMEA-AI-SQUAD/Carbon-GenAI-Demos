@@ -1,0 +1,36 @@
+# =============================================================================
+# DGPCI Extract Service — Containerfile
+# Replaces the private icr.io/ai-services-cicd/service-base with a public
+# UBI9 Python 3.12 image that is available for ppc64le.
+# =============================================================================
+
+FROM registry.access.redhat.com/ubi9/python-312:latest
+
+USER root
+
+# Install system dependencies needed by the Python packages
+RUN dnf install -y gcc libpq-devel && dnf clean all
+
+WORKDIR /opt/services/extract
+
+ENV PYTHONPATH=/opt/services
+ENV PYTHONUNBUFFERED=1
+
+# Install Python dependencies
+# The requirements are derived from the imports in the services/extract source
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the common library (shared across all services)
+COPY common /opt/services/common
+
+# Copy the extract service source
+COPY extract/ .
+
+# Run as non-root
+USER 1001
+
+EXPOSE 6000
+
+CMD ["python", "-m", "uvicorn", "app:app", \
+     "--host", "0.0.0.0", "--port", "6000"]

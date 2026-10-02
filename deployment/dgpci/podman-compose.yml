@@ -1,0 +1,258 @@
+# =============================================================================
+# DGPCI Romania Demo — Podman Compose Stack
+# IBM Power10 / RHEL — ppc64le
+#
+# Services:
+#   postgres          — shared DB for extract + translate services (port 5432)
+#   ollama            — LLM backend for extract, translate, and RAG (port 11434)
+#   opensearch        — vector store for RAG (port 9200)
+#   extract-service   — IBM AI Services Entity Extraction (port 6000)
+#   translate-service — IBM AI Services Translation (port 9000)
+#   rag-backend       — Our RAG-with-Notebook Flask backend (port 8080)
+#                       Used in preference to the official chatbot service,
+#                       which has extra dependencies (similarity-service,
+#                       dedicated embedding endpoint) unsuitable for a demo.
+#   carbon-ui         — Next.js Carbon demo frontend (port 3000)
+#
+# Usage:
+#   cp env.example .env          # edit passwords / model name if needed
+#   podman-compose --env-file .env up -d
+# =============================================================================
+
+version: "3.8"
+
+networks:
+  dgpci-net:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  ollama-models:
+  opensearch-data:
+  extract-cache:
+  translate-cache:
+
+services:
+
+  # ── PostgreSQL — shared by extract + translate services ──────────────────
+  postgres:
+    image: docker.io/library/postgres:16
+    container_name: postgres
+    environment:
+      POSTGRES_USER:     ${POSTGRES_USER:-dgpci}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dgpci_secret}
+      POSTGRES_DB:       ${POSTGRES_DB:-dgpci}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    ports:
+      - "5432:5432"
+    networks:
+      - dgpci-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dgpci}"]
+      interval: 10s
+      timeout: 5s
+      start_period: 30s
+      retries: 5
+    restart: unless-stopped
+
+  # ── Ollama — LLM backend (OpenAI-compatible, Granite 4.0) ───────────────
+  ollama:
+    image: ${OLLAMA_IMAGE:-icr.io/ppc64le-oss/ollama-ppc64le:v0.17.6}
+    container_name: ollama-service
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-models:/root/.ollama/models
+    networks:
+      - dgpci-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:11434/api/version || exit 1"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 5
+    restart: unless-stopped
+
+  # ── OpenSearch — vector store for RAG ───────────────────────────────────
+  opensearch:
+    image: icr.io/ppc64le-oss/opensearch-ppc64le:3.3.0
+    container_name: opensearch-service
+    environment:
+      - discovery.type=single-node
+      - OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g
+      - DISABLE_SECURITY_PLUGIN=true
+      - DISABLE_INSTALL_DEMO_CONFIG=true
+    ports:
+      - "9200:9200"
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+    networks:
+      - dgpci-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health | grep -qE '\"status\":\"(green|yellow)\"'"]
+      interval: 30s
+      timeout: 10s
+      start_period: 90s
+      retries: 6
+    restart: unless-stopped
+
+  # ── Entity Extraction Service ────────────────────────────────────────────
+  extract-service:
+    image: ${EXTRACT_IMAGE:-localhost/dgpci-extract:latest}
+    container_name: extract-service
+    build:
+      context: ./services/extract-service
+      dockerfile: Containerfile
+    environment:
+      # LLM (Ollama — OpenAI-compatible)
+      LLM_ENDPOINT:    http://ollama-service:11434
+      LLM_MODEL:       ${OLLAMA_MODEL:-granite4:latest}
+      LLM_MAX_MODEL_LEN: 32768
+      # PostgreSQL
+      POSTGRES_HOST:     postgres
+      POSTGRES_PORT:     "5432"
+      POSTGRES_DB:       extract_db
+      POSTGRES_USER:     ${POSTGRES_USER:-dgpci}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dgpci_secret}
+      # App
+      APP_LOG_LEVEL: INFO
+    ports:
+      - "6000:6000"
+    volumes:
+      - extract-cache:/var/cache/extract
+    networks:
+      - dgpci-net
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:6000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 4
+    restart: unless-stopped
+
+  # ── Translation Service ──────────────────────────────────────────────────
+  translate-service:
+    image: ${TRANSLATE_IMAGE:-localhost/dgpci-translate:latest}
+    container_name: translate-service
+    build:
+      context: ./services/translate-service
+      dockerfile: Containerfile
+    environment:
+      # LLM (Ollama — OpenAI-compatible)
+      LLM_ENDPOINT:    http://ollama-service:11434
+      LLM_MODEL:       ${OLLAMA_MODEL:-granite4:latest}
+      LLM_MAX_MODEL_LEN: 32768
+      # PostgreSQL
+      POSTGRES_HOST:     postgres
+      POSTGRES_PORT:     "5432"
+      POSTGRES_DB:       translate_db
+      POSTGRES_USER:     ${POSTGRES_USER:-dgpci}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dgpci_secret}
+      # Language allowlist — extend beyond the default english,german
+      SUPPORTED_LANGUAGES: english,german,chinese,romanian
+      # App
+      APP_LOG_LEVEL: INFO
+    ports:
+      - "9000:9000"
+    volumes:
+      - translate-cache:/var/cache/translate
+    networks:
+      - dgpci-net
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 4
+    restart: unless-stopped
+
+  # ── RAG Backend — from RAG-with-Notebook (proven on Power/RHEL) ──────────
+  # Uses our own rag-backend rather than the official chatbot service.
+  # The official chatbot requires a separate similarity-service + dedicated
+  # embedding endpoint — too many moving parts for a demo deployment.
+  rag-backend:
+    image: ${RAG_BACKEND_IMAGE:-localhost/dgpci-rag-backend:latest}
+    container_name: rag-backend
+    build:
+      # Source is staged from RAG-with-Notebook during deploy-dgpci.sh
+      context: ./services/rag-backend
+      dockerfile: Dockerfile
+    environment:
+      # OpenSearch
+      OPENSEARCH_HOST:     opensearch-service
+      OPENSEARCH_PORT:     "9200"
+      OPENSEARCH_USERNAME: admin
+      OPENSEARCH_PASSWORD: admin
+      OPENSEARCH_DB_PREFIX: dgpci
+      # Ollama replaces vLLM/llama.cpp — OpenAI-compatible on port 11434
+      OLLAMA_HOST:         ollama-service
+      OLLAMA_PORT:         "11434"
+      OLLAMA_MODEL:        ${OLLAMA_MODEL:-granite4:latest}
+      GRANITE_HOST:        ollama-service
+      GRANITE_PORT:        "11434"
+      LLAMA_HOST:          ollama-service
+      LLAMA_PORT:          "11434"
+      CORS_ORIGIN:         "*"
+    ports:
+      - "8081:8080"
+    networks:
+      - dgpci-net
+    depends_on:
+      opensearch:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 4
+    restart: unless-stopped
+
+  # ── Carbon UI Frontend ───────────────────────────────────────────────────
+  carbon-ui:
+    image: ${CARBON_UI_IMAGE:-localhost/dgpci-carbon-ui:latest}
+    container_name: dgpci-carbon-ui
+    build:
+      context: ../../carbon-ui
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV:             production
+      PORT:                 "3000"
+      # Backend service URLs (resolved within the Podman network at build/runtime)
+      EXTRACT_SERVICE_URL:  http://extract-service:6000
+      TRANSLATE_SERVICE_URL: http://translate-service:9000
+      RAG_BACKEND_URL:      http://rag-backend:8080
+    ports:
+      - "3000:3000"
+    networks:
+      - dgpci-net
+    depends_on:
+      extract-service:
+        condition: service_healthy
+      translate-service:
+        condition: service_healthy
+      rag-backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:3000 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+    restart: unless-stopped
+
+# Made with Bob

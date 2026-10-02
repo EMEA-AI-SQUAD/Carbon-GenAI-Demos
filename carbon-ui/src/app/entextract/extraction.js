@@ -1,45 +1,55 @@
-export async function runExtractionWithStreaming(values, openai_client) {
-  // 1) Build messages dynamically from the UI values
-  const messages = buildMessages(values);
+/**
+ * DGPCI Romania — Entity Extraction via IBM AI Services extract endpoint.
+ *
+ * Calls the Next.js proxy at /api/extract which forwards to the
+ * AI Services extract-service running on the LPAR (port 6000).
+ *
+ * The AI Services /v1/extract endpoint expects:
+ *   POST { "text": "...", "schema_name": "vehicle_import" }
+ * and returns:
+ *   { "data": { "extraction": { <field>: <value>, ... } }, "meta": {...}, "usage": {...} }
+ *
+ * Falls back to a simple key-for-key pass-through if the extraction field
+ * structure doesn't exactly match the expected keys (uses the same
+ * reconcileOutput logic as before so the table always renders).
+ */
+import { getExpectedKeys, parseModelJson, reconcileOutput, buildKeyLabelMap } from "./postprocess";
 
-  // 2) Create streaming completion
-  const stream = await openai_client.chat.completions.create({
-    model: "gpt-3.5-turbo", // llama.cpp ignores but field required
-    messages,
-    stream: true,
-    temperature: 0
+export async function runExtraction(values) {
+  const text = (values.free_form_text || "").trim();
+  if (!text) throw new Error("Nu există text de analizat.");
+
+  const response = await fetch('/api/extract', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      text,
+      schema_name: 'vehicle_import',
+    }),
   });
 
-  // 3) Accumulate streamed content
-  let fullText = "";
-
-  // If you want to expose incremental tokens to the UI, pass a callback
-  // (onToken) that appends chunkText to a text area or state.
-  // Example signature: onToken?: (chunkText: string) => void
-  // For now we'll just accumulate.
-  for await (const chunk of stream) {
-    const part = chunk?.choices?.[0]?.delta?.content ?? "";
-    if (part) {
-      fullText += part;
-      // onToken?.(part);
-    }
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err?.error || err?.detail || `Serviciul de extracție a returnat eroarea ${response.status}`);
   }
 
-  // 4) Parse model output (tolerant to extra prose), build expected keys, reconcile
-  const modelObj = parseModelJson(fullText);
+  const result = await response.json();
+
+  // AI Services returns: { data: { extraction: { ... } }, meta: {}, usage: {} }
+  const extraction = result?.data?.extraction ?? result?.extraction ?? result;
+
   const expected = getExpectedKeys(values);
-  const finalObj = reconcileOutput(modelObj, expected, {
+  const finalObj = reconcileOutput(extraction, expected, {
     discardExtras: true,
-    fillValue: "Data not available"
+    fillValue: "Date indisponibile",
   });
 
-  // 5) (Optional) map normalized keys back to user labels for display
   const keyLabelMap = buildKeyLabelMap(values);
-  const rows = expected.map((k) => ({
+  const rows = expected.map((k, i) => ({
+    id: String(i),
     label: keyLabelMap.get(k) || k,
-    value: finalObj[k]
+    value: finalObj[k],
   }));
 
-  return { rawText: fullText, json: finalObj, rows };
+  return { json: finalObj, rows };
 }
-``

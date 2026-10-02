@@ -1,0 +1,27 @@
+# =============================================================================
+# DGPCI Translate Service — Containerfile
+# =============================================================================
+
+FROM registry.access.redhat.com/ubi9/python-312:latest
+
+USER root
+
+RUN dnf install -y gcc libpq-devel && dnf clean all
+
+WORKDIR /opt/services/translate
+
+ENV PYTHONPATH=/opt/services
+ENV PYTHONUNBUFFERED=1
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY common /opt/services/common
+COPY translate/ .
+
+USER 1001
+
+EXPOSE 9000
+
+CMD ["python", "-m", "uvicorn", "app:app", \
+     "--host", "0.0.0.0", "--port", "9000"]

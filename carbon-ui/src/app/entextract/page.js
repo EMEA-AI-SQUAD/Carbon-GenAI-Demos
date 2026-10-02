@@ -40,29 +40,15 @@ import {
   Globe
 } from '@carbon/pictograms-react';
 import Image from 'next/image';
-import React, { useMemo, useState, useEffect } from 'react';
-import { DEFAULTS } from "./defaults";
-import { buildMessages } from "./messages";
-import { getExpectedKeys, parseModelJson, reconcileOutput, buildKeyLabelMap } from "./postprocess";
-import OpenAI from 'openai';
-import { runExtractionWithStreaming } from "./extraction";
+import React, { useState, useEffect } from 'react';
+import { DEFAULTS, DOC_OMODA_SUSPICIOUS } from "./defaults";
+import { getExpectedKeys, reconcileOutput, buildKeyLabelMap } from "./postprocess";
+import { runExtraction } from "./extraction";
 import { IT_OPS_SCENARIOS } from "./it-ops-emails";
 import { LOGISTICS_QUOTE_SCENARIO } from "./logistics-quote";
 
-const API_URL = typeof window !== 'undefined'
-  ? `http://${window.location.hostname}:3001/v1`
-  : 'http://localhost:3001/v1';
-
-const openai_client = new OpenAI({
-  baseURL: API_URL,
-  apiKey: 'sk-no-key-required',
-  dangerouslyAllowBrowser: true,
-});
-
 export default function EntityExtractionPage() {
   const [values, setValues] = useState(() => DEFAULTS);
-  const [streamedText, setStreamedText] = useState("");
-  const messages = useMemo(() => buildMessages(values), [values]);
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -134,46 +120,16 @@ export default function EntityExtractionPage() {
     setIsLoading(true);
     setErrorMsg('');
     setIsComplete(false);
-    // Track which demo tab initiated the request (0, 1, or 2)
     setProcessingTab(activeTab);
-    // Optionally clear previous results while loading:
     setExtractedRows([]);
 
-    console.log("Calling LLM...");
     try {
-      const messages = buildMessages(values); // uses your free_form_text + entities
-
-      const result = await openai_client.chat.completions.create({
-        model: "gpt-3.5-turbo", // llama.cpp ignores but field required
-        messages,
-        stream: false,
-        temperature: 0,
-      });
-
-      const text = result?.choices?.[0]?.message?.content ?? "";
-      console.log("Raw model response:", text);
-
-      // Parse + reconcile with your expected keys
-      const modelObj = parseModelJson(text);
-      const expected = getExpectedKeys(values);
-      const finalObj = reconcileOutput(modelObj, expected, {
-        discardExtras: true,
-        fillValue: "Data not available",
-      });
-
-      // Optional: map normalized keys back to original labels for display
-      const labelMap = buildKeyLabelMap(values);
-      const rows = expected.map((k, i) => ({
-        id: String(i),
-        label: labelMap.get(k) || k,
-        value: finalObj[k],
-      }));
-
+      const { rows } = await runExtraction(values);
       setExtractedRows(rows);
       setIsComplete(true);
     } catch (err) {
       console.error(err);
-      setErrorMsg(err?.message || 'Failed to contact the LLM.');
+      setErrorMsg(err?.message || 'Eroare la contactarea serviciului de extracție.');
     } finally {
       setIsLoading(false);
     }
@@ -188,7 +144,7 @@ export default function EntityExtractionPage() {
 
   // Get demo tab name for display
   const getDemoTabName = (tabIndex) => {
-    const names = ['Why IBM Power', 'Book Review', 'IT Ops Email', 'Quote Email', 'What We\'re Using'];
+    const names = ['De ce IBM Power', 'Import Vehicul', 'E-mail IT Ops', 'Ofertă Logistică', 'Tehnologie'];
     return names[tabIndex] || 'Demo';
   };
 
@@ -200,17 +156,17 @@ export default function EntityExtractionPage() {
             <a href="/">Return to main page</a>
           </BreadcrumbItem>
         </Breadcrumb>
-        <h1 className="landing-page__heading">Demonstrate using GenAI to extract entities with IBM Power</h1>
+        <h1 className="landing-page__heading">Extragere automată de entități din documente de import vehicule</h1>
       </Column>
 
       <Column lg={16} md={8} sm={4} className="landing-page__r2">
         <Tabs selectedIndex={activeTab} onChange={({ selectedIndex }) => setActiveTab(selectedIndex)}>
           <TabList className="tabs-group" aria-label="Tab navigation">
-            <Tab>Why IBM Power</Tab>
-            <Tab>Book Review</Tab>
-            <Tab>IT Ops Email</Tab>
-            <Tab>Quote Email</Tab>
-            <Tab>What We're Using</Tab>
+            <Tab>De ce IBM Power</Tab>
+            <Tab>Import Vehicul</Tab>
+            <Tab>E-mail IT Ops</Tab>
+            <Tab>Ofertă Logistică</Tab>
+            <Tab>Tehnologie</Tab>
           </TabList>
           <TabPanels>
             <TabPanel>
@@ -402,27 +358,36 @@ export default function EntityExtractionPage() {
               )}
               <Grid className="tabs-group-content">
                 <Column md={4} lg={7} sm={4} className="entity__tab-content">
-                  <h3 className="landing-page__subheading">Extract key points from unstructured text</h3>
+                  <h3 className="landing-page__subheading">Extragere structurată din declarații vamale</h3>
                   <p className="landing-page__p">
-                    In this version of the Entity Extraction demo, we will use the LLM
-                    running in this IBM Power Virtual Server to extract details about
-                    a book from the unstructured text below. You can alter the text to
-                    test getting results from different inputs. This demo comes from an
-                    example from the Granite Cafe, which you can see more about by
-                    following the link below.
+                    Serviciul IBM AI Services <strong>Entity Extraction</strong> analizează declarațiile
+                    vamale de import vehicule și extrage automat câmpurile cheie — marca, modelul, VIN-ul,
+                    valoarea declarată și importatorul. Documentul de mai jos poate fi modificat liber
+                    pentru a testa alte scenarii de import.
                   </p>
-                  <Link href="https://github.com/ibm-granite-community/granite-snack-cookbook/blob/main/recipes/Entity-Extraction/entity_extraction.ipynb">
-                    Entity Extraction from text using Granite
-                  </Link>
+                  <p className="landing-page__p">
+                    Apăsați <strong>Trimite la serviciul de extracție</strong> pentru a obține rezultatele
+                    structurate. Serviciul rulează local pe IBM Power, fără date care părăsesc rețeaua DGPCI.
+                  </p>
                 </Column>
                 <Column md={4} lg={{ span: 8, offset: 7 }} sm={4}>
-                  <Image
-                    className="landing-page__illo"
-                    src="https://assets.ibm.com/is/image/ibm/thinkstudio?$original$"
-                    alt="People Studying Books"
-                    width={500}
-                    height={208}
-                  />
+                  <Tile style={{ padding: '2rem', background: 'var(--cds-layer-02)', height: '100%' }}>
+                    <h4 style={{ marginTop: 0 }}>🚗 Scenarii de demonstrație</h4>
+                    <p style={{ fontSize: '0.875rem', marginBottom: '1rem' }}>
+                      <strong>Doc 1 — BYD Atto 3</strong> (implicit): import legitim, toate documentele prezente.
+                    </p>
+                    <p style={{ fontSize: '0.875rem', marginBottom: '1rem' }}>
+                      <strong>Doc 3 — Omoda 5</strong>: valoare declarată suspectă (6.800 EUR vs. valoare de piață ~24.000 EUR),
+                      importator înregistrat cu 3 săptămâni înainte de import.
+                    </p>
+                    <Button
+                      kind="ghost"
+                      size="sm"
+                      onClick={() => setValues(prev => ({ ...prev, free_form_text: DOC_OMODA_SUSPICIOUS }))}
+                    >
+                      Încarcă documentul Omoda 5 suspect →
+                    </Button>
+                  </Tile>
                 </Column>
 
                 <Column lg={16} md={8} sm={4} className="landing-page__tab-content" style={{ marginTop: '2rem' }}>
@@ -433,7 +398,7 @@ export default function EntityExtractionPage() {
                     disabled={isLoading}
                     style={{ marginBottom: '1rem' }}
                   >
-                    {isLoading ? 'Processing...' : '🚀 Pre-load Demo Results'}
+                    {isLoading ? 'Se procesează...' : '🚀 Pre-încarcă rezultatele demonstrației'}
                   </Button>
                   {isLoading && (
                     <InlineNotification
@@ -449,8 +414,8 @@ export default function EntityExtractionPage() {
 
                 <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
                   <p className="landing-page__p">
-                    Below is the free form text we will extract the desired information, known as entities, from.
-                    Feel free to change this text as you like, and we shall use that for the demo.
+                    Mai jos este textul declarației vamale. Îl puteți modifica liber pentru a testa
+                    extragerea cu documente diferite.
                   </p>
                   <TextArea
                     className="text-area-class"
@@ -463,8 +428,8 @@ export default function EntityExtractionPage() {
                 </Column>
                 <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
                   <p className="landing-page__p">
-                    Below are the labels and definitions that define the entities we shall extract from the text.
-                    Again, you can feel free to change these as you like, to extract other details if desired.
+                    Mai jos sunt etichetele și definițiile câmpurilor care vor fi extrase. Le puteți
+                    modifica pentru a extrage și alte informații din document.
                   </p>
                 </Column>
               </Grid>
@@ -503,7 +468,7 @@ export default function EntityExtractionPage() {
               <Grid className="tabs-group-content">
                 <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
                   <Button className="send-to-llm-class" onClick={()=>completion()} disabled={isLoading}>
-                    {isLoading ? 'Sending…' : 'Send Prompt to LLM'}
+                    {isLoading ? 'Se procesează…' : 'Trimite la serviciul de extracție'}
                   </Button>
                 </Column>
 
@@ -536,8 +501,8 @@ export default function EntityExtractionPage() {
                         <Loading description="Processing" withOverlay={false} />
                         <InlineNotification
                           kind="info"
-                          title="Processing"
-                          subtitle="Granite 4.0 is analyzing your text..."
+                          title="Procesare în curs"
+                          subtitle="IBM AI Services analizează documentul vamal..."
                           hideCloseButton
                           lowContrast
                         />
@@ -563,22 +528,22 @@ export default function EntityExtractionPage() {
                       alignItems: 'center',
                       gap: '1rem'
                     }}>
-                      <h4 style={{ margin: 0 }}>No entities extracted yet</h4>
+                      <h4 style={{ margin: 0 }}>Nu există entități extrase încă</h4>
                       <p style={{
                         color: 'var(--cds-text-secondary)',
                         maxWidth: '400px',
                         margin: 0
                       }}>
-                        Edit the text and entity definitions above, then click
-                        <strong> Send Prompt to LLM</strong> to extract structured data.
+                        Modificați textul și definițiile câmpurilor de mai sus, apoi apăsați
+                        <strong> Trimite la serviciul de extracție</strong> pentru date structurate.
                       </p>
                     </div>
                   ) : (
                     <DataTable
                       rows={extractedRows}
                       headers={[
-                        { key: 'label', header: 'Entity' },
-                        { key: 'value', header: 'Value' },
+                        { key: 'label', header: 'Câmp' },
+                        { key: 'value', header: 'Valoare extrasă' },
                       ]}
                       isSortable
                       size="sm"
@@ -588,18 +553,18 @@ export default function EntityExtractionPage() {
                         <TableContainer
                           title={
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                              <span>Extracted Entities</span>
+                              <span>Câmpuri extrase din declarație</span>
                               <AILabel size="sm">
                                 <AILabelContent>
                                   <div>
-                                    <p className="secondary">AI Generated</p>
-                                    <p className="secondary">Content extracted by Granite 4.0 LLM</p>
+                                    <p className="secondary">Generat de AI</p>
+                                    <p className="secondary">IBM AI Services — Entity Extraction</p>
                                   </div>
                                 </AILabelContent>
                               </AILabel>
                             </div>
                           }
-                          description="Entities extracted from your text using AI"
+                          description="Câmpuri extrase automat din declarația vamală"
                         >
                           <Table stickyHeader {...getTableProps()}>
                             <TableHead>
@@ -1234,33 +1199,35 @@ export default function EntityExtractionPage() {
                     Here's what makes it work:
                   </p>
 
-                  <h3 className="landing-page__label" style={{ marginTop: '2rem' }}>IBM Granite 4.0 Micro</h3>
+                  <h3 className="landing-page__label" style={{ marginTop: '2rem' }}>IBM Granite 4.2 — 8B</h3>
                   <p className="landing-page__p">
-                    Our foundation is IBM's Granite 4.0 Micro large language model, specifically designed for enterprise use cases.
-                    This model excels at entity extraction, text analysis, and structured data generation while maintaining a
-                    compact footprint suitable for on-premises deployment.
+                    Modelul de bază este IBM Granite 4.2 (8 miliarde de parametri), proiectat pentru
+                    utilizare enterprise. Suportă nativ limba chineză, română și alte 12 limbi, și
+                    excelează la extragere de entități, RAG și dialog multilingv — toate cu context
+                    de 128.000 de tokeni.
                   </p>
 
-                  <h3 className="landing-page__label" style={{ marginTop: '2rem' }}>llama.cpp Inference Engine</h3>
+                  <h3 className="landing-page__label" style={{ marginTop: '2rem' }}>IBM AI Services — AI Launchpad</h3>
                   <p className="landing-page__p">
-                    We're using llama.cpp as our inference engine, running in CPU-only mode. This is important to note:
-                    <strong> we are not using GPUs, and we are not using IBM Spyre accelerators</strong> for this demonstration.
-                    The entire inference workload runs on standard IBM Power CPU cores, demonstrating the raw computational
-                    capability of the Power architecture for AI workloads.
+                    Serviciile de extracție, traducere și RAG sunt furnizate de <strong>IBM AI Services</strong>
+                    (cunoscut anterior ca AI Launchpad), o suită de microservicii FastAPI care rulează în
+                    Podman pe RHEL. <strong>Nu se folosesc GPU-uri și nu se folosesc acceleratoare IBM Spyre</strong>
+                    — toată inferența rulează pe CPU-urile IBM Power10.
                   </p>
 
-                  <h3 className="landing-page__label" style={{ marginTop: '2rem' }}>RHEL on IBM Power</h3>
+                  <h3 className="landing-page__label" style={{ marginTop: '2rem' }}>Ollama pe RHEL / IBM Power</h3>
                   <p className="landing-page__p">
-                    Everything runs within a single Red Hat Enterprise Linux (RHEL) logical partition (LPAR) on IBM Power.
-                    The LLM server, proxy layer, and web application all coexist in the same virtual server environment,
-                    demonstrating the consolidation capabilities of IBM Power.
+                    Ollama servește modelul Granite 4.2:8b și expune un API compatibil OpenAI.
+                    Toate serviciile IBM AI Services apelează Ollama pentru inferență LLM.
+                    Stiva completă — Ollama, Extract, Translate, RAG, OpenSearch, PostgreSQL și
+                    interfața Carbon UI — rulează în același LPAR RHEL pe IBM Power.
                   </p>
 
-                  <h3 className="landing-page__label" style={{ marginTop: '2rem' }}>Modern Web Stack</h3>
+                  <h3 className="landing-page__label" style={{ marginTop: '2rem' }}>Interfață Carbon Design System</h3>
                   <p className="landing-page__p">
-                    The user interface is built with Next.js and IBM's Carbon Design System, providing a responsive and
-                    accessible experience. A Node.js proxy layer handles communication between the web frontend and the
-                    llama.cpp server, managing API requests and responses efficiently.
+                    Interfața este construită cu Next.js și IBM Carbon Design System, oferind o
+                    experiență consistentă cu produsele IBM. Rutele API Next.js acționează ca proxy
+                    server-side, astfel încât adresa LPAR-ului nu este expusă browserului.
                   </p>
                 </Column>
 
@@ -1288,23 +1255,24 @@ export default function EntityExtractionPage() {
                       </p>
                     </Tile>
 
-                    {/* Middleware Layer */}
+                    {/* AI Services Layer */}
                     <Tile style={{ width: '100%', maxWidth: '400px', textAlign: 'center', padding: '1.5rem' }}>
                       <CloudServices style={{ width: '64px', height: '64px', margin: '0 auto 1rem' }} />
-                      <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1.125rem', fontWeight: 600 }}>llama.cpp Server</h4>
+                      <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1.125rem', fontWeight: 600 }}>IBM AI Services</h4>
                       <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--cds-text-secondary)' }}>
-                        Inference Engine + Node.js Proxy<br/>
-                        <strong>Ports 8080 & 3001</strong>
+                        Extract :6000 · Translate :9000<br/>
+                        RAG :8080 · OpenSearch :9200<br/>
+                        <strong>Podman on RHEL</strong>
                       </p>
                     </Tile>
 
                     {/* AI Model Layer */}
                     <Tile style={{ width: '100%', maxWidth: '400px', textAlign: 'center', padding: '1.5rem' }}>
                       <MachineLearningModel style={{ width: '64px', height: '64px', margin: '0 auto 1rem' }} />
-                      <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1.125rem', fontWeight: 600 }}>Granite 4.0 Micro</h4>
+                      <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1.125rem', fontWeight: 600 }}>Granite 4.2:8b via Ollama</h4>
                       <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--cds-text-secondary)' }}>
-                        IBM's Enterprise LLM<br/>
-                        <strong>GGUF Format</strong>
+                        IBM Enterprise LLM — 128K context<br/>
+                        <strong>Port 11434 · CPU only</strong>
                       </p>
                     </Tile>
 

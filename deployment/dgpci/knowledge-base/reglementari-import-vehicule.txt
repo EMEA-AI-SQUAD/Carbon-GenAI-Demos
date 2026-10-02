@@ -1,0 +1,52 @@
+REGLEMENTĂRI PRIVIND IMPORTUL DE VEHICULE ÎN ROMÂNIA
+Documente necesare pentru omologarea și importul de vehicule din țări terțe
+Sursa: Registrul Auto Român (RAR) și legislația UE aplicabilă
+
+=== DOCUMENTELE OBLIGATORII LA IMPORTUL DE VEHICULE ===
+
+1. Certificatul de Conformitate UE (CoC)
+Orice vehicul importat din afara UE care urmează să fie înmatriculat în România 
+trebuie să dețină un Certificat de Conformitate UE valid, eliberat de producător.
+Pentru vehiculele de origine chineză care nu au filiale UE, importatorul trebuie 
+să obțină o omologare individuală sau o omologare națională mică serie (NSNO) 
+de la Registrul Auto Român.
+
+2. Titlul de proprietate și documentul de proveniență
+- Factura de cumpărare originală (tradusă și legalizată în limba română)
+- Documentul de export din țara de origine
+- Bill of Lading sau AWB pentru transport maritim/aerian
+
+3. Documente vamale
+- Declarația vamală de import (DAU/SAD)
+- Numărul de identificare a vehiculului (VIN) — obligatoriu pe toate documentele
+- Valoarea în vamă declarată conform Codului Vamal al UE
+
+=== TAXE ȘI IMPOZITE LA IMPORTUL DE VEHICULE ===
+
+Taxa vamală standard UE pentru vehicule de pasageri: 6,5%
+TVA aplicabil în România: 19%
+Accize: aplicabile conform legislației naționale
+
+ATENȚIE: Vehiculele electrice (BEV) din China fac obiectul unor taxe 
+compensatorii suplimentare adoptate de UE în 2024-2025. Cotele variază 
+în funcție de producător:
+- BYD: taxă compensatorie 17,0% (total: 23,5%)
+- Geely: taxă compensatorie 18,8% (total: 25,3%)  
+- SAIC: taxă compensatorie 35,3% (total: 41,8%)
+- Alți producători cooperanți: 21,3%
+- Alți producători necooperanți: 35,3%
+
+=== NUMĂRUL DE IDENTIFICARE A VEHICULULUI (VIN) ===
+
+Structura VIN pentru vehicule chineze:
+- Prefixe WMI specifice Chinei: L (urmat de două caractere — identificator producător)
+- Exemple: LBV (SAIC-VW), LSG (SAIC-GM), LFV (FAW-VW), LB2 (BYD)
+- LVVDB: BYD Auto (vehicule electrice)
+- Lungime standard: 17 caractere
+- Caracterele 10-17 identifică: an fabricație, uzina, număr de serie
+
+Semne de falsificare VIN:
+- Lungime diferită de 17 caractere
+- Caractere I, O sau Q (interzise în standard)
+- Prefixe WMI neînregistrate în baza de date internațională
+- Neconcordanță între VIN pe caroserie și VIN pe motor

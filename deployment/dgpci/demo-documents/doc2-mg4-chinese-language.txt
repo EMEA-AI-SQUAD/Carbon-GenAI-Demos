@@ -1,0 +1,38 @@
+车辆进口报关单 / VEHICLE CUSTOMS DECLARATION
+
+报关单编号 / Declaration No: CN-EXP-2024-SH-229881
+出口口岸 / Port of Export: 上海港 (Port of Shanghai)
+申报日期 / Declaration Date: 2024-08-28
+
+车辆信息 / VEHICLE INFORMATION:
+车架号 (底盘号) / Chassis No (VIN): LSGFBF2G0NH304721
+生产厂商 / Manufacturer: 上汽集团 (SAIC Motor Corporation)
+品牌 / Brand: MG
+车型 / Model: MG4 Electric (MULAN)
+车身形式 / Body Type: 5门掀背车 (5-door Hatchback)
+驱动电机型号 / Motor Model: CR130EM
+驱动电机编号 / Motor Number: CR130EM2024H445521
+电池容量 / Battery: 64 kWh NCM电池 (NCM Lithium)
+驱动方式 / Drive: 后轮驱动 (RWD)
+车身颜色 / Colour: 幻夜黑 (Fantasy Black)
+生产年份 / Year: 2024年
+原产地 / Country of Origin: 中华人民共和国上海市 (Shanghai, PRC)
+生产工厂 / Factory: 上汽乘用车临港基地 (SAIC Lingang Base)
+
+申报价值 / DECLARED VALUE:
+成交价格 / Transaction Price: CNY 136,800
+运费 / Freight: CNY 8,500
+保险费 / Insurance: CNY 1,200
+完税价格 / Customs Value: CNY 146,500
+等值欧元 / EUR Equivalent: EUR 19,050
+
+出口企业 / EXPORTER:
+企业名称 / Company: 上汽集团进出口有限公司
+统一信用代码 / Credit Code: 91310000132456789X
+地址 / Address: 上海市浦东新区博霞路50号
+
+运输信息 / TRANSPORT:
+提单号 / Bill of Lading: MSC-SHA-0824-445521
+船名 / Vessel: MSC LEANDRA
+装货港 / Loading Port: 上海洋山港 (Shanghai Yangshan Port)
+目的港 / Destination: 康斯坦察港, 罗马尼亚 (Constanta, Romania)

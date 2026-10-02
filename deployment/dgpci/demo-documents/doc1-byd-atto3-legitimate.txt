@@ -1,0 +1,37 @@
+DECLARAȚIE DE IMPORT VEHICUL / VEHICLE IMPORT DECLARATION
+
+Document No: RO-IMP-2024-04471
+Port of Entry: Constanța, România
+Date of Declaration: 2024-09-12
+
+VEHICLE DETAILS:
+Chassis Number (VIN): LVVDB21B8ND123456
+Manufacturer: BYD Auto Co., Ltd.
+Brand: BYD
+Model: Atto 3 EV (Yuan Plus)
+Body Type: SUV (5-door)
+Engine Type: Electric Motor, Permanent Magnet Synchronous
+Engine Number: BYD-EV-2023E-789012
+Battery Capacity: 60.48 kWh
+Drive: Front-Wheel Drive (FWD)
+Colour: Pearl White (Galaxy White)
+Year of Manufacture: 2023
+Country of Origin: People's Republic of China
+Factory: Changsha BYD Automobile Co., Hunan Province
+
+DECLARED VALUE:
+Transaction Value: CNY 158,000
+Equivalent EUR at customs rate: EUR 20,540
+Insurance: EUR 412
+Freight: EUR 1,800
+Customs Value (CIF): EUR 22,752
+
+IMPORTER:
+Company: SC Auto Import Romania SRL
+CUI: RO45678901
+Address: Str. Portului 14, Constanța
+
+TRANSPORT:
+Bill of Lading: COSCO-SHA-2024-887712
+Vessel: COSCO SHIPPING ARIES
+Port of Loading: Shanghai, China

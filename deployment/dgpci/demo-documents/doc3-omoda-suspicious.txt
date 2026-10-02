@@ -1,0 +1,43 @@
+VEHICLE IMPORT DECLARATION — SUSPICIOUS DOCUMENT
+[DGPCI Demo — Document with discrepancies for investigation scenario]
+
+Document No: RO-IMP-2024-08812
+Port of Entry: Constanța, România
+Date of Declaration: 2024-11-03
+
+VEHICLE DETAILS:
+Chassis Number (VIN): LVV1A2B3C4D567890
+Manufacturer: Chery Automobile Co., Ltd.
+Brand: Omoda
+Model: Omoda 5 PHEV
+Body Type: SUV Compact
+Engine Type: 1.5T + Electric Motor (PHEV)
+Engine Number: SQRE4T15-PHEV-2024-33219
+Battery Capacity: 11.3 kWh (PHEV)
+Drive: All-Wheel Drive
+Colour: Blazing Red
+Year of Manufacture: 2024
+Country of Origin: People's Republic of China
+Factory: Wuhu, Anhui Province
+
+DECLARED VALUE:
+Transaction Value: EUR 8,900
+Insurance: EUR 90
+Freight: EUR 950
+Customs Value (CIF): EUR 9,940
+
+IMPORTER:
+Company: Individual Import — Gheorghe Ionescu
+CNP: 1780514215034
+Address: Str. Mihai Viteazu 7, Pitești, Argeș
+
+TRANSPORT:
+Bill of Lading: EVGA-ODX-2024-112233
+Vessel: EVERGREEN ANDES
+Port of Loading: Ningbo, China
+
+--- DGPCI INVESTIGATOR NOTES ---
+FLAG 1: VIN 'LVV1A2B3C4D567890' contains sequential pattern — possible fabrication.
+FLAG 2: Declared value EUR 8,900 is far below market average for Omoda 5 PHEV (EUR 26,000+).
+FLAG 3: Individual importer for a new vehicle — unusual pattern.
+FLAG 4: VIN check: WMI 'LVV' registered to FAW-VW, not Chery — possible VIN swap.
