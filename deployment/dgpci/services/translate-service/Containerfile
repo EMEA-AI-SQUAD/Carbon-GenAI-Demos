@@ -1,5 +1,6 @@
 # =============================================================================
 # DGPCI Translate Service — Containerfile
+# Public UBI9 Python 3.12 image for IBM Power (ppc64le)
 # =============================================================================
 
 FROM registry.access.redhat.com/ubi9/python-312:latest
@@ -14,7 +15,7 @@ ENV PYTHONPATH=/opt/services
 ENV PYTHONUNBUFFERED=1
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt --extra-index-url https://wheels.developerfirst.ibm.com/ppc64le/linux --prefer-binary
 
 COPY common /opt/services/common
 COPY translate/ .
@@ -23,5 +24,5 @@ USER 1001
 
 EXPOSE 9000
 
-CMD ["python", "-m", "uvicorn", "app:app", \
+CMD ["python", "-m", "uvicorn", "translate.app:app", \
      "--host", "0.0.0.0", "--port", "9000"]

@@ -125,10 +125,8 @@ services:
     networks:
       - dgpci-net
     depends_on:
-      postgres:
-        condition: service_healthy
-      ollama:
-        condition: service_healthy
+      - postgres
+      - ollama-service
     healthcheck:
       test: ["CMD-SHELL", "curl -sf http://localhost:6000/health || exit 1"]
       interval: 30s
@@ -166,10 +164,8 @@ services:
     networks:
       - dgpci-net
     depends_on:
-      postgres:
-        condition: service_healthy
-      ollama:
-        condition: service_healthy
+      - postgres
+      - ollama-service
     healthcheck:
       test: ["CMD-SHELL", "curl -sf http://localhost:9000/health || exit 1"]
       interval: 30s
@@ -210,10 +206,8 @@ services:
     networks:
       - dgpci-net
     depends_on:
-      opensearch:
-        condition: service_healthy
-      ollama:
-        condition: service_healthy
+      - opensearch-service
+      - ollama-service
     healthcheck:
       test: ["CMD-SHELL", "curl -sf http://localhost:8080/health || exit 1"]
       interval: 30s
@@ -228,10 +222,13 @@ services:
     container_name: dgpci-carbon-ui
     build:
       context: ../../carbon-ui
-      dockerfile: Dockerfile
+      dockerfile: Containerfile
     environment:
       NODE_ENV:             production
       PORT:                 "3000"
+      # Ollama — called directly for entity extraction (Option C)
+      OLLAMA_URL:           http://ollama-service:11434
+      LLM_MODEL:            ${OLLAMA_MODEL:-granite4:latest}
       # Backend service URLs (resolved within the Podman network at build/runtime)
       EXTRACT_SERVICE_URL:  http://extract-service:6000
       TRANSLATE_SERVICE_URL: http://translate-service:9000
@@ -241,12 +238,9 @@ services:
     networks:
       - dgpci-net
     depends_on:
-      extract-service:
-        condition: service_healthy
-      translate-service:
-        condition: service_healthy
-      rag-backend:
-        condition: service_healthy
+      - extract-service
+      - translate-service
+      - rag-backend
     healthcheck:
       test: ["CMD-SHELL", "curl -sf http://localhost:3000 || exit 1"]
       interval: 30s

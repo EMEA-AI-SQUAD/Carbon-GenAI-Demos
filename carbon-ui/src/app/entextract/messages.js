@@ -1,5 +1,8 @@
-// Set to false if you want keys to stay exactly as user typed them.
-const NORMALIZE_KEYS = true;
+// Keep keys exactly as the user typed them so they match the Romanian labels
+// that the AI Services extract-service returns from its vehicle_import schema.
+// (NORMALIZE_KEYS=true was stripping diacritics — "Marcă"→"marc" — causing
+// every field except "Model" to come back as "Date indisponibile".)
+const NORMALIZE_KEYS = false;
 
 const toJsonKey = (s) =>
   s.trim().toLowerCase().replace(/\s+/g, "_").replace(/[^\w]/g, "");
