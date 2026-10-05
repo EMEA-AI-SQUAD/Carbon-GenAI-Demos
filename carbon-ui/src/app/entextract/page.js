@@ -26,6 +26,7 @@ import {
   Toggle,
   Tile,
   Loading,
+  Tag,
 } from '@carbon/react';
 import {
   Application,
