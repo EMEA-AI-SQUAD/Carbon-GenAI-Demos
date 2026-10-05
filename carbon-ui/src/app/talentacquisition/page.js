@@ -23,6 +23,7 @@ import {
   InlineNotification,
   Loading,
   Tile,
+  Tag,
 } from '@carbon/react';
 import {
   Application,
@@ -713,7 +714,7 @@ export default function TalentAcquisitionPage() {
                     title={
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <span>{tableTitle}</span>
-                        <Tag type="blue" size="sm">AI Generated · Content by Granite 4.0</Tag>
+                        <Tag type="blue" size="sm">AI Generated ï¿½ Content by Granite 4.0</Tag>
                       </div>
                     }
                     description={tableDescription}>

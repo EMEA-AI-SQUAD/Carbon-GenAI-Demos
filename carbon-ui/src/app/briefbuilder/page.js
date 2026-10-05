@@ -23,6 +23,7 @@ import {
   InlineNotification,
   Loading,
   Tile,
+  Tag,
 } from '@carbon/react';
 import {
   Application,
@@ -708,7 +709,7 @@ export default function BriefBuilderPage() {
               <div style={{ marginBottom: '2rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                   <h3 style={{ margin: 0 }}>{tableTitle}</h3>
-                  <Tag type="blue" size="sm">AI Generated · Content by Granite 4.0</Tag>
+                  <Tag type="blue" size="sm">AI Generated ï¿½ Content by Granite 4.0</Tag>
                 </div>
                 <p style={{ marginBottom: '1rem', color: 'var(--cds-text-secondary)' }}>
                   {tableDescription}
