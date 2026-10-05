@@ -21,8 +21,6 @@ import {
   TableCell,
   DataTableSkeleton,
   InlineNotification,
-  AILabel,
-  AILabelContent,
   Loading,
   Tag,
   Tile,
@@ -514,14 +512,7 @@ export default function ConversationIntelligencePage() {
                           title={
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                               <span>Conversation Intelligence</span>
-                              <AILabel size="sm">
-                                <AILabelContent>
-                                  <div>
-                                    <p className="secondary">AI Generated</p>
-                                    <p className="secondary">Insights by Granite 4.0</p>
-                                  </div>
-                                </AILabelContent>
-                              </AILabel>
+                              <Tag type="blue" size="sm">AI Generated · Insights by Granite 4.0</Tag>
                             </div>
                           }
                           description="Key insights extracted from conversation analysis"
@@ -772,14 +763,7 @@ export default function ConversationIntelligencePage() {
                           title={
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                               <span>Multilingual Support Intelligence</span>
-                              <AILabel size="sm">
-                                <AILabelContent>
-                                  <div>
-                                    <p className="secondary">AI Generated</p>
-                                    <p className="secondary">Insights by Granite 4.0</p>
-                                  </div>
-                                </AILabelContent>
-                              </AILabel>
+                              <Tag type="blue" size="sm">AI Generated · Insights by Granite 4.0</Tag>
                             </div>
                           }
                           description="Key insights extracted from multilingual conversation analysis"
@@ -1030,14 +1014,7 @@ export default function ConversationIntelligencePage() {
                           title={
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                               <span>Meeting Intelligence</span>
-                              <AILabel size="sm">
-                                <AILabelContent>
-                                  <div>
-                                    <p className="secondary">AI Generated</p>
-                                    <p className="secondary">Insights by Granite 4.0</p>
-                                  </div>
-                                </AILabelContent>
-                              </AILabel>
+                              <Tag type="blue" size="sm">AI Generated · Insights by Granite 4.0</Tag>
                             </div>
                           }
                           description="Key insights extracted from meeting analysis"

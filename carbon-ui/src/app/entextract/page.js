@@ -23,8 +23,6 @@ import {
   TableCell,
   DataTableSkeleton,
   InlineNotification,
-  AILabel,
-  AILabelContent,
   Toggle,
   Tile,
   Loading,
@@ -561,14 +559,7 @@ export default function EntityExtractionPage() {
                           title={
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                               <span>Câmpuri extrase din declarație</span>
-                              <AILabel size="sm">
-                                <AILabelContent>
-                                  <div>
-                                    <p className="secondary">Generat de AI</p>
-                                    <p className="secondary">IBM AI Services — Entity Extraction</p>
-                                  </div>
-                                </AILabelContent>
-                              </AILabel>
+                              <Tag type="blue" size="sm">AI · IBM AI Services</Tag>
                             </div>
                           }
                           description="Câmpuri extrase automat din declarația vamală"
@@ -887,14 +878,7 @@ export default function EntityExtractionPage() {
                           title={
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                               <span>Extracted & Translated Entities</span>
-                              <AILabel size="sm">
-                                <AILabelContent>
-                                  <div>
-                                    <p className="secondary">AI Generated</p>
-                                    <p className="secondary">Multilingual extraction by Granite 4.0</p>
-                                  </div>
-                                </AILabelContent>
-                              </AILabel>
+                              <Tag type="blue" size="sm">AI · Granite 4.0</Tag>
                             </div>
                           }
                           description={`Entities extracted from ${IT_OPS_SCENARIOS[selectedScenario].language} email and translated to English`}
@@ -1125,14 +1109,7 @@ export default function EntityExtractionPage() {
                           title={
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                               <span>Extracted Entities with Calculations</span>
-                              <AILabel size="sm">
-                                <AILabelContent>
-                                  <div>
-                                    <p className="secondary">AI Generated</p>
-                                    <p className="secondary">Extracted and calculated by Granite 4.0</p>
-                                  </div>
-                                </AILabelContent>
-                              </AILabel>
+                              <Tag type="blue" size="sm">AI · Granite 4.0</Tag>
                             </div>
                           }
                           description="Entities extracted from German text with AI-calculated dimensions"

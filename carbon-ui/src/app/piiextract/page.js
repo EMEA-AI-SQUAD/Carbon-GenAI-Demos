@@ -22,8 +22,6 @@ import {
   TableCell,
   DataTableSkeleton,
   InlineNotification,
-  AILabel,
-  AILabelContent,
   Loading,
   Tile,
   Tag,
@@ -748,14 +746,7 @@ Extraction completed in ${result.duration}s.`;
                       title={
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                           <span>Extracted PII</span>
-                          <AILabel size="sm">
-                            <AILabelContent>
-                              <div>
-                                <p className="secondary">AI Generated</p>
-                                <p className="secondary">PII identified by Granite 4.0</p>
-                              </div>
-                            </AILabelContent>
-                          </AILabel>
+                          <Tag type="blue" size="sm">AI Generated · PII identified by Granite 4.0</Tag>
                         </div>
                       }
                       description="Sensitive information extracted for redaction"
@@ -796,14 +787,7 @@ Extraction completed in ${result.duration}s.`;
                   <Tile style={{ padding: '1.5rem', height: '100%' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                       <h4 style={{ margin: 0, fontSize: '1rem' }}>Redacted Text</h4>
-                      <AILabel size="sm">
-                        <AILabelContent>
-                          <div>
-                            <p className="secondary">AI Generated</p>
-                            <p className="secondary">PII redacted by Granite 4.0</p>
-                          </div>
-                        </AILabelContent>
-                      </AILabel>
+                      <Tag type="blue" size="sm">AI Generated · PII redacted by Granite 4.0</Tag>
                     </div>
                     <p style={{
                       fontSize: '0.75rem',
@@ -1111,14 +1095,7 @@ Extraction completed in ${result.duration}s.`;
                             title={
                               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 <span>Extracted Identity Data</span>
-                                <AILabel size="sm">
-                                  <AILabelContent>
-                                    <div>
-                                      <p className="secondary">AI Generated</p>
-                                      <p className="secondary">Parsed by Granite 4.0</p>
-                                    </div>
-                                  </AILabelContent>
-                                </AILabel>
+                                <Tag type="blue" size="sm">AI Generated · Parsed by Granite 4.0</Tag>
                               </div>
                             }
                             description="Structured data for visitor registration"
@@ -1159,14 +1136,7 @@ Extraction completed in ${result.duration}s.`;
                         <Tile style={{ padding: '1.5rem', height: '100%' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                             <h4 style={{ margin: 0, fontSize: '1rem' }}>Verification Status</h4>
-                            <AILabel size="sm">
-                              <AILabelContent>
-                                <div>
-                                  <p className="secondary">AI Generated</p>
-                                  <p className="secondary">Verified by Granite 4.0</p>
-                                </div>
-                              </AILabelContent>
-                            </AILabel>
+                            <Tag type="blue" size="sm">AI Generated · Verified by Granite 4.0</Tag>
                           </div>
                           <p style={{
                             fontSize: '0.75rem',
@@ -1542,14 +1512,7 @@ Extraction completed in ${result.duration}s.`;
                             title={
                               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 <span>Personal Data Found</span>
-                                <AILabel size="sm">
-                                  <AILabelContent>
-                                    <div>
-                                      <p className="secondary">AI Generated</p>
-                                      <p className="secondary">Identified by Granite 4.0</p>
-                                    </div>
-                                  </AILabelContent>
-                                </AILabel>
+                                <Tag type="blue" size="sm">AI Generated · Identified by Granite 4.0</Tag>
                               </div>
                             }
                             description="Personal data extracted from unstructured content"
@@ -1590,14 +1553,7 @@ Extraction completed in ${result.duration}s.`;
                         <Tile style={{ padding: '1.5rem', height: '100%' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                             <h4 style={{ margin: 0, fontSize: '1rem' }}>Redacted Document</h4>
-                            <AILabel size="sm">
-                              <AILabelContent>
-                                <div>
-                                  <p className="secondary">AI Generated</p>
-                                  <p className="secondary">Personal data redacted by Granite 4.0</p>
-                                </div>
-                              </AILabelContent>
-                            </AILabel>
+                            <Tag type="blue" size="sm">AI Generated · Personal data redacted by Granite 4.0</Tag>
                           </div>
                           <p style={{
                             fontSize: '0.75rem',

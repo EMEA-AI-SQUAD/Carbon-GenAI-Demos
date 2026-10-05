@@ -21,8 +21,6 @@ import {
   TableCell,
   DataTableSkeleton,
   InlineNotification,
-  AILabel,
-  AILabelContent,
   Loading,
   Tile,
 } from '@carbon/react';
@@ -710,14 +708,7 @@ export default function BriefBuilderPage() {
               <div style={{ marginBottom: '2rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                   <h3 style={{ margin: 0 }}>{tableTitle}</h3>
-                  <AILabel size="sm">
-                    <AILabelContent>
-                      <div>
-                        <p className="secondary">AI Generated</p>
-                        <p className="secondary">Content by Granite 4.0</p>
-                      </div>
-                    </AILabelContent>
-                  </AILabel>
+                  <Tag type="blue" size="sm">AI Generated · Content by Granite 4.0</Tag>
                 </div>
                 <p style={{ marginBottom: '1rem', color: 'var(--cds-text-secondary)' }}>
                   {tableDescription}

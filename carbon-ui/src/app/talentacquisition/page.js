@@ -21,8 +21,6 @@ import {
   TableCell,
   DataTableSkeleton,
   InlineNotification,
-  AILabel,
-  AILabelContent,
   Loading,
   Tile,
 } from '@carbon/react';
@@ -715,14 +713,7 @@ export default function TalentAcquisitionPage() {
                     title={
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <span>{tableTitle}</span>
-                        <AILabel size="sm">
-                          <AILabelContent>
-                            <div>
-                              <p className="secondary">AI Generated</p>
-                              <p className="secondary">Content by Granite 4.0</p>
-                            </div>
-                          </AILabelContent>
-                        </AILabel>
+                        <Tag type="blue" size="sm">AI Generated · Content by Granite 4.0</Tag>
                       </div>
                     }
                     description={tableDescription}>
