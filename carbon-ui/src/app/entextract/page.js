@@ -46,8 +46,16 @@ import { getExpectedKeys, reconcileOutput, buildKeyLabelMap } from "./postproces
 import { runExtraction } from "./extraction";
 import { IT_OPS_SCENARIOS } from "./it-ops-emails";
 import { LOGISTICS_QUOTE_SCENARIO } from "./logistics-quote";
+import { useLang } from '../lang-context';
+
+const EETABS = {
+  ro: ['De ce IBM Power', 'Import Vehicul', 'E-mail IT Ops', 'Ofertă Logistică', 'Tehnologie'],
+  en: ['Why IBM Power', 'Vehicle Import', 'IT Ops Email',  'Logistics Quote',  'Technology'],
+};
 
 export default function EntityExtractionPage() {
+  const { lang } = useLang();
+  const tabs = EETABS[lang];
   const [values, setValues] = useState(() => DEFAULTS);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -143,30 +151,29 @@ export default function EntityExtractionPage() {
   };
 
   // Get demo tab name for display
-  const getDemoTabName = (tabIndex) => {
-    const names = ['De ce IBM Power', 'Import Vehicul', 'E-mail IT Ops', 'Ofertă Logistică', 'Tehnologie'];
-    return names[tabIndex] || 'Demo';
+  const getDemoTabName = (tabIndex) => tabs[tabIndex] || 'Demo';
+
+  const headings = {
+    ro: 'Extragere automată de entități din documente de import vehicule',
+    en: 'Automatic entity extraction from vehicle import documents',
   };
+  const breadcrumbs = { ro: 'Pagina principală', en: 'Home' };
 
   return (
     <Grid className="landing-page" fullWidth>
       <Column lg={16} md={8} sm={4} className="landing-page__banner">
         <Breadcrumb noTrailingSlash aria-label="Page navigation">
           <BreadcrumbItem>
-            <a href="/">Return to main page</a>
+            <a href="/">{breadcrumbs[lang]}</a>
           </BreadcrumbItem>
         </Breadcrumb>
-        <h1 className="landing-page__heading">Extragere automată de entități din documente de import vehicule</h1>
+        <h1 className="landing-page__heading">{headings[lang]}</h1>
       </Column>
 
       <Column lg={16} md={8} sm={4} className="landing-page__r2">
         <Tabs selectedIndex={activeTab} onChange={({ selectedIndex }) => setActiveTab(selectedIndex)}>
           <TabList className="tabs-group" aria-label="Tab navigation">
-            <Tab>De ce IBM Power</Tab>
-            <Tab>Import Vehicul</Tab>
-            <Tab>E-mail IT Ops</Tab>
-            <Tab>Ofertă Logistică</Tab>
-            <Tab>Tehnologie</Tab>
+            {tabs.map((label, i) => <Tab key={i}>{label}</Tab>)}
           </TabList>
           <TabPanels>
             <TabPanel>
