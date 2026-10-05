@@ -46,7 +46,7 @@ export default function LandingPage() {
             a 15 servicii publice esențiale (înmatriculări, permise, pașapoarte, imigrări) până în 2030,
             și a lansat o licitație de <strong>2,6 milioane EUR (PNRR)</strong> pentru un sistem AI
             conversațional pentru hub.mai.gov.ro. Această platformă demonstrează că acele capabilități
-            pot rula <strong>on-premises pe IBM Power10</strong> — date care nu părăsesc niciodată
+            pot rula <strong>on-premises pe IBM Power</strong> — date care nu părăsesc niciodată
             infrastructura MAI, fără costuri cloud per tranzacție.
           </p>
         </Tile>
@@ -63,7 +63,7 @@ export default function LandingPage() {
             <TabPanel>
               <Grid className="tabs-group-content">
                 <Column md={4} lg={7} sm={4} className="landing-page__tab-content">
-                  <h3 className="landing-page__subheading">IBM AI Services pe IBM Power10</h3>
+                  <h3 className="landing-page__subheading">IBM AI Services pe IBM Power</h3>
                   <p className="landing-page__p">
                     Platforma combină trei servicii AI din <strong>IBM AI Services (AI Launchpad)</strong>
                     cu modelul <strong>IBM Granite 4.2:8b</strong> — suport nativ pentru română și chineză,
@@ -82,7 +82,7 @@ export default function LandingPage() {
                   <Image
                     className="landing-page__illo"
                     src="https://newsroom.ibm.com/image/Power11-Launch-SocialKit_Banner.png"
-                    alt="IBM Power10"
+                    alt="IBM Power"
                     width={604}
                     height={498}
                   />
@@ -97,7 +97,7 @@ export default function LandingPage() {
                     România este strict legată de <strong>Regulamentul UE privind AI (EU AI Act)</strong>
                     și <strong>GDPR</strong>. Datele procesate rămân exclusiv în infrastructura MAI —
                     niciun document de identitate, nicio declarație vamală, nicio sesizare a cetățenilor
-                    nu ajunge la furnizori cloud externi. IBM Power10 oferă cu ordine de mărime mai puține
+                    nu ajunge la furnizori cloud externi. IBM Power oferă cu ordine de mărime mai puține
                     vulnerabilități de securitate în stratul de virtualizare față de arhitecturile x86.
                   </p>
                   <p className="landing-page__p">
