@@ -6,7 +6,7 @@
 
 ## Status
 
-**DGPCI Romania Power10 deployment FULLY OPERATIONAL on TechZone LPAR `pvm1-2ij8bu3k.p1308.pok-systems.techzone.ibm.com` (UOM7SE8, RHEL 10.2). All 7 containers healthy. Entity Extraction validated end-to-end (BYD Atto 3 — all 10 fields extracted). RAG knowledge base ingested. Carbon UI live on port 3000. Ready to demo.**
+**DGPCI Romania Power10 deployment OPERATIONAL. Carbon UI rebuilt with RO/EN language toggle, new DGPCI RAG assistant page, and ppc64le fetch fix. Entity extraction reaching LLM successfully. UI live on port 3000. One outstanding item to investigate (noted by user at end of session — new task needed).**
 
 ---
 
@@ -23,6 +23,7 @@
 | Oct 2026 (2nd) | **DGPCI Romania Deployment Setup & AI Services Diagnostics**: Official `translate-service` (`icr.io/ai-services/translate-service:v0.0.13`), `postgres`, `ollama-service`, `opensearch-service`, and `rag-backend` verified live and healthy. Diagnosed `extract-service` (v0.0.17) startup dependencies: tight coupling to vLLM's `/tokenize` endpoint and `common/retry_utils.py` dependency on `opensearchpy`. Ready to test pinning an earlier version of `extract-service` (e.g., v0.0.16) or using the direct Ollama extraction route. |
 | Oct 2026 (5th) | **Extract Service Probe Script**: Created `deployment/dgpci/try-extract.sh` — tries `extract-service:latest` (weekend fixes?), then `v0.0.16` (N-1, pre-tokenize refactor), then `localhost/dgpci-extract:latest` (our Ollama-patched build). No `-d` flag anywhere in the script to avoid hung sessions. Removed `-d` from `manage-dgpci.sh` start/restart and `deploy-dgpci.sh` up commands. |
 | Oct 2026 (5th, cont.) | **Full stack operational**: Root-caused two extract-service failures: (1) `StderrMonitor` in `common/diagnostic_logger.py` uses `os.dup2` which deadlocks uvicorn worker forks — fixed with `ENV DISABLE_CRASH_HANDLER=1` in Containerfile; (2) `/var/cache/extract` volume permission error — fixed with `RUN mkdir -p ... && chown 1001:1001` in Containerfile. Added `opensearch-py>=2.4.0` to requirements (missing vs upstream service-base). Converted LPAR from tarball to proper `git clone --branch feature/dgpci-romania`. RAG knowledge base ingested via `podman exec` Python script into OpenSearch index `dgpci_199857dcd9c701aeeec9a1c10d76444b` (collection: `dgpci-regulations`). Validated: entity extraction (BYD Atto 3 — 10/10 fields, 22s), RAG search (Romanian regulation docs retrieved). Carbon UI live on port 3000. |
+| Oct 2026 (5th, UI session) | **UI improvements**: (1) Removed all nav links from header bar — kept only "IBM EMEA AI on IBM Power Squad Demos" name. (2) Replaced all marketing "IBM Power10" refs with "IBM Power" (factual infra refs kept). (3) Added global RO/EN language toggle (EN/RO button in header) via `LangContext` — home, translate, entextract pages fully bilingual. (4) Replaced generic RFP Assistant page at `/rfpassistant` with proper DGPCI RAG assistant (bilingual, suggested questions, calls `/api/rag`). (5) Fixed 502 "fetch failed" on all API routes — replaced undici/fetch with Node.js `http.request` (ppc64le Podman hostname resolution issue). (6) Removed `AILabel`/`AILabelContent` from all pages (React error #130 on results render — component resolves to undefined with this yarn lock). Replaced with `Tag type="blue"`. (7) Added missing `Tag` import to briefbuilder, talentacquisition, entextract pages. Carbon UI `Containerfile` committed (was untracked). |
 
 ---
 
@@ -60,16 +61,27 @@
 
 ## Next steps
 
-**All services are running — the demo is ready.**
+**UI rebuilt and deployed. Entity extraction reaching LLM. One outstanding item to check (user spotted something at end of session).**
 
-Stack status (as of 2026-10-05):
-- `postgres`, `ollama-service`, `opensearch-service`, `rag-backend`, `translate-service` — Up 2+ days, healthy
-- `extract-service` — Up and healthy (fixed today)
-- `dgpci-carbon-ui` — Up, serving on port 3000
+Stack status (as of 2026-10-05 end of UI session):
+- `postgres`, `ollama-service`, `opensearch-service` — Up 3+ days, healthy
+- `extract-service` — Up, no healthcheck (started manually outside compose)
+- `translate-service`, `rag-backend` — **NOT RUNNING** (fell out of stack during UI container rebuilds — need restart)
+- `dgpci-carbon-ui` — Up, serving on port 3000 (latest image with lang toggle + ppc64le fix)
 
 Demo URL: `http://pvm1-2ij8bu3k.p1308.pok-systems.techzone.ibm.com:3000`
 
-1. **If stack needs restart** (foreground — no `-d`; use tmux/screen):
+1. **Restart translate-service and rag-backend** (they dropped out during UI rebuilds):
+   ```bash
+   cd ~/Carbon-GenAI-Demos/deployment/dgpci
+   podman start translate-service rag-backend
+   # or if containers were removed:
+   podman-compose --env-file .env up -d translate-service rag-backend
+   ```
+
+2. **Investigate the outstanding UI item** spotted by user at end of session (unknown — start new task and ask user what they saw).
+
+3. **If full stack needs restart** (foreground — no `-d`; use tmux/screen):
    ```bash
    cd ~/Carbon-GenAI-Demos/deployment/dgpci
    tmux new -s demo
@@ -116,6 +128,7 @@ Demo URL: `http://pvm1-2ij8bu3k.p1308.pok-systems.techzone.ibm.com:3000`
 | Branch | State | Purpose |
 |---|---|---|
 | `main` | Clean, in sync with GitHub | Generic reusable demo |
+| `feature/dgpci-romania` | Active — UI session commits pushed | DGPCI Romania demo |
 | `denmark-2026` | Local only, never push | Danish tailoring for Thursday session |
 
 ---
@@ -125,7 +138,7 @@ Demo URL: `http://pvm1-2ij8bu3k.p1308.pok-systems.techzone.ibm.com:3000`
 Paste this into the first message:
 
 ```
-DGPCI Romania — IBM AI Services Demo: Build & Deployment Session
+DGPCI Romania — IBM AI Services Demo: UI Testing & Fixes Session
 
 We are on branch feature/dgpci-romania of Carbon-GenAI-Demos.
 Read _checkpoint.md for full context.
@@ -134,11 +147,14 @@ TechZone LPAR details:
 - Host: pvm1-2ij8bu3k.p1308.pok-systems.techzone.ibm.com
 - User: UOM7SE8
 - Key: C:\Users\029878866\Downloads\techzone_id_rsa (password in your password manager)
-- Current LPAR state: postgres (5432), ollama-service (11434), opensearch-service (9200), rag-backend (8081), and translate-service (9000) are healthy and running.
-- ALL SERVICES RUNNING. Demo is ready on port 3000.
-- extract-service fixed (DISABLE_CRASH_HANDLER=1 + cache dir chown in Containerfile)
-- RAG knowledge base ingested (collection: dgpci-regulations)
-- NOTE: -d flag removed from all podman-compose up. Use tmux/screen to detach.
-
-The demo is live. See Next Steps in _checkpoint.md for restart / rebuild instructions if needed.
+- Current LPAR state:
+  - postgres, ollama-service, opensearch-service: healthy and running
+  - extract-service: running (no healthcheck, started manually)
+  - translate-service, rag-backend: NOT running — need restart
+  - dgpci-carbon-ui: running on port 3000 (latest image)
+- UI changes this session: RO/EN language toggle, DGPCI RAG page, ppc64le fetch fix, AILabel removal
+- Entity extraction reaching LLM successfully
+- One outstanding UI item to investigate (user spotted something — ask them what it was)
+- NOTE: do not use -d flag on podman-compose. Use nohup + redirect for background tasks.
+- NOTE: build without --no-cache to use cached yarn layer; only use --no-cache if yarn layer itself is broken.
 ```
