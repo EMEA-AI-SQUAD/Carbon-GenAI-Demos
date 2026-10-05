@@ -11,3 +11,4 @@ aiofiles>=23.2.1
 psutil>=5.9.0
 sentence-splitter>=1.4
 numpy>=1.26.0
+opensearch-py>=2.4.0

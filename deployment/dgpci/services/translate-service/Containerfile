@@ -13,12 +13,18 @@ WORKDIR /opt/services/translate
 
 ENV PYTHONPATH=/opt/services
 ENV PYTHONUNBUFFERED=1
+# Disable the StderrMonitor crash handler — same os.dup2 deadlock as extract-service
+ENV DISABLE_CRASH_HANDLER=1
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt --extra-index-url https://wheels.developerfirst.ibm.com/ppc64le/linux --prefer-binary
 
 COPY common /opt/services/common
 COPY translate/ .
+
+# Pre-create cache dir with correct ownership
+RUN mkdir -p /var/cache/translate/staging /var/cache/translate/results \
+    && chown -R 1001:1001 /var/cache/translate
 
 USER 1001
 
