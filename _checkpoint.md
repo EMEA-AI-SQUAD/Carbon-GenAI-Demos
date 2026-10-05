@@ -1,12 +1,12 @@
 # Checkpoint — Carbon GenAI IBM Power Recipe
 
-> Last updated: 2026-09-10
+> Last updated: 2026-10-05
 
 ---
 
 ## Status
 
-**CE Marketplace PR submitted. Both demos live on TechZone. Ready for tomorrow's call.**
+**DGPCI Romania Power10 deployment in progress on TechZone LPAR `pvm1-2ij8bu3k.p1308.pok-systems.techzone.ibm.com` (UOM7SE8, RHEL 10.2). Core infrastructure containers (`postgres`, `ollama-service`, `opensearch-service`, `rag-backend`) are healthy. Python ppc64le dependency fixes and Next.js Containerfile are ready locally.**
 
 ---
 
@@ -20,6 +20,8 @@
 | Sep 2026 | v2 TechZone platform (`6a7aba1916c56f06e4b1e910`) validated. RHEL 10.2 full deployment confirmed (38m 2s clean). All 4 services running. Granite 4.0 Micro LLM verified. Username handling fixed (`cecuser` → per-reservation). Barry doc updated. TechZone bug report drafted. Everything committed (`d639457`). |
 | Sep 2026 (10th) | MCP reservation tested — confirmed `userVariables` bug (empty array → `TZ-FS5200_` image not found). Manual reservation works. Bug report updated with full API comparison evidence. `.carbonvenv` purged from all git history (175 commits, both remotes). `.gitattributes` added to prevent CRLF on shell scripts. New Farnell dual-deploy scripts added (`deploy-farnell-ui.sh`, `remote-launch-farnell.sh`). Both demos deployed and verified on `pvm1-sqqsd52k.p1210.pok-systems.techzone.ibm.com` (U3KAJZD, RHEL 10.2, reservation `6aa286be`, expires 2026-09-14). All 5 ports confirmed live. |
 | Sep 2026 (10th, cont.) | All use case counts corrected to 18 across all docs. CE Marketplace PR opened: `github.ibm.com/ClientEngineering/bob/pull/231` — `Recipes/IBM-Power-GenAI/` with `README.md` and `01-IBM-Power-GenAI.md`. |
+| Oct 2026 (2nd) | **DGPCI Romania Deployment Setup & AI Services Diagnostics**: Official `translate-service` (`icr.io/ai-services/translate-service:v0.0.13`), `postgres`, `ollama-service`, `opensearch-service`, and `rag-backend` verified live and healthy. Diagnosed `extract-service` (v0.0.17) startup dependencies: tight coupling to vLLM's `/tokenize` endpoint and `common/retry_utils.py` dependency on `opensearchpy`. Ready to test pinning an earlier version of `extract-service` (e.g., v0.0.16) or using the direct Ollama extraction route. |
+| Oct 2026 (5th) | **Extract Service Probe Script**: Created `deployment/dgpci/try-extract.sh` — tries `extract-service:latest` (weekend fixes?), then `v0.0.16` (N-1, pre-tokenize refactor), then `localhost/dgpci-extract:latest` (our Ollama-patched build). No `-d` flag anywhere in the script to avoid hung sessions. Removed `-d` from `manage-dgpci.sh` start/restart and `deploy-dgpci.sh` up commands. |
 
 ---
 
@@ -57,31 +59,38 @@
 
 ## Next steps
 
-1. **Before Thursday** — deploy is running on the Denmark VM. Once complete (~38 min from start),
-   push the Danish-tailored files and rebuild. You are currently on the `denmark-2026` local branch.
-   Run these scp commands from the repo root:
+1. **Resolve Extract Service** — run the probe script:
+   ```bash
+   cd ~/Carbon-GenAI-Demos/deployment/dgpci
+   chmod +x try-extract.sh
+   ./try-extract.sh
    ```
-   KEY="C:\Users\029878866\Downloads\techzone-power-key-denmark.pem"
-   HOST="UY32QEF@pvm1-fso8l13k.p651.pok-systems.techzone.ibm.com"
-   BASE="carbon-ui/src/app"
-   scp -i "$KEY" $BASE/entextract/defaults.js         "$HOST:~/Carbon-GenAI-Demos/$BASE/entextract/defaults.js"
-   scp -i "$KEY" $BASE/entextract/it-ops-emails.js    "$HOST:~/Carbon-GenAI-Demos/$BASE/entextract/it-ops-emails.js"
-   scp -i "$KEY" $BASE/entextract/logistics-quote.js  "$HOST:~/Carbon-GenAI-Demos/$BASE/entextract/logistics-quote.js"
-   scp -i "$KEY" $BASE/convintel/defaults.js           "$HOST:~/Carbon-GenAI-Demos/$BASE/convintel/defaults.js"
-   scp -i "$KEY" $BASE/home/page.js                    "$HOST:~/Carbon-GenAI-Demos/$BASE/home/page.js"
-   ssh -i "$KEY" "$HOST" "cd ~/Carbon-GenAI-Demos/carbon-ui && yarn build && pm2 restart nextjs-app"
-   ```
-   Demo at: `http://pvm1-fso8l13k.p651.pok-systems.techzone.ibm.com:3000` (IBM VPN required)
+   The script tries three images in order and leaves the winner running on port 6000:
+   - `icr.io/ai-services/extract-service:latest` (newest upstream — may have weekend fixes)
+   - `icr.io/ai-services/extract-service:v0.0.16` (N-1 — pre-tokenize refactor)
+   - `localhost/dgpci-extract:latest` (our Ollama-patched local build — proven fallback)
 
-2. **After Thursday** — return local working copy to the generic demo:
+   On success, the winner is written to `.extract-winner`. Update `.env`:
    ```
-   git checkout main
+   EXTRACT_IMAGE=<winner tag>
    ```
-   The `denmark-2026` branch is preserved locally. See [`TAILORING.md`](TAILORING.md) for the full pattern.
 
-3. **CE Marketplace PR** — awaiting review: `github.ibm.com/ClientEngineering/bob/pull/231`
+2. **Start the full stack** (foreground — no `-d` to avoid hung sessions):
+   ```bash
+   ./manage-dgpci.sh start
+   ```
+   Use a `tmux` or `screen` session if you want to detach safely.
 
-4. **Send TechZone bug report** (optional / when time allows) — copy [`TECHZONE-BUG-REPORT.md`](TECHZONE-BUG-REPORT.md) to `techzone.help@ibm.com`
+3. **Initialize Schema & Knowledge Base**:
+   ```bash
+   chmod +x ./init-schema.sh ./ingest-regulations.sh
+   ./init-schema.sh
+   ./ingest-regulations.sh
+   ```
+4. **Verify Demo Scenarios**:
+   - Test Entity Extraction (`/entextract`) with BYD Atto 3 and Omoda 5.
+   - Test Document Translation (`/translate`) Chinese → Romanian.
+   - Test Assistant (`/rag`) for regulation queries.
 
 ---
 
@@ -99,11 +108,22 @@
 Paste this into the first message:
 
 ```
-We are working on the Carbon GenAI IBM Power recipe for the CE Marketplace.
+DGPCI Romania — IBM AI Services Demo: Build & Deployment Session
+
+We are on branch feature/dgpci-romania of Carbon-GenAI-Demos.
 Read _checkpoint.md for full context.
 
-Current status: Denmark VM deploying — pvm1-fso8l13k.p651.pok-systems.techzone.ibm.com (UY32QEF, RHEL 10.2,
-key at C:\Users\029878866\Downloads\techzone-power-key-denmark.pem). Danish tailoring on local branch
-denmark-2026 (not pushed). After Thursday run: git checkout main. CE Marketplace PR open at
-github.ibm.com/ClientEngineering/bob/pull/231. IBM VPN required.
+TechZone LPAR details:
+- Host: pvm1-2ij8bu3k.p1308.pok-systems.techzone.ibm.com
+- User: UOM7SE8
+- Key: C:\Users\029878866\Downloads\techzone_id_rsa (password in your password manager)
+- Current LPAR state: postgres (5432), ollama-service (11434), opensearch-service (9200), rag-backend (8081), and translate-service (9000) are healthy and running.
+- Extract service: run ./try-extract.sh — tries latest, v0.0.16, then local Ollama-patched build.
+- NOTE: -d flag has been removed from all podman-compose up calls. Use tmux/screen to detach safely.
+
+Please continue directly from step 1 of Next Steps in _checkpoint.md:
+1. Run ./try-extract.sh to find a working extract-service image
+2. Start full stack: ./manage-dgpci.sh start  (in tmux/screen)
+3. Run ./init-schema.sh and ./ingest-regulations.sh
+4. Validate the three demo scenarios (BYD clean import, MG4 translation, Omoda 5 anomaly)
 ```

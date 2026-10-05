@@ -1,7 +1,6 @@
 # =============================================================================
 # DGPCI Extract Service — Containerfile
-# Replaces the private icr.io/ai-services-cicd/service-base with a public
-# UBI9 Python 3.12 image that is available for ppc64le.
+# Public UBI9 Python 3.12 image for IBM Power (ppc64le)
 # =============================================================================
 
 FROM registry.access.redhat.com/ubi9/python-312:latest
@@ -15,22 +14,26 @@ WORKDIR /opt/services/extract
 
 ENV PYTHONPATH=/opt/services
 ENV PYTHONUNBUFFERED=1
+# Disable the StderrMonitor crash handler — it redirects stderr via os.dup2
+# which is incompatible with uvicorn's multi-worker fork model and causes
+# workers to block silently on their first stderr write, timing out with exit 0.
+ENV DISABLE_CRASH_HANDLER=1
 
-# Install Python dependencies
-# The requirements are derived from the imports in the services/extract source
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt --extra-index-url https://wheels.developerfirst.ibm.com/ppc64le/linux --prefer-binary
 
-# Copy the common library (shared across all services)
 COPY common /opt/services/common
-
-# Copy the extract service source
 COPY extract/ .
 
-# Run as non-root
+# Pre-create the cache directory with correct ownership so user 1001 can write
+# to it at runtime without needing root.  Must be done after COPY so the dir
+# is part of the image layer rather than relying on a volume chown at deploy time.
+RUN mkdir -p /var/cache/extract/staging /var/cache/extract/results \
+    && chown -R 1001:1001 /var/cache/extract
+
 USER 1001
 
 EXPOSE 6000
 
-CMD ["python", "-m", "uvicorn", "app:app", \
+CMD ["python", "-m", "uvicorn", "extract.app:app", \
      "--host", "0.0.0.0", "--port", "6000"]

@@ -77,6 +77,8 @@ else
 fi
 ok "Pre-flight complete"
 
+export PATH="${HOME}/.local/bin:${PATH}"
+
 # ── Install Podman ────────────────────────────────────────────────────────
 step "Installing Podman and podman-compose"
 
@@ -167,6 +169,32 @@ else
     warn "translate/settings.py not found — skipping patch (env var will handle it)"
 fi
 
+# Patch common/lang_utils.py to avoid hard import of spacy
+for ctx in "${EXTRACT_CTX}" "${TRANSLATE_CTX}"; do
+    LANG_UTILS="${ctx}/common/lang_utils.py"
+    if [[ -f "${LANG_UTILS}" ]]; then
+        sed -i 's/^import spacy/# import spacy/' "${LANG_UTILS}" 2>/dev/null || true
+        sed -i 's/^from spacy.language import/# from spacy.language import/' "${LANG_UTILS}" 2>/dev/null || true
+    fi
+done
+
+# Patch extract/utils/schema.py _tokenize to fall back gracefully on Ollama
+# Patch extract/utils/schema.py _tokenize to fall back gracefully on Ollama
+EXTRACT_SCHEMA_UTIL="${EXTRACT_CTX}/extract/utils/schema.py"
+if [[ -f "${EXTRACT_SCHEMA_UTIL}" ]]; then
+    sed -i 's/from common.llm_utils import tokenize_with_llm/return max(1, len(text) \/\/ 4) # /' "${EXTRACT_SCHEMA_UTIL}" 2>/dev/null || true
+fi
+if [[ -f "${EXTRACT_SCHEMA_UTIL}" ]]; then
+    sed -i 's/from common.llm_utils import tokenize_with_llm/return max(1, len(text) \/\/ 4) # /' "${EXTRACT_SCHEMA_UTIL}" 2>/dev/null || true
+fi
+for ctx in "${EXTRACT_CTX}" "${TRANSLATE_CTX}"; do
+    LANG_UTILS="${ctx}/common/lang_utils.py"
+    if [[ -f "${LANG_UTILS}" ]]; then
+        sed -i 's/^import spacy/# import spacy/' "${LANG_UTILS}" 2>/dev/null || true
+        sed -i 's/^from spacy.language import/# from spacy.language import/' "${LANG_UTILS}" 2>/dev/null || true
+    fi
+done
+
 # Patch translate/app.py lingua language detector setup to include Chinese + Romanian
 TRANSLATE_APP="${TRANSLATE_CTX}/translate/app.py"
 if [[ -f "${TRANSLATE_APP}" ]]; then
@@ -206,6 +234,7 @@ ok "rag-backend image built"
 
 info "Building carbon-ui (Next.js build — ~4 min)…"
 podman build \
+    -f "${REPO_ROOT}/carbon-ui/Containerfile" \
     --tag localhost/dgpci-carbon-ui:latest \
     "${REPO_ROOT}/carbon-ui" \
     2>&1 | tee -a "${LOG_FILE}"
@@ -214,7 +243,9 @@ ok "carbon-ui image built"
 # ── Start all services ────────────────────────────────────────────────────
 step "Starting full stack"
 cd "${SCRIPT_DIR}"
-podman-compose --env-file .env up -d 2>&1 | tee -a "${LOG_FILE}"
+# No -d flag: foreground so a failed startup does not leave this session hung.
+# podman-compose will stream logs here; Ctrl-C is safe.
+podman-compose --env-file .env up 2>&1 | tee -a "${LOG_FILE}"
 
 # Pull Granite model into Ollama (non-blocking — runs in background after stack starts)
 OLLAMA_MODEL=$(grep -E '^OLLAMA_MODEL=' "${SCRIPT_DIR}/.env" | cut -d= -f2 | tr -d '"' || echo "granite4:latest")

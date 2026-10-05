@@ -6,13 +6,17 @@ CMD="${1:-status}"
 
 case "${CMD}" in
   start)
-    podman-compose --env-file "${SCRIPT_DIR}/.env" -f "${SCRIPT_DIR}/podman-compose.yml" up -d
+    # No -d flag: run in foreground so that a failed startup does not leave the
+    # session hung waiting on a detach that never returns.
+    # Use Ctrl-C to interrupt; or run in a tmux/screen session for persistence.
+    podman-compose --env-file "${SCRIPT_DIR}/.env" -f "${SCRIPT_DIR}/podman-compose.yml" up
     ;;
   stop)
     podman-compose --env-file "${SCRIPT_DIR}/.env" -f "${SCRIPT_DIR}/podman-compose.yml" down
     ;;
   restart)
-    podman-compose --env-file "${SCRIPT_DIR}/.env" -f "${SCRIPT_DIR}/podman-compose.yml" restart
+    podman-compose --env-file "${SCRIPT_DIR}/.env" -f "${SCRIPT_DIR}/podman-compose.yml" down
+    podman-compose --env-file "${SCRIPT_DIR}/.env" -f "${SCRIPT_DIR}/podman-compose.yml" up
     ;;
   status)
     echo "=== DGPCI Demo Stack Status ==="
