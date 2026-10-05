@@ -6,7 +6,7 @@
 
 ## Status
 
-**DGPCI Romania Power10 deployment in progress on TechZone LPAR `pvm1-2ij8bu3k.p1308.pok-systems.techzone.ibm.com` (UOM7SE8, RHEL 10.2). Core infrastructure containers (`postgres`, `ollama-service`, `opensearch-service`, `rag-backend`) are healthy. Python ppc64le dependency fixes and Next.js Containerfile are ready locally.**
+**DGPCI Romania Power10 deployment FULLY OPERATIONAL on TechZone LPAR `pvm1-2ij8bu3k.p1308.pok-systems.techzone.ibm.com` (UOM7SE8, RHEL 10.2). All 7 containers healthy. Entity Extraction validated end-to-end (BYD Atto 3 — all 10 fields extracted). RAG knowledge base ingested. Carbon UI live on port 3000. Ready to demo.**
 
 ---
 
@@ -22,6 +22,7 @@
 | Sep 2026 (10th, cont.) | All use case counts corrected to 18 across all docs. CE Marketplace PR opened: `github.ibm.com/ClientEngineering/bob/pull/231` — `Recipes/IBM-Power-GenAI/` with `README.md` and `01-IBM-Power-GenAI.md`. |
 | Oct 2026 (2nd) | **DGPCI Romania Deployment Setup & AI Services Diagnostics**: Official `translate-service` (`icr.io/ai-services/translate-service:v0.0.13`), `postgres`, `ollama-service`, `opensearch-service`, and `rag-backend` verified live and healthy. Diagnosed `extract-service` (v0.0.17) startup dependencies: tight coupling to vLLM's `/tokenize` endpoint and `common/retry_utils.py` dependency on `opensearchpy`. Ready to test pinning an earlier version of `extract-service` (e.g., v0.0.16) or using the direct Ollama extraction route. |
 | Oct 2026 (5th) | **Extract Service Probe Script**: Created `deployment/dgpci/try-extract.sh` — tries `extract-service:latest` (weekend fixes?), then `v0.0.16` (N-1, pre-tokenize refactor), then `localhost/dgpci-extract:latest` (our Ollama-patched build). No `-d` flag anywhere in the script to avoid hung sessions. Removed `-d` from `manage-dgpci.sh` start/restart and `deploy-dgpci.sh` up commands. |
+| Oct 2026 (5th, cont.) | **Full stack operational**: Root-caused two extract-service failures: (1) `StderrMonitor` in `common/diagnostic_logger.py` uses `os.dup2` which deadlocks uvicorn worker forks — fixed with `ENV DISABLE_CRASH_HANDLER=1` in Containerfile; (2) `/var/cache/extract` volume permission error — fixed with `RUN mkdir -p ... && chown 1001:1001` in Containerfile. Added `opensearch-py>=2.4.0` to requirements (missing vs upstream service-base). Converted LPAR from tarball to proper `git clone --branch feature/dgpci-romania`. RAG knowledge base ingested via `podman exec` Python script into OpenSearch index `dgpci_199857dcd9c701aeeec9a1c10d76444b` (collection: `dgpci-regulations`). Validated: entity extraction (BYD Atto 3 — 10/10 fields, 22s), RAG search (Romanian regulation docs retrieved). Carbon UI live on port 3000. |
 
 ---
 
@@ -59,38 +60,54 @@
 
 ## Next steps
 
-1. **Resolve Extract Service** — run the probe script:
+**All services are running — the demo is ready.**
+
+Stack status (as of 2026-10-05):
+- `postgres`, `ollama-service`, `opensearch-service`, `rag-backend`, `translate-service` — Up 2+ days, healthy
+- `extract-service` — Up and healthy (fixed today)
+- `dgpci-carbon-ui` — Up, serving on port 3000
+
+Demo URL: `http://pvm1-2ij8bu3k.p1308.pok-systems.techzone.ibm.com:3000`
+
+1. **If stack needs restart** (foreground — no `-d`; use tmux/screen):
    ```bash
    cd ~/Carbon-GenAI-Demos/deployment/dgpci
-   chmod +x try-extract.sh
-   ./try-extract.sh
-   ```
-   The script tries three images in order and leaves the winner running on port 6000:
-   - `icr.io/ai-services/extract-service:latest` (newest upstream — may have weekend fixes)
-   - `icr.io/ai-services/extract-service:v0.0.16` (N-1 — pre-tokenize refactor)
-   - `localhost/dgpci-extract:latest` (our Ollama-patched local build — proven fallback)
-
-   On success, the winner is written to `.extract-winner`. Update `.env`:
-   ```
-   EXTRACT_IMAGE=<winner tag>
-   ```
-
-2. **Start the full stack** (foreground — no `-d` to avoid hung sessions):
-   ```bash
+   tmux new -s demo
    ./manage-dgpci.sh start
    ```
-   Use a `tmux` or `screen` session if you want to detach safely.
 
-3. **Initialize Schema & Knowledge Base**:
+2. **If extract-service needs rebuild** (e.g. after `git pull`):
    ```bash
-   chmod +x ./init-schema.sh ./ingest-regulations.sh
-   ./init-schema.sh
-   ./ingest-regulations.sh
+   cd ~/Carbon-GenAI-Demos/deployment/dgpci
+   git pull origin feature/dgpci-romania
+   # Re-stage AI services source
+   cp -r ~/project-ai-services/services/extract services/extract-service/extract
+   cp -r ~/project-ai-services/services/common  services/extract-service/common
+   podman build --tag localhost/dgpci-extract:latest services/extract-service/
+   podman rm -f extract-service
+   podman run -d --name extract-service --network dgpci_dgpci-net \
+     --env LLM_ENDPOINT=http://ollama-service:11434 --env LLM_MODEL=granite4:latest \
+     --env LLM_MAX_MODEL_LEN=32768 --env POSTGRES_HOST=postgres \
+     --env POSTGRES_PORT=5432 --env POSTGRES_DB=extract_db \
+     --env POSTGRES_USER=dgpci --env POSTGRES_PASSWORD=dgpci_secret \
+     -p 6000:6000 --restart unless-stopped localhost/dgpci-extract:latest
    ```
-4. **Verify Demo Scenarios**:
-   - Test Entity Extraction (`/entextract`) with BYD Atto 3 and Omoda 5.
-   - Test Document Translation (`/translate`) Chinese → Romanian.
-   - Test Assistant (`/rag`) for regulation queries.
+
+3. **If RAG knowledge base needs re-ingesting**:
+   ```bash
+   # Copy kb files and ingest script into container
+   podman cp deployment/dgpci/knowledge-base/fraude-vamale-vehicule.txt rag-backend:/tmp/
+   podman cp deployment/dgpci/knowledge-base/producatori-vehicule-chineze.txt rag-backend:/tmp/
+   podman cp deployment/dgpci/knowledge-base/reglementari-import-vehicule.txt rag-backend:/tmp/
+   podman cp deployment/dgpci/ingest_kb.py rag-backend:/tmp/
+   podman exec rag-backend python3 /tmp/ingest_kb.py
+   ```
+   RAG collection name: `dgpci-regulations`, index: `dgpci_199857dcd9c701aeeec9a1c10d76444b`
+
+4. **Demo scenarios to validate**:
+   - Entity Extraction (`/entextract`): paste `doc1-byd-atto3-legitimate.txt` → expect 10 fields extracted ✅
+   - Translation (`/translate`): paste `doc2-mg4-chinese-language.txt` → Chinese → Romanian
+   - RAG (`/rag` or `/rfpassistant`): ask *"Ce documente sunt necesare la importul unui vehicul din China?"* → regulation answer
 
 ---
 
@@ -118,12 +135,10 @@ TechZone LPAR details:
 - User: UOM7SE8
 - Key: C:\Users\029878866\Downloads\techzone_id_rsa (password in your password manager)
 - Current LPAR state: postgres (5432), ollama-service (11434), opensearch-service (9200), rag-backend (8081), and translate-service (9000) are healthy and running.
-- Extract service: run ./try-extract.sh — tries latest, v0.0.16, then local Ollama-patched build.
-- NOTE: -d flag has been removed from all podman-compose up calls. Use tmux/screen to detach safely.
+- ALL SERVICES RUNNING. Demo is ready on port 3000.
+- extract-service fixed (DISABLE_CRASH_HANDLER=1 + cache dir chown in Containerfile)
+- RAG knowledge base ingested (collection: dgpci-regulations)
+- NOTE: -d flag removed from all podman-compose up. Use tmux/screen to detach.
 
-Please continue directly from step 1 of Next Steps in _checkpoint.md:
-1. Run ./try-extract.sh to find a working extract-service image
-2. Start full stack: ./manage-dgpci.sh start  (in tmux/screen)
-3. Run ./init-schema.sh and ./ingest-regulations.sh
-4. Validate the three demo scenarios (BYD clean import, MG4 translation, Omoda 5 anomaly)
+The demo is live. See Next Steps in _checkpoint.md for restart / rebuild instructions if needed.
 ```
