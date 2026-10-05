@@ -1,0 +1,42 @@
+# =============================================================================
+# Carbon UI Next.js Frontend — Containerfile
+# Multi-stage build for IBM Power10 ppc64le
+# =============================================================================
+
+FROM registry.access.redhat.com/ubi9/nodejs-20:latest AS builder
+
+USER root
+WORKDIR /app
+
+RUN npm install -g yarn
+
+COPY package.json yarn.lock ./
+RUN yarn install --ignore-engines
+
+COPY . .
+
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+
+RUN yarn build
+
+FROM registry.access.redhat.com/ubi9/nodejs-20-minimal:latest AS runner
+
+USER root
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV NEXT_TELEMETRY_DISABLED=1
+
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/src ./src
+
+USER 1001
+
+EXPOSE 3000
+
+CMD ["npm", "start"]
