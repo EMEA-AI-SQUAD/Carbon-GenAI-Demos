@@ -7,8 +7,6 @@ import {
   Column,
   TextArea,
   InlineNotification,
-  AILabel,
-  AILabelContent,
   Tile,
   Loading,
   Tag,
@@ -168,15 +166,7 @@ export default function TranslatePage() {
           <Translate size={20} />
           <h3 style={{ margin: 0 }}>{t.targetLabel}</h3>
           {translatedText && (
-            <AILabel size="sm">
-              <AILabelContent>
-                <div>
-                  <p className="secondary">{t.aiGenerated}</p>
-                  <p className="secondary">IBM AI Services — Translation</p>
-                  <p className="secondary">Model: Granite 4.2:8b · IBM Power10</p>
-                </div>
-              </AILabelContent>
-            </AILabel>
+            <Tag type="blue" size="sm">{t.aiGenerated} · IBM AI Services Translation · Granite 4.2:8b</Tag>
           )}
         </div>
         <TextArea id="translated-text" labelText="" value={translatedText} readOnly

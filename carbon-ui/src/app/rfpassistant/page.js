@@ -7,13 +7,11 @@ import {
   Column,
   TextArea,
   InlineNotification,
-  AILabel,
-  AILabelContent,
   Tile,
   Loading,
   Tag,
 } from '@carbon/react';
-import { Chat, DocumentBlank } from '@carbon/icons-react';
+import { Chat } from '@carbon/icons-react';
 import React, { useState, useRef } from 'react';
 import { useLang } from '../lang-context';
 
@@ -116,7 +114,7 @@ export default function RagAssistantPage() {
     }
   }
 
-  function useSuggested(q) {
+  function handleSuggested(q) {
     setQuestion(q);
     handleAsk(q);
   }
@@ -144,7 +142,7 @@ export default function RagAssistantPage() {
         </p>
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
           {suggested.map((q, i) => (
-            <Button key={i} kind="tertiary" size="sm" onClick={() => useSuggested(q)}
+            <Button key={i} kind="tertiary" size="sm" onClick={() => handleSuggested(q)}
               style={{ textAlign: 'left', whiteSpace: 'normal', height: 'auto', padding: '0.5rem 1rem' }}>
               {q}
             </Button>
@@ -183,15 +181,7 @@ export default function RagAssistantPage() {
             <Chat size={20} />
             <h3 style={{ margin: 0 }}>{t.answerLabel}</h3>
             {answer && (
-              <AILabel size="sm">
-                <AILabelContent>
-                  <div>
-                    <p className="secondary">{t.aiGenerated}</p>
-                    <p className="secondary">IBM AI Services — RAG</p>
-                    <p className="secondary">Model: Granite 4.2:8b · IBM Power10</p>
-                  </div>
-                </AILabelContent>
-              </AILabel>
+              <Tag type="blue" size="sm">{t.aiGenerated} · IBM AI Services RAG · Granite 4.2:8b</Tag>
             )}
           </div>
           {isLoading
