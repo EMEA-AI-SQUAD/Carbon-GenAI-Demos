@@ -27,4 +27,5 @@ if (-not (Test-Path $SCRIPT)) {
 
 # Pipe the bash script to the remote shell.
 # ssh -tt allocates a pseudo-TTY so the password prompt works interactively.
-Get-Content $SCRIPT -Raw | ssh -o StrictHostKeyChecking=accept-new -tt "${LPAR_USER}@${LPAR_HOST}" "bash -s"
+$sshTarget = "${LPAR_USER}@${LPAR_HOST}"
+Get-Content $SCRIPT -Raw | ssh -o StrictHostKeyChecking=accept-new -tt $sshTarget 'bash -s'
