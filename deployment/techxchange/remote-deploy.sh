@@ -57,18 +57,34 @@ fi
 dnf install -y $DNF_OPTS llvm-toolset 2>/dev/null \
     || warn "llvm-toolset not found -- cmake will use gcc"
 
-# Node.js -- need v18+ for Next.js 14; v16 is too old
+# Node.js -- @carbon/themes >= 11.82 requires Node >=22
+# Always install Node 22 from the module stream, even if an older version exists
 NODE_MAJOR=0
 if command -v node >/dev/null 2>&1; then
     NODE_MAJOR=$(node --version | sed 's/v//' | cut -d. -f1)
 fi
-if [ "${NODE_MAJOR}" -ge 18 ] 2>/dev/null; then
+if [ "${NODE_MAJOR}" -ge 22 ] 2>/dev/null; then
     ok "Node sufficient: $(node --version)"
 else
-    warn "Node v${NODE_MAJOR} too old or missing -- upgrading to Node 20"
+    warn "Node v${NODE_MAJOR} -- need >=22 for @carbon/themes; installing Node 22"
+    # Reset any existing stream, then enable 22
     dnf module reset  -y nodejs $DNF_OPTS 2>/dev/null || true
-    dnf module enable -y nodejs:20 $DNF_OPTS 2>/dev/null || true
-    dnf install -y $DNF_OPTS nodejs npm
+    # AlmaLinux 9 AppStream ships nodejs:22 in newer releases
+    if dnf module enable -y nodejs:22 $DNF_OPTS 2>/dev/null; then
+        dnf install -y $DNF_OPTS nodejs npm
+    else
+        # Fall back: install via NodeSource if module stream lacks 22
+        warn "nodejs:22 module not found -- trying NodeSource RPM"
+        curl -fsSL https://rpm.nodesource.com/setup_22.x | bash - 2>/dev/null \
+            || { warn "NodeSource unavailable -- installing nvm instead"; \
+                 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash; \
+                 export NVM_DIR="$HOME/.nvm"; \
+                 [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"; \
+                 nvm install 22; \
+                 nvm use 22; \
+                 nvm alias default 22; }
+        command -v node >/dev/null 2>&1 && dnf install -y $DNF_OPTS nodejs npm 2>/dev/null || true
+    fi
     ok "Node $(node --version)"
 fi
 
@@ -98,8 +114,10 @@ ok "yarn $(yarn --version)  pm2 $(pm2 --version)"
 step "[5/12] Node.js dependencies"
 cd "${WORK_DIR}/${REPO_DIR}/${APP_DIR}"
 printf '{"extends":"next/core-web-vitals","rules":{"react/no-unescaped-entities":"off"}}\n' > .eslintrc.json
-yarn
-yarn add @carbon/react@latest sass@1.63.6 @carbon/icons-react@latest @carbon/pictograms-react@latest
+# --ignore-engines: carbon/themes requires >=22; we may be on 20 if 22 unavailable
+yarn --ignore-engines
+yarn add --ignore-engines \
+    @carbon/react@latest sass@1.63.6 @carbon/icons-react@latest @carbon/pictograms-react@latest
 npm install openai@^4.104.0 cors express@^4.21.2 http-proxy-middleware@^2.0.7
 if [ -d src/llama-proxy ]; then
     cd src/llama-proxy && npm install && cd "${WORK_DIR}/${REPO_DIR}/${APP_DIR}"
@@ -109,7 +127,7 @@ ok "Dependencies installed"
 # [6] Build Next.js
 step "[6/12] Build Next.js"
 cd "${WORK_DIR}/${REPO_DIR}/${APP_DIR}"
-yarn build
+yarn --ignore-engines build
 ok "Build complete"
 
 # [7] Python venv for llama.cpp OpenBLAS
@@ -124,7 +142,7 @@ if command -v python3.12 >/dev/null 2>&1; then
     deactivate
     ok "LLM Python venv ready"
 else
-    warn "python3.12 not found -- llama.cpp will build without OpenBLAS (slower inference)"
+    warn "python3.12 not found -- llama.cpp will build without OpenBLAS (slower)"
 fi
 
 # [8] Build llama.cpp
