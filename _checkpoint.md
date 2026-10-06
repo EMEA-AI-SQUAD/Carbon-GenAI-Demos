@@ -90,6 +90,8 @@
 | Branch | State | Purpose |
 |---|---|---|
 | `main` | Clean, in sync with GitHub | Generic reusable demo |
+| `feature/lab1127-techxchange` | Active — created 2026-10-06 | TechXChange Lab 1127 — LPAR deploy + Spyre toggle |
+| `feature/dgpci-romania` | Pushed — awaiting Romanian team feedback | DGPCI Romania / RAR demo |
 | `denmark-2026` | Local only, never push | Danish tailoring for Thursday session |
 
 ---

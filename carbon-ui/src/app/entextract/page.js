@@ -28,6 +28,7 @@ import {
   Toggle,
   Tile,
   Loading,
+  Tag,
 } from '@carbon/react';
 import {
   Application,
@@ -44,22 +45,15 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { DEFAULTS } from "./defaults";
 import { buildMessages } from "./messages";
 import { getExpectedKeys, parseModelJson, reconcileOutput, buildKeyLabelMap } from "./postprocess";
-import OpenAI from 'openai';
 import { runExtractionWithStreaming } from "./extraction";
 import { IT_OPS_SCENARIOS } from "./it-ops-emails";
 import { LOGISTICS_QUOTE_SCENARIO } from "./logistics-quote";
-
-const API_URL = typeof window !== 'undefined'
-  ? `http://${window.location.hostname}:3001/v1`
-  : 'http://localhost:3001/v1';
-
-const openai_client = new OpenAI({
-  baseURL: API_URL,
-  apiKey: 'sk-no-key-required',
-  dangerouslyAllowBrowser: true,
-});
+import { useSpyre as useSpyreCtx } from '../spyre-context';
 
 export default function EntityExtractionPage() {
+  // ── Spyre toggle — reads from SpyreContext (set via header toggle) ──────
+  const { useSpyre } = useSpyreCtx();
+
   const [values, setValues] = useState(() => DEFAULTS);
   const [streamedText, setStreamedText] = useState("");
   const messages = useMemo(() => buildMessages(values), [values]);
@@ -139,19 +133,36 @@ export default function EntityExtractionPage() {
     // Optionally clear previous results while loading:
     setExtractedRows([]);
 
-    console.log("Calling LLM...");
-    try {
-      const messages = buildMessages(values); // uses your free_form_text + entities
+    // ── Backend selection ──────────────────────────────────────────────────
+    // useSpyre is read from SpyreContext (toggled in the header).
+    // We POST to /api/chat (Next.js route on port 3000) which proxies to
+    // either local llama.cpp or IBM Spyre based on the useSpyre flag.
+    const backendLabel = useSpyre ? '⚡ IBM Spyre' : 'IBM Power MMA';
+    console.log(`Calling LLM via ${backendLabel}...`);
 
-      const result = await openai_client.chat.completions.create({
-        model: "gpt-3.5-turbo", // llama.cpp ignores but field required
-        messages,
-        stream: false,
-        temperature: 0,
+    try {
+      const msgs = buildMessages(values); // uses your free_form_text + entities
+
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'gpt-3.5-turbo', // llama.cpp ignores but field required
+          messages: msgs,
+          stream: false,
+          temperature: 0,
+          useSpyre,              // consumed by /api/chat, stripped before forwarding
+        }),
       });
 
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result?.error || `HTTP ${response.status}`);
+      }
+
       const text = result?.choices?.[0]?.message?.content ?? "";
-      console.log("Raw model response:", text);
+      const backend = response.headers.get('X-LLM-Backend') || (useSpyre ? 'spyre' : 'llama');
+      console.log(`Raw model response [${backend}]:`, text);
 
       // Parse + reconcile with your expected keys
       const modelObj = parseModelJson(text);
@@ -502,9 +513,14 @@ export default function EntityExtractionPage() {
 
               <Grid className="tabs-group-content">
                 <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
-                  <Button className="send-to-llm-class" onClick={()=>completion()} disabled={isLoading}>
-                    {isLoading ? 'Sending…' : 'Send Prompt to LLM'}
-                  </Button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                    <Button className="send-to-llm-class" onClick={()=>completion()} disabled={isLoading}>
+                      {isLoading ? 'Sending…' : 'Send Prompt to LLM'}
+                    </Button>
+                    <Tag type={useSpyre ? 'green' : 'blue'} size="md">
+                      {useSpyre ? '⚡ IBM Spyre' : '🔵 IBM Power MMA'}
+                    </Tag>
+                  </div>
                 </Column>
 
                 {/* Error Display */}
@@ -831,9 +847,14 @@ export default function EntityExtractionPage() {
               {/* Submit button and results - reuse the same pattern from Book Review tab */}
               <Grid className="tabs-group-content">
                 <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
-                  <Button className="send-to-llm-class" onClick={()=>completion()} disabled={isLoading}>
-                    {isLoading ? 'Sending…' : 'Send Prompt to LLM'}
-                  </Button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                    <Button className="send-to-llm-class" onClick={()=>completion()} disabled={isLoading}>
+                      {isLoading ? 'Sending…' : 'Send Prompt to LLM'}
+                    </Button>
+                    <Tag type={useSpyre ? 'green' : 'blue'} size="md">
+                      {useSpyre ? '⚡ IBM Spyre' : '🔵 IBM Power MMA'}
+                    </Tag>
+                  </div>
                 </Column>
 
                 {/* Error Display */}
@@ -1068,9 +1089,14 @@ export default function EntityExtractionPage() {
 
               <Grid className="tabs-group-content">
                 <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
-                  <Button className="send-to-llm-class" onClick={()=>completion()} disabled={isLoading}>
-                    {isLoading ? 'Sending…' : 'Send Prompt to LLM'}
-                  </Button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                    <Button className="send-to-llm-class" onClick={()=>completion()} disabled={isLoading}>
+                      {isLoading ? 'Sending…' : 'Send Prompt to LLM'}
+                    </Button>
+                    <Tag type={useSpyre ? 'green' : 'blue'} size="md">
+                      {useSpyre ? '⚡ IBM Spyre' : '🔵 IBM Power MMA'}
+                    </Tag>
+                  </div>
                 </Column>
 
                 {/* Error Display */}

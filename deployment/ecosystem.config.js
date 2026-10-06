@@ -30,6 +30,12 @@ const appPort   = process.env.APP_PORT   || '3000';
 const llamaModel = process.env.LLAMA_MODEL
   || `${process.env.HOME}/models/granite-4.0-micro-Q4_K_M.gguf`;
 
+// TechXChange Lab 1127 — IBM Spyre endpoint.
+// The Spyre cards are on 9.8.70.146; they expose the same llama.cpp
+// OpenAI-compatible API so no format changes are needed.
+// Override with SPYRE_URL env var if the address changes.
+const spyreUrl = process.env.SPYRE_URL || 'http://9.8.70.146:8080';
+
 module.exports = {
   apps: [
     // -------------------------------------------------------------------------
@@ -96,6 +102,9 @@ module.exports = {
       env: {
         PORT: appPort,
         NODE_ENV: 'production',
+        // Spyre backend URL — read by /api/chat Next.js route
+        LLAMA_URL: `http://localhost:${llamaPort}`,
+        SPYRE_URL: spyreUrl,
       },
 
       // Restart policy — more restarts allowed since ECONNRESET should no
