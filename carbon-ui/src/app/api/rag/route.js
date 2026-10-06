@@ -3,7 +3,7 @@ import http from 'http';
 
 // Two-step RAG:
 //   1. POST /api/search on the RAG backend — retrieves relevant chunks from
-//      the DGPCI regulations knowledge base in OpenSearch.
+//      the RAR regulations knowledge base in OpenSearch.
 //   2. POST /api/chat on Ollama — generates an answer grounded in the chunks.
 //
 // The rag-backend image is the RAG-with-Notebook app. Its /api/generate endpoint
@@ -71,15 +71,15 @@ export async function POST(request) {
       : '(No relevant documents found in the knowledge base.)';
 
     const systemPrompt =
-      'You are a helpful assistant for DGPCI (Direcția Generală de Prevenire și Combatere a Infracționalității), ' +
-      'the Romanian customs investigative authority. ' +
-      'Answer questions about vehicle import regulations, customs procedures, and related Romanian/EU law. ' +
+      'You are a helpful assistant for RAR (Registrul Auto Român - Romanian Automotive Register), ' +
+      'the Romanian technical inspection and vehicle homologation authority. ' +
+      'Answer questions about vehicle homologation, import regulations, technical compliance procedures, and related Romanian/EU law. ' +
       'Base your answer strictly on the provided context. ' +
       'If the context does not contain enough information, say so clearly. ' +
       'Answer in the same language as the question.';
 
     const userPrompt =
-      `Context from the DGPCI knowledge base:\n\n${context}\n\n` +
+      `Context from the RAR knowledge base:\n\n${context}\n\n` +
       `Question: ${query}\n\n` +
       `Answer concisely and accurately based on the context above.`;
 

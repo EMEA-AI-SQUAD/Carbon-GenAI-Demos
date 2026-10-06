@@ -21,10 +21,10 @@ const T = {
     breadcrumb: 'Pagina principală',
     pageTitle: 'Traducere automată documente în limbă chineză',
     currentPage: 'Traducere documente',
-    contextTile: <>Serviciul <strong>IBM AI Services Translation</strong> traduce automat declarațiile vamale
-      și documentele tehnice din chineză în română. Documentele procesate rămân în rețeaua internă
-      DGPCI — nu ajung în niciun serviciu cloud extern. Modelul Granite 4.2:8b rulează local
-      pe IBM Power10.</>,
+    contextTile: <>Serviciul <strong>IBM AI Services Translation</strong> traduce automat declarațiile vamale,
+      omologările și documentele tehnice din chineză în română. Documentele procesate rămân în rețeaua internă
+      RAR (Registrul Auto Român) — nu ajung în niciun serviciu cloud extern. Modelul Granite 4.2:8b rulează local
+      pe IBM Power.</>,
     selectDoc: 'Selectați documentul',
     sourceLabel: 'Document sursă',
     targetLabel: 'Traducere în română',
@@ -45,9 +45,9 @@ const T = {
     pageTitle: 'Automatic translation of Chinese-language documents',
     currentPage: 'Document Translation',
     contextTile: <>The <strong>IBM AI Services Translation</strong> service automatically translates customs
-      declarations and technical documents from Chinese into Romanian. Processed documents remain within
-      the DGPCI internal network — they never reach any external cloud service. The Granite 4.2:8b model
-      runs locally on IBM Power10.</>,
+      declarations, homologation files, and technical data sheets from Chinese into Romanian. Processed documents remain within
+      the RAR (Registrul Auto Român) internal network — they never reach any external cloud service. The Granite 4.2:8b model
+      runs locally on IBM Power.</>,
     selectDoc: 'Select document',
     sourceLabel: 'Source document',
     targetLabel: 'Romanian translation',

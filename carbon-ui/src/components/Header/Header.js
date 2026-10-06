@@ -36,7 +36,7 @@ const TutorialHeader = () => {
   return (
     <HeaderContainer
       render={() => (
-        <Header aria-label="DGPCI Romania AI Demo">
+        <Header aria-label="RAR Romania AI Demo">
           <SkipToContent />
           <Link href="/" passHref legacyBehavior>
             <HeaderName prefix="IBM">EMEA AI on IBM Power Squad Demos</HeaderName>

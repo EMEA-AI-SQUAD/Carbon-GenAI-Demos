@@ -1,5 +1,5 @@
 /**
- * DGPCI Romania — Entity Extraction via direct Ollama call.
+ * RAR Romania — Entity Extraction via direct Ollama call.
  *
  * The Next.js route at /api/extract builds the LLM prompt from the UI's
  * entity labels + definitions, calls Ollama /api/chat, and returns:

@@ -1,12 +1,12 @@
 # Checkpoint — Carbon GenAI IBM Power Recipe
 
-> Last updated: 2026-10-05 (session 2)
+> Last updated: 2026-10-06
 
 ---
 
 ## Status
 
-**Full stack OPERATIONAL. All three AI demo routes (extract, translate, RAG) call Ollama/Granite directly — no dependency on AI Services containers for the demo flow. Passed to Romanian colleague for testing. Good stopping point.**
+**Full stack OPERATIONAL and refocused for RAR (Registrul Auto Român). UI and story fully aligned with RAR vehicle homologation and CIV issuance workflows, incorporating the Hans Geis 5X / 80% time-saving ROI benchmark. All three AI demo routes (extract, translate, RAG) call Ollama/Granite directly on IBM Power.**
 
 ---
 
@@ -26,6 +26,7 @@
 | Oct 2026 (5th, UI session) | **UI improvements**: (1) Removed all nav links from header bar — kept only "IBM EMEA AI on IBM Power Squad Demos" name. (2) Replaced all marketing "IBM Power10" refs with "IBM Power" (factual infra refs kept). (3) Added global RO/EN language toggle (EN/RO button in header) via `LangContext` — home, translate, entextract pages fully bilingual. (4) Replaced generic RFP Assistant page at `/rfpassistant` with proper DGPCI RAG assistant (bilingual, suggested questions, calls `/api/rag`). (5) Fixed 502 "fetch failed" on all API routes — replaced undici/fetch with Node.js `http.request` (ppc64le Podman hostname resolution issue). (6) Removed `AILabel`/`AILabelContent` from all pages (React error #130 on results render — component resolves to undefined with this yarn lock). Replaced with `Tag type="blue"`. (7) Added missing `Tag` import to briefbuilder, talentacquisition, entextract pages. Carbon UI `Containerfile` committed (was untracked). |
 | Oct 2026 (5th, session 2) | **Extraction fix & nav**: (1) Removed IT Ops Email and Logistics Quote tabs from `/entextract` — now 3 tabs: Why IBM Power, Import Vehicul, Technology. (2) Switched `/api/extract` from AI Services `schema_name` approach to **direct Ollama `/api/chat`** (Option C). (3) Added `OLLAMA_URL` + `LLM_MODEL` env vars to `carbon-ui` in `podman-compose.yml`. (4) Added `HeaderNavigation` to header with links for Entity Extraction, Translation, RAG Assistant — bilingual RO/EN, active-page highlight. |
 | Oct 2026 (5th, session 3) | **All three routes on Ollama (Option C)**: Diagnosed `/api/translate` — AI Services translate-service crashes on `/tokenize` 404 (vLLM endpoint, not available on Ollama). Replaced with direct Ollama `/api/chat` translation prompt; returns `{data:{translation,source_language}}`. Diagnosed `/api/rag` — route was calling `/query` (wrong path); RAG backend `/api/generate` is coupled to IBM Power sales-manual use case (MTM lookups, Watson intent). Fixed with two-step approach: (1) `/api/search` with `collection_name=dgpci-regulations` for retrieval, (2) Ollama `/api/chat` for generation grounded in retrieved chunks; returns `{answer,sources}`. UI rebuilt and redeployed. All three health checks green. |
+| Oct 2026 (6th) | **Refocus Demo for RAR (Registrul Auto Român)**: Aligned messaging, prompts, and UI with RAR (technical homologation authority, CIV generation) rather than DGPCI. Integrated Hans Geis case study benchmark (80% time reduction, 5X throughput speedup) on the Why IBM Power tab. Updated home page, translation page, RAG assistant prompts, and entity extraction copy with full bilingual RO/EN support. |
 
 ---
 

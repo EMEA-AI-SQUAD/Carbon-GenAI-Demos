@@ -169,134 +169,146 @@ export default function EntityExtractionPage() {
               )}
               <Grid className="tabs-group-content">
                 <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
-                  <h2 className="landing-page__subheading">Why IBM Power for Entity Extraction</h2>
-                  <p className="landing-page__p" style={{ marginTop: '2rem', marginBottom: '3rem' }}>
-                    Extracting structured information from unstructured documents with AI on IBM Power provides
-                    unique advantages for enterprise document processing, business intelligence, and operational automation.
+                  <h2 className="landing-page__subheading">
+                    {lang === 'ro'
+                      ? 'De ce IBM Power pentru RAR (Registrul Auto Român)'
+                      : 'Why IBM Power for RAR (Romanian Automotive Register)'}
+                  </h2>
+                  <p className="landing-page__p" style={{ marginTop: '1.5rem', marginBottom: '2rem' }}>
+                    {lang === 'ro'
+                      ? 'Automatizarea extragerii de date din documente tehnice și dosare de omologare cu AI pe IBM Power transformă operațiunile RAR — oferind randament crescut, securitate on-premises și eliminarea blocajelor manuale.'
+                      : 'Automating data extraction from technical documents and homologation dossiers with AI on IBM Power delivers proven business value — increasing throughput, securing vehicle data on-prem, and eliminating manual bottlenecks.'}
                   </p>
                 </Column>
 
-                {/* Benefit 1: Document Security */}
-                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
-                    <Security style={{ width: '80px', height: '80px', flexShrink: 0 }} />
-                    <div>
-                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>Secure Document Processing</h3>
-                      <p className="landing-page__p">
-                        <strong>Business documents never leave your infrastructure.</strong> Process contracts, emails, and reports without cloud exposure.
-                      </p>
-                    </div>
-                  </div>
-                </Column>
-                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
-                  <ul style={{ marginLeft: '1rem', marginTop: '1.5rem' }}>
-                    <li>Confidential contracts stay on-premises</li>
-                    <li>Proprietary information protected</li>
-                    <li>Customer data remains secure</li>
-                    <li>Compliance with document retention policies</li>
-                  </ul>
-                </Column>
-
-                {/* Benefit 2: Real-time Extraction */}
-                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
-                    <DataStorage style={{ width: '80px', height: '80px', flexShrink: 0 }} />
-                    <div>
-                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>Real-time Document Intelligence</h3>
-                      <p className="landing-page__p">
-                        Extract entities from documents as they arrive - emails, quotes, invoices - without batch processing delays.
-                      </p>
-                    </div>
-                  </div>
-                </Column>
-                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
-                  <ul style={{ marginLeft: '1rem', marginTop: '1.5rem' }}>
-                    <li>Instant processing of incoming emails</li>
-                    <li>Immediate quote and invoice analysis</li>
-                    <li>Real-time business intelligence updates</li>
-                    <li>No waiting for cloud API responses</li>
-                  </ul>
-                </Column>
-
-                {/* Benefit 3: Integrated with Business Systems */}
-                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
-                    <Enterprise style={{ width: '80px', height: '80px', flexShrink: 0 }} />
-                    <div>
-                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>Integrated Business Workflows</h3>
-                      <p className="landing-page__p">
-                        Entity extraction runs alongside ERP, CRM, and document management systems on the same platform.
-                      </p>
-                    </div>
-                  </div>
-                </Column>
-                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
-                  <ul style={{ marginLeft: '1rem', marginTop: '1.5rem' }}>
-                    <li>Direct integration with SAP, Oracle, Salesforce</li>
-                    <li>Automated data enrichment in databases</li>
-                    <li>Seamless workflow automation</li>
-                    <li>No middleware or data transformation needed</li>
-                  </ul>
-                </Column>
-
-                {/* Benefit 4: Cost-Effective at Scale */}
-                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
-                    <Globe style={{ width: '80px', height: '80px', flexShrink: 0 }} />
-                    <div>
-                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>Unlimited Document Processing</h3>
-                      <p className="landing-page__p">
-                        Process thousands of documents without per-document API costs or cloud service fees.
-                      </p>
-                    </div>
-                  </div>
-                </Column>
-                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
-                  <ul style={{ marginLeft: '1rem', marginTop: '1.5rem' }}>
-                    <li>No per-page or per-document charges</li>
-                    <li>Predictable infrastructure costs</li>
-                    <li>Process entire document archives</li>
-                    <li>No bandwidth costs for large files</li>
-                  </ul>
-                </Column>
-
-                {/* Benefit 5: Multilingual Support */}
-                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
-                    <Microservices style={{ width: '80px', height: '80px', flexShrink: 0 }} />
-                    <div>
-                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>Global Document Processing</h3>
-                      <p className="landing-page__p">
-                        Extract entities from documents in multiple languages without separate translation services.
-                      </p>
-                    </div>
-                  </div>
-                </Column>
-                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
-                  <ul style={{ marginLeft: '1rem', marginTop: '1.5rem' }}>
-                    <li>Process documents in any language</li>
-                    <li>No translation API costs</li>
-                    <li>Consistent extraction across languages</li>
-                    <li>Support for global operations</li>
-                  </ul>
-                </Column>
-
-                {/* Summary */}
+                {/* Proven ROI Banner - Hans Geis Benchmark */}
                 <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
-                  <Tile style={{ marginTop: '2rem', padding: '2rem', background: 'var(--cds-layer-02)' }}>
-                    <p style={{ margin: 0, fontSize: '1.125rem', fontStyle: 'italic', textAlign: 'center' }}>
-                      Transform unstructured business documents into actionable intelligence - securely, efficiently, and at scale -
-                      all within your existing IBM Power infrastructure.
+                  <Tile style={{
+                    background: 'var(--cds-layer-02)',
+                    padding: '1.5rem 2rem',
+                    borderLeft: '4px solid #0f62fe',
+                    marginBottom: '2rem'
+                  }}>
+                    <h3 style={{ margin: '0 0 0.5rem', fontSize: '1.25rem' }}>
+                      {lang === 'ro'
+                        ? '🏆 Rezultate validate în producție: 80% economie de timp, accelerare de 5X'
+                        : '🏆 Proven Production Benchmark: 80% Time Reduction, 5X Acceleration'}
+                    </h3>
+                    <p style={{ margin: 0, fontSize: '0.95rem', lineHeight: '1.5' }}>
+                      {lang === 'ro'
+                        ? <>Similar studiului de caz <strong>Hans Geis GmbH</strong> (unde procesarea automată a comenzilor pe IBM Power a redus timpii cu <strong>80%</strong> și a accelerat procesarea de <strong>5X</strong>), tehnicienii RAR scapă de citirea manuală a fișelor tehnice și a declarațiilor în limbi străine (ex: chineză). Datele sunt extrase și încărcate direct în baza de date națională a vehiculelor.</>
+                        : <>As proven with <strong>Hans Geis GmbH</strong> on IBM Power (where automated AI extraction cut processing times by <strong>80%</strong> and accelerated order handling by <strong>5X</strong>), RAR technicians no longer need to manually decipher foreign-language technical sheets or certificates. Extracted specs are loaded directly into the national vehicle registry.</>}
                     </p>
                   </Tile>
                 </Column>
 
+                {/* Benefit 1: Increased Throughput & Revenue */}
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '1.5rem' }}>
+                    <Globe style={{ width: '64px', height: '64px', flexShrink: 0 }} />
+                    <div>
+                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>
+                        {lang === 'ro' ? 'Creșterea capacității & veniturilor din omologări' : 'Higher Homologation Throughput & Revenue'}
+                      </h3>
+                      <p className="landing-page__p">
+                        {lang === 'ro'
+                          ? 'Deblochează cozile de omologare pentru dealeri și importatori. Fiecare dosar de omologare / CIV finalizat mai rapid crește volumul zilnic tarifabil.'
+                          : 'Clears vehicle homologation backlogs for importers and dealers. Faster file turnarounds directly increase daily fee-generating certification capacity.'}
+                      </p>
+                    </div>
+                  </div>
+                </Column>
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
+                  <ul style={{ marginLeft: '1rem', marginTop: '1rem' }}>
+                    <li>{lang === 'ro' ? 'Accelerare de 5X a prelucrării dosarelor tehnice' : '5X speedup in processing technical dossiers'}</li>
+                    <li>{lang === 'ro' ? 'Reducerea timpilor de așteptare pentru importatori' : 'Slashed waiting times at customs and inspection stations'}</li>
+                    <li>{lang === 'ro' ? 'Procesarea imediată a vehiculelor chinezești noi (EV)' : 'Immediate processing of incoming Chinese EV brands'}</li>
+                    <li>{lang === 'ro' ? 'Capacitate crescută fără suplimentare de personal' : 'Scalable throughput without increasing technician headcount'}</li>
+                  </ul>
+                </Column>
+
+                {/* Benefit 2: Data Sovereignty & Security */}
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '1.5rem' }}>
+                    <Security style={{ width: '64px', height: '64px', flexShrink: 0 }} />
+                    <div>
+                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>
+                        {lang === 'ro' ? 'Securitate & Suveranitate On-Premises' : 'On-Premises Data Sovereignty & Security'}
+                      </h3>
+                      <p className="landing-page__p">
+                        {lang === 'ro'
+                          ? 'Datele tehnice, seriile VIN și documentele vamale nu părăsesc niciodată infrastructura RAR. Zero riscuri de expunere a datelor în cloud-uri publice.'
+                          : 'Technical specs, VINs, and customs documentation never leave RAR infrastructure. Zero risk of data exposure to public hyperscalers.'}
+                      </p>
+                    </div>
+                  </div>
+                </Column>
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
+                  <ul style={{ marginLeft: '1rem', marginTop: '1rem' }}>
+                    <li>{lang === 'ro' ? 'Conformitate strictă cu EU AI Act și GDPR' : 'Full compliance with EU AI Act & GDPR regulations'}</li>
+                    <li>{lang === 'ro' ? 'Protecția secretelor industriale ale producătorilor' : 'Manufacturer intellectual property remains protected'}</li>
+                    <li>{lang === 'ro' ? 'Zero dependență de conexiuni externe sau servicii cloud' : 'Zero dependency on external internet or SaaS APIs'}</li>
+                    <li>{lang === 'ro' ? 'Securitate la nivel hardware pe IBM Power' : 'Industry-leading hardware security on IBM Power'}</li>
+                  </ul>
+                </Column>
+
+                {/* Benefit 3: Direct Integration with Core Registries */}
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '1.5rem' }}>
+                    <Enterprise style={{ width: '64px', height: '64px', flexShrink: 0 }} />
+                    <div>
+                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>
+                        {lang === 'ro' ? 'Integrare directă cu bazele de date RAR' : 'Direct Integration with Core RAR Databases'}
+                      </h3>
+                      <p className="landing-page__p">
+                        {lang === 'ro'
+                          ? 'Serviciile AI rulează pe aceeași infrastructură IBM Power unde se află bazele de date și aplicațiile de omologare ale registrului.'
+                          : 'AI services run alongside core vehicle databases and registries on the same IBM Power footprint with ultra-low latency.'}
+                      </p>
+                    </div>
+                  </div>
+                </Column>
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
+                  <ul style={{ marginLeft: '1rem', marginTop: '1rem' }}>
+                    <li>{lang === 'ro' ? 'Pre-populare automată a Cărții de Identitate (CIV)' : 'Automated pre-filling of Vehicle Identity Cards (CIV)'}</li>
+                    <li>{lang === 'ro' ? 'Eliminarea erorilor umane de transcriere a VIN-ului' : 'Eliminates manual VIN transcription errors'}</li>
+                    <li>{lang === 'ro' ? 'Human-in-the-loop: validare rapidă cu un singur click' : 'Human-in-the-loop: one-click technician verification'}</li>
+                    <li>{lang === 'ro' ? 'Fără costuri suplimentare de middleware sau transformare' : 'No middleware or complex data pipeline overhead'}</li>
+                  </ul>
+                </Column>
+
+                {/* Benefit 4: Zero Per-Document Costs */}
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '1.5rem' }}>
+                    <DataStorage style={{ width: '64px', height: '64px', flexShrink: 0 }} />
+                    <div>
+                      <h3 className="landing-page__label" style={{ marginTop: 0 }}>
+                        {lang === 'ro' ? 'Costuri predictibile & Fără taxe per document' : 'Predictable Costs & Zero Per-Document Fees'}
+                      </h3>
+                      <p className="landing-page__p">
+                        {lang === 'ro'
+                          ? 'Procesați sute de mii de fișe de omologare fără taxe variabile de API sau costuri ascunse de transfer de date.'
+                          : 'Process hundreds of thousands of homologation files with no variable API token charges or cloud egress fees.'}
+                      </p>
+                    </div>
+                  </div>
+                </Column>
+                <Column lg={8} md={4} sm={4} className="landing-page__tab-content">
+                  <ul style={{ marginLeft: '1rem', marginTop: '1rem' }}>
+                    <li>{lang === 'ro' ? 'Cost fix și predictibil pe infrastructura existentă' : 'Fixed, predictable cost on existing infrastructure'}</li>
+                    <li>{lang === 'ro' ? 'Procesare fără limită de volum sau apeluri API' : 'Unlimited processing capacity without throttling'}</li>
+                    <li>{lang === 'ro' ? 'Eficiență energetică superioară pe arhitectură IBM Power' : 'Superior energy efficiency on IBM Power architecture'}</li>
+                    <li>{lang === 'ro' ? 'Rentabilitate maximă a investiției (ROI rapid)' : 'Rapid return on investment with minimal operational overhead'}</li>
+                  </ul>
+                </Column>
+
                 {/* Summary */}
                 <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
-                  <Tile style={{ marginTop: '2rem', padding: '2rem', background: 'var(--cds-layer-02)' }}>
-                    <p style={{ margin: 0, fontSize: '1.125rem', fontStyle: 'italic', textAlign: 'center' }}>
-                      This approach represents a pragmatic path to AI adoption for enterprises that prioritize data control,
-                      operational simplicity, and integration with existing mission-critical systems.
+                  <Tile style={{ marginTop: '1.5rem', padding: '1.5rem 2rem', background: 'var(--cds-layer-02)' }}>
+                    <p style={{ margin: 0, fontSize: '1.05rem', fontStyle: 'italic', textAlign: 'center' }}>
+                      {lang === 'ro'
+                        ? '„Transformarea procesării documentelor de omologare cu AI on-premises pe IBM Power permite RAR să accelereze timpul de răspuns către importatori și cetățeni, eliminând blocajele manuale și garantând suveranitatea datelor naționale.”'
+                        : '"Transforming homologation document processing with on-premises AI on IBM Power allows RAR to accelerate response times for importers and citizens, eliminate manual bottlenecks, and guarantee national data sovereignty."'}
                     </p>
                   </Tile>
                 </Column>
@@ -330,16 +342,20 @@ export default function EntityExtractionPage() {
               )}
               <Grid className="tabs-group-content">
                 <Column md={4} lg={7} sm={4} className="entity__tab-content">
-                  <h3 className="landing-page__subheading">Extragere structurată din declarații vamale</h3>
+                  <h3 className="landing-page__subheading">
+                    {lang === 'ro'
+                      ? 'Extragere structurată din dosare de omologare & import vehicule'
+                      : 'Structured extraction from vehicle import & homologation dossiers'}
+                  </h3>
                   <p className="landing-page__p">
-                    Serviciul IBM AI Services <strong>Entity Extraction</strong> analizează declarațiile
-                    vamale de import vehicule și extrage automat câmpurile cheie — marca, modelul, VIN-ul,
-                    valoarea declarată și importatorul. Documentul de mai jos poate fi modificat liber
-                    pentru a testa alte scenarii de import.
+                    {lang === 'ro'
+                      ? <>Serviciul <strong>Entity Extraction</strong> analizează documentele tehnice și declarațiile vamale de import și extrage automat câmpurile esențiale — marca, modelul, VIN-ul, seria de șasiu, valorile financiare și importatorul pentru generarea automată a Cărții de Identitate a Vehiculului (CIV).</>
+                      : <>The <strong>Entity Extraction</strong> service analyzes technical sheets and import declarations to automatically extract key fields — make, model, VIN, chassis specs, financial values, and importer details for automated Vehicle Identity Card (CIV) pre-population.</>}
                   </p>
                   <p className="landing-page__p">
-                    Apăsați <strong>Trimite la serviciul de extracție</strong> pentru a obține rezultatele
-                    structurate. Serviciul rulează local pe IBM Power, fără date care părăsesc rețeaua DGPCI.
+                    {lang === 'ro'
+                      ? <>Apăsați <strong>Trimite la serviciul de extracție</strong> pentru a obține rezultatele structurate. Serviciul rulează local pe IBM Power, fără date care părăsesc rețeaua RAR.</>
+                      : <>Click <strong>Send to Extraction Service</strong> to get structured output. The service runs locally on IBM Power — no data ever leaves RAR network.</>}
                   </p>
                 </Column>
                 <Column md={4} lg={{ span: 8, offset: 7 }} sm={4}>

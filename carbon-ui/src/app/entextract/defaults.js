@@ -1,4 +1,4 @@
-// DGPCI Romania — Vehicle Import Entity Extraction defaults
+// RAR Romania — Vehicle Import Entity Extraction defaults
 // Demo document: BYD Atto 3 — legitimate import (doc1)
 export const DEFAULTS = {
   free_form_text: `DECLARAȚIE VAMALĂ DE IMPORT — VEHICUL AUTOTURISM

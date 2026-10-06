@@ -19,13 +19,13 @@ const SUGGESTED = {
   ro: [
     'Ce documente sunt necesare la importul unui vehicul din China?',
     'Care sunt procedurile vamale pentru vehicule electrice importate?',
-    'Ce verificări face DGPCI pentru declarațiile de import?',
+    'Ce verificări face RAR pentru omologarea vehiculelor importate?',
     'Care sunt penalitățile pentru declarații vamale incorecte?',
   ],
   en: [
     'What documents are required to import a vehicle from China?',
     'What are the customs procedures for imported electric vehicles?',
-    'What checks does DGPCI carry out on import declarations?',
+    'What checks does RAR carry out for imported vehicle homologation?',
     'What are the penalties for incorrect customs declarations?',
   ],
 };
@@ -34,11 +34,11 @@ const T = {
   ro: {
     breadcrumb: 'Pagina principală',
     currentPage: 'Asistent RAG',
-    heading: 'Asistent reglementări — DGPCI',
+    heading: 'Asistent reglementări — RAR (Registrul Auto Român)',
     contextTile: <>Asistentul conversațional utilizează <strong>IBM AI Services RAG</strong> cu baza de cunoștințe
-      DGPCI — reglementări de import vehicule, proceduri vamale și cadrul legal pentru vehicule chineze.
-      Toate datele rămân în infrastructura MAI. Modelul <strong>Granite 4.2:8b</strong> rulează local
-      pe IBM Power10.</>,
+      RAR — reglementări de omologare și import vehicule, proceduri tehnice și cadrul legal pentru vehicule chineze.
+      Toate datele rămân securizate on-premises. Modelul <strong>Granite 4.2:8b</strong> rulează local
+      pe IBM Power.</>,
     suggestedLabel: 'Întrebări sugerate:',
     inputLabel: 'Întrebarea dumneavoastră',
     placeholder: 'Scrieți o întrebare despre reglementări, proceduri vamale sau importul de vehicule...',
@@ -53,11 +53,11 @@ const T = {
   en: {
     breadcrumb: 'Home',
     currentPage: 'RAG Assistant',
-    heading: 'Regulations Assistant — DGPCI',
-    contextTile: <>The conversational assistant uses <strong>IBM AI Services RAG</strong> with the DGPCI
-      knowledge base — vehicle import regulations, customs procedures, and the legal framework for Chinese
-      vehicles. All data remains within MAI infrastructure. The <strong>Granite 4.2:8b</strong> model
-      runs locally on IBM Power10.</>,
+    heading: 'Regulations Assistant — RAR (Romanian Automotive Register)',
+    contextTile: <>The conversational assistant uses <strong>IBM AI Services RAG</strong> with the RAR
+      knowledge base — vehicle homologation regulations, technical inspection procedures, and the legal framework for Chinese
+      vehicles. All data remains securely on-premises. The <strong>Granite 4.2:8b</strong> model
+      runs locally on IBM Power.</>,
     suggestedLabel: 'Suggested questions:',
     inputLabel: 'Your question',
     placeholder: 'Ask a question about regulations, customs procedures, or vehicle imports...',
