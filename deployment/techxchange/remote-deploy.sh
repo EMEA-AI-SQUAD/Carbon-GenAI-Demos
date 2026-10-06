@@ -6,14 +6,14 @@
 set -euo pipefail
 
 BRANCH="${BRANCH:-feature/lab1127-techxchange}"
-REPO_URL="${REPO_URL:-https://github.com/ibm-power-demos-with-bob/Carbon-GenAI-Demos}"
+REPO_URL="${REPO_URL:-https://github.com/EMEA-AI-SQUAD/Carbon-GenAI-Demos}"
 SPYRE_URL="${SPYRE_URL:-http://9.8.70.146:8080}"
 
 GREEN='\033[0;32m'; YELLOW='\033[1;33m'; RED='\033[0;31m'
 CYAN='\033[0;36m'; BOLD='\033[1m'; NC='\033[0m'
-step()    { echo -e "\n${BOLD}${CYAN}>>> $*${NC}"; }
-ok()      { echo -e "${GREEN}OK${NC} $*"; }
-warn()    { echo -e "${YELLOW}WARN${NC} $*"; }
+step() { echo -e "\n${BOLD}${CYAN}>>> $*${NC}"; }
+ok()   { echo -e "${GREEN}OK${NC} $*"; }
+warn() { echo -e "${YELLOW}WARN${NC} $*"; }
 
 START=$(date +%s)
 WORK_DIR="$HOME"
@@ -25,7 +25,6 @@ MODEL_URL="https://huggingface.co/ibm-granite/granite-4.0-micro-GGUF/resolve/mai
 LOG_FILE="${HOME}/deployment/techxchange-deploy-$(date +%Y%m%d-%H%M%S).log"
 mkdir -p "${HOME}/deployment"
 exec > >(tee -a "$LOG_FILE") 2>&1
-
 echo "Log: $LOG_FILE | Branch: $BRANCH | Spyre: $SPYRE_URL"
 
 # [1] Pre-flight
@@ -35,38 +34,41 @@ ok "OS: $(cat /etc/redhat-release)"
 ok "Arch: $(uname -m)"
 FREE=$(df -BG "$WORK_DIR" | awk 'NR==2 {print $4}' | sed 's/G//')
 if [ "${FREE}" -lt 5 ]; then
-    echo -e "${RED}ERROR: only ${FREE}GB free â€” need at least 5GB (model is 3.7GB)${NC}"
-    echo "Free up space first: du -sh ~/* | sort -rh | head -20"
+    echo "ERROR: only ${FREE}GB free -- need at least 5GB (model is 3.7GB)"
+    echo "Free up space: du -sh ~/* | sort -rh"
     exit 1
 fi
-[ "${FREE}" -lt 10 ] && warn "Low disk: ${FREE}GB â€” may be tight" || ok "Disk: ${FREE}GB free"
+[ "${FREE}" -lt 10 ] && warn "Low disk: ${FREE}GB -- may be tight" || ok "Disk: ${FREE}GB free"
 
-# [2] Skip full system update â€” install only what we need
-step "[2/12] Install required packages (skipping full dnf update)"
-# Disable repos that are known-unreachable on this LPAR to avoid failures
-DNF_OPTS="--disablerepo=IBM_Power_Tools"
+# [2] Install packages -- disable unreachable IBM repos
+step "[2/12] Install required packages"
+DNF_OPTS="--disablerepo=IBM_Power_Tools --disablerepo=Advance_Toolchain"
 
 dnf install -y $DNF_OPTS \
     git gcc gcc-c++ make cmake automake ninja-build \
     gfortran curl-devel wget lsof \
-    || warn "Some packages may have been skipped (non-fatal)"
+    || warn "Some packages skipped (non-fatal)"
 
-# Python 3.12
 if ! command -v python3.12 >/dev/null 2>&1; then
     dnf install -y $DNF_OPTS python3.12 python3.12-pip python3.12-devel \
-        || warn "python3.12 not available â€” llama.cpp Python deps may fail"
+        || warn "python3.12 not available -- llama.cpp Python deps may fail"
 fi
 
-# llvm-toolset (for clang/LLVM, needed by llama.cpp cmake)
-dnf install -y $DNF_OPTS llvm-toolset 2>/dev/null || warn "llvm-toolset not found â€” cmake will use gcc"
+dnf install -y $DNF_OPTS llvm-toolset 2>/dev/null \
+    || warn "llvm-toolset not found -- cmake will use gcc"
 
-# Node.js
+# Node.js -- need v18+ for Next.js 14; v16 is too old
+NODE_MAJOR=0
 if command -v node >/dev/null 2>&1; then
-    ok "Node already installed: $(node --version)"
+    NODE_MAJOR=$(node --version | sed 's/v//' | cut -d. -f1)
+fi
+if [ "${NODE_MAJOR}" -ge 18 ] 2>/dev/null; then
+    ok "Node sufficient: $(node --version)"
 else
-    warn "Node.js not found â€” installing via dnf module"
+    warn "Node v${NODE_MAJOR} too old or missing -- upgrading to Node 20"
+    dnf module reset  -y nodejs $DNF_OPTS 2>/dev/null || true
     dnf module enable -y nodejs:20 $DNF_OPTS 2>/dev/null || true
-    dnf install -y $DNF_OPTS nodejs
+    dnf install -y $DNF_OPTS nodejs npm
     ok "Node $(node --version)"
 fi
 
@@ -122,14 +124,14 @@ if command -v python3.12 >/dev/null 2>&1; then
     deactivate
     ok "LLM Python venv ready"
 else
-    warn "python3.12 not found -- llama.cpp will build without OpenBLAS (slower)"
+    warn "python3.12 not found -- llama.cpp will build without OpenBLAS (slower inference)"
 fi
 
 # [8] Build llama.cpp
 step "[8/12] Build llama.cpp"
 cd "$WORK_DIR"
 if [ -f "llama.cpp/build/bin/llama-server" ]; then
-    warn "llama-server binary already exists -- skipping build (~15 min saved)"
+    warn "llama-server binary exists -- skipping build (~15 min saved)"
 else
     [ -d llama.cpp ] && rm -rf llama.cpp
     git clone https://github.com/ggml-org/llama.cpp.git
@@ -143,7 +145,7 @@ else
             -DBLAS_LIBRARIES="$OB_LIB" -DBLAS_INCLUDE_DIRS="$OB_INC" \
             -DGGML_CUDA=OFF
     else
-        warn "OpenBLAS not found -- building llama.cpp without BLAS acceleration"
+        warn "OpenBLAS not found -- building without BLAS acceleration"
         cmake -B build -DGGML_CUDA=OFF
     fi
     cmake --build build --config Release
@@ -155,13 +157,13 @@ ok "llama-server ready"
 step "[9/12] Download Granite model"
 mkdir -p "$MODEL_DIR"
 if [ -f "${MODEL_DIR}/${MODEL_FILE}" ]; then
-    warn "Model already present -- skipping download (~10-20 min saved)"
+    warn "Model already present -- skipping download"
 else
     wget --quiet --show-progress "$MODEL_URL" -O "${MODEL_DIR}/${MODEL_FILE}"
 fi
 ok "Model: $(du -h ${MODEL_DIR}/${MODEL_FILE} | cut -f1)"
 
-# [10] pm2 services
+# [10] Start services via pm2
 step "[10/12] Start services via pm2"
 cd "$WORK_DIR"
 pm2 delete all 2>/dev/null || true
@@ -189,28 +191,27 @@ pm2 list
 for port in 8080 3001 3000; do
     lsof -Pi ":${port}" -sTCP:LISTEN -t >/dev/null 2>&1 \
         && ok "Port ${port} listening" \
-        || echo -e "${RED}FAIL Port ${port} not listening -- check: pm2 logs${NC}"
+        || echo "FAIL: Port ${port} not listening -- check: pm2 logs"
 done
 
 if curl -sf http://localhost:8080/health >/dev/null 2>&1 \
    || curl -sf http://localhost:8080/v1/models >/dev/null 2>&1; then
     ok "llama-server health check passed"
 else
-    warn "llama-server may still be loading the model -- retry: curl http://localhost:8080/health"
+    warn "llama-server may still be loading -- retry: curl http://localhost:8080/health"
 fi
 
 if curl -sf --connect-timeout 5 "${SPYRE_URL}/health" >/dev/null 2>&1 \
    || curl -sf --connect-timeout 5 "${SPYRE_URL}/v1/models" >/dev/null 2>&1; then
     ok "Spyre reachable at ${SPYRE_URL}"
 else
-    warn "Spyre not reachable yet -- ensure llama-server is running on 9.8.70.146"
+    warn "Spyre not reachable -- ensure llama-server is running on 9.8.70.146"
 fi
 
 ELAPSED=$(( $(date +%s) - START ))
 echo ""
 echo "========================================================"
 echo "  DONE in $(( ELAPSED/60 ))m $(( ELAPSED%60 ))s"
-echo ""
 echo "  Demo:  http://9.8.70.150:3000"
 echo "  Spyre: ${SPYRE_URL}"
 echo "  Toggle MMA <-> Spyre in the header bar"
