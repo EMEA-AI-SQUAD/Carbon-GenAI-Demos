@@ -1,7 +1,6 @@
 #!/bin/bash
 # remote-deploy.sh - runs ON the LPAR via:
 #   Get-Content remote-deploy.sh -Raw | ssh root@9.8.70.150 'bash -s'
-# Do not run this directly on Windows.
 
 set -euo pipefail
 
@@ -27,6 +26,69 @@ mkdir -p "${HOME}/deployment"
 exec > >(tee -a "$LOG_FILE") 2>&1
 echo "Log: $LOG_FILE | Branch: $BRANCH | Spyre: $SPYRE_URL"
 
+# [0] Expand filesystem if < 20 GB free
+step "[0/12] Check and expand disk if needed"
+FREE=$(df -BG "$WORK_DIR" | awk 'NR==2 {print $4}' | sed 's/G//')
+ok "Current free space on $WORK_DIR: ${FREE}GB"
+
+if [ "${FREE}" -lt 20 ]; then
+    warn "Less than 20GB free -- attempting LVM expansion"
+
+    echo "--- disk layout ---"
+    lsblk
+    echo "--- VGs ---"
+    vgdisplay 2>/dev/null || echo "(no LVM or vgdisplay not available)"
+    echo "--- PVs ---"
+    pvdisplay 2>/dev/null || true
+
+    # Find the VG backing the home/root filesystem
+    HOME_FS=$(df "$WORK_DIR" | awk 'NR==2 {print $1}')
+    ok "Filesystem for $WORK_DIR: $HOME_FS"
+
+    # Detect VG name from the LV path (e.g. /dev/almalinux/home -> almalinux)
+    VG_NAME=$(lvdisplay "$HOME_FS" 2>/dev/null | awk '/VG Name/{print $3}' || true)
+    if [ -z "$VG_NAME" ]; then
+        # Try parsing from device path e.g. /dev/mapper/almalinux-home or /dev/almalinux/home
+        VG_NAME=$(echo "$HOME_FS" | sed 's|/dev/mapper/||;s|-.*||;s|/dev/||;s|/.*||')
+    fi
+    ok "VG name: $VG_NAME"
+
+    # Check for free extents in the VG
+    VG_FREE=$(vgdisplay "$VG_NAME" 2>/dev/null | awk '/Free.*PE/{print $5}' || echo "0")
+    ok "Free PEs in VG: ${VG_FREE}"
+
+    if [ "${VG_FREE:-0}" -gt 0 ]; then
+        ok "Free space available in VG -- extending LV by all free extents"
+        lvextend -l +100%FREE "$HOME_FS"
+        # Grow the filesystem
+        FS_TYPE=$(blkid -o value -s TYPE "$HOME_FS" 2>/dev/null || df -T "$WORK_DIR" | awk 'NR==2{print $2}')
+        ok "Filesystem type: $FS_TYPE"
+        case "$FS_TYPE" in
+            xfs)  xfs_growfs "$WORK_DIR" ;;
+            ext4) resize2fs "$HOME_FS" ;;
+            *)    warn "Unknown FS type $FS_TYPE -- try: xfs_growfs $WORK_DIR or resize2fs $HOME_FS" ;;
+        esac
+        FREE=$(df -BG "$WORK_DIR" | awk 'NR==2 {print $4}' | sed 's/G//')
+        ok "Free space after expansion: ${FREE}GB"
+    else
+        warn "No free extents in VG $VG_NAME"
+        echo ""
+        echo "Options to free space manually before re-running:"
+        echo "  1. Remove old kernels:  dnf remove --oldinstallonly --setopt installonly_limit=2 kernel"
+        echo "  2. Clean dnf cache:     dnf clean all"
+        echo "  3. Remove large files:  du -sh ~/* | sort -rh"
+        echo "  4. Ask your LPAR admin to extend the virtual disk (then: pvresize /dev/<disk>; lvextend -l +100%FREE <lv>; xfs_growfs /)"
+        echo ""
+        if [ "${FREE}" -lt 5 ]; then
+            echo "ERROR: only ${FREE}GB free -- cannot proceed. Free space and re-run."
+            exit 1
+        fi
+        warn "Continuing with ${FREE}GB -- may fail at model download"
+    fi
+else
+    ok "Sufficient free space (${FREE}GB) -- no expansion needed"
+fi
+
 # [1] Pre-flight
 step "[1/12] Pre-flight checks"
 [ -f /etc/redhat-release ] || { echo "ERROR: requires RHEL/AlmaLinux"; exit 1; }
@@ -34,11 +96,10 @@ ok "OS: $(cat /etc/redhat-release)"
 ok "Arch: $(uname -m)"
 FREE=$(df -BG "$WORK_DIR" | awk 'NR==2 {print $4}' | sed 's/G//')
 if [ "${FREE}" -lt 5 ]; then
-    echo "ERROR: only ${FREE}GB free -- need at least 5GB (model is 3.7GB)"
-    echo "Free up space: du -sh ~/* | sort -rh"
+    echo "ERROR: only ${FREE}GB free -- need at least 5GB"
     exit 1
 fi
-[ "${FREE}" -lt 10 ] && warn "Low disk: ${FREE}GB -- may be tight" || ok "Disk: ${FREE}GB free"
+ok "Disk: ${FREE}GB free"
 
 # [2] Install packages -- disable unreachable IBM repos
 step "[2/12] Install required packages"
@@ -51,14 +112,13 @@ dnf install -y $DNF_OPTS \
 
 if ! command -v python3.12 >/dev/null 2>&1; then
     dnf install -y $DNF_OPTS python3.12 python3.12-pip python3.12-devel \
-        || warn "python3.12 not available -- llama.cpp Python deps may fail"
+        || warn "python3.12 not available"
 fi
 
 dnf install -y $DNF_OPTS llvm-toolset 2>/dev/null \
     || warn "llvm-toolset not found -- cmake will use gcc"
 
-# Node.js -- @carbon/themes >= 11.82 requires Node >=22
-# Always install Node 22 from the module stream, even if an older version exists
+# Node.js -- @carbon/themes requires Node >=22
 NODE_MAJOR=0
 if command -v node >/dev/null 2>&1; then
     NODE_MAJOR=$(node --version | sed 's/v//' | cut -d. -f1)
@@ -66,24 +126,18 @@ fi
 if [ "${NODE_MAJOR}" -ge 22 ] 2>/dev/null; then
     ok "Node sufficient: $(node --version)"
 else
-    warn "Node v${NODE_MAJOR} -- need >=22 for @carbon/themes; installing Node 22"
-    # Reset any existing stream, then enable 22
+    warn "Node v${NODE_MAJOR} -- need >=22; upgrading"
     dnf module reset  -y nodejs $DNF_OPTS 2>/dev/null || true
-    # AlmaLinux 9 AppStream ships nodejs:22 in newer releases
     if dnf module enable -y nodejs:22 $DNF_OPTS 2>/dev/null; then
         dnf install -y $DNF_OPTS nodejs npm
     else
-        # Fall back: install via NodeSource if module stream lacks 22
-        warn "nodejs:22 module not found -- trying NodeSource RPM"
-        curl -fsSL https://rpm.nodesource.com/setup_22.x | bash - 2>/dev/null \
-            || { warn "NodeSource unavailable -- installing nvm instead"; \
-                 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash; \
-                 export NVM_DIR="$HOME/.nvm"; \
-                 [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"; \
-                 nvm install 22; \
-                 nvm use 22; \
-                 nvm alias default 22; }
-        command -v node >/dev/null 2>&1 && dnf install -y $DNF_OPTS nodejs npm 2>/dev/null || true
+        warn "nodejs:22 module not in AppStream -- trying nvm"
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
+        nvm install 22
+        nvm use 22
+        nvm alias default 22
     fi
     ok "Node $(node --version)"
 fi
@@ -107,6 +161,9 @@ ok "Repo ready on $BRANCH"
 
 # [4] yarn + pm2
 step "[4/12] Install yarn + pm2"
+# Re-source nvm in case we installed it above
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh" || true
 npm install --global yarn pm2
 ok "yarn $(yarn --version)  pm2 $(pm2 --version)"
 
@@ -114,7 +171,6 @@ ok "yarn $(yarn --version)  pm2 $(pm2 --version)"
 step "[5/12] Node.js dependencies"
 cd "${WORK_DIR}/${REPO_DIR}/${APP_DIR}"
 printf '{"extends":"next/core-web-vitals","rules":{"react/no-unescaped-entities":"off"}}\n' > .eslintrc.json
-# --ignore-engines: carbon/themes requires >=22; we may be on 20 if 22 unavailable
 yarn --ignore-engines
 yarn add --ignore-engines \
     @carbon/react@latest sass@1.63.6 @carbon/icons-react@latest @carbon/pictograms-react@latest
@@ -142,7 +198,7 @@ if command -v python3.12 >/dev/null 2>&1; then
     deactivate
     ok "LLM Python venv ready"
 else
-    warn "python3.12 not found -- llama.cpp will build without OpenBLAS (slower)"
+    warn "python3.12 not found -- building llama.cpp without OpenBLAS"
 fi
 
 # [8] Build llama.cpp
@@ -163,7 +219,7 @@ else
             -DBLAS_LIBRARIES="$OB_LIB" -DBLAS_INCLUDE_DIRS="$OB_INC" \
             -DGGML_CUDA=OFF
     else
-        warn "OpenBLAS not found -- building without BLAS acceleration"
+        warn "OpenBLAS not found -- building without BLAS"
         cmake -B build -DGGML_CUDA=OFF
     fi
     cmake --build build --config Release
@@ -184,6 +240,8 @@ ok "Model: $(du -h ${MODEL_DIR}/${MODEL_FILE} | cut -f1)"
 # [10] Start services via pm2
 step "[10/12] Start services via pm2"
 cd "$WORK_DIR"
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh" || true
 pm2 delete all 2>/dev/null || true
 
 pm2 start "${WORK_DIR}/llama.cpp/build/bin/llama-server" \
