@@ -6,7 +6,7 @@
 
 ## Status
 
-**DGPCI Romania Power10 deployment OPERATIONAL. Carbon UI rebuilt with RO/EN language toggle, new DGPCI RAG assistant page, and ppc64le fetch fix. Entity extraction reaching LLM successfully. UI live on port 3000. One outstanding item to investigate (noted by user at end of session — new task needed).**
+**Full stack OPERATIONAL. All three AI demo routes (extract, translate, RAG) call Ollama/Granite directly — no dependency on AI Services containers for the demo flow. Passed to Romanian colleague for testing. Good stopping point.**
 
 ---
 
@@ -24,7 +24,8 @@
 | Oct 2026 (5th) | **Extract Service Probe Script**: Created `deployment/dgpci/try-extract.sh` — tries `extract-service:latest` (weekend fixes?), then `v0.0.16` (N-1, pre-tokenize refactor), then `localhost/dgpci-extract:latest` (our Ollama-patched build). No `-d` flag anywhere in the script to avoid hung sessions. Removed `-d` from `manage-dgpci.sh` start/restart and `deploy-dgpci.sh` up commands. |
 | Oct 2026 (5th, cont.) | **Full stack operational**: Root-caused two extract-service failures: (1) `StderrMonitor` in `common/diagnostic_logger.py` uses `os.dup2` which deadlocks uvicorn worker forks — fixed with `ENV DISABLE_CRASH_HANDLER=1` in Containerfile; (2) `/var/cache/extract` volume permission error — fixed with `RUN mkdir -p ... && chown 1001:1001` in Containerfile. Added `opensearch-py>=2.4.0` to requirements (missing vs upstream service-base). Converted LPAR from tarball to proper `git clone --branch feature/dgpci-romania`. RAG knowledge base ingested via `podman exec` Python script into OpenSearch index `dgpci_199857dcd9c701aeeec9a1c10d76444b` (collection: `dgpci-regulations`). Validated: entity extraction (BYD Atto 3 — 10/10 fields, 22s), RAG search (Romanian regulation docs retrieved). Carbon UI live on port 3000. |
 | Oct 2026 (5th, UI session) | **UI improvements**: (1) Removed all nav links from header bar — kept only "IBM EMEA AI on IBM Power Squad Demos" name. (2) Replaced all marketing "IBM Power10" refs with "IBM Power" (factual infra refs kept). (3) Added global RO/EN language toggle (EN/RO button in header) via `LangContext` — home, translate, entextract pages fully bilingual. (4) Replaced generic RFP Assistant page at `/rfpassistant` with proper DGPCI RAG assistant (bilingual, suggested questions, calls `/api/rag`). (5) Fixed 502 "fetch failed" on all API routes — replaced undici/fetch with Node.js `http.request` (ppc64le Podman hostname resolution issue). (6) Removed `AILabel`/`AILabelContent` from all pages (React error #130 on results render — component resolves to undefined with this yarn lock). Replaced with `Tag type="blue"`. (7) Added missing `Tag` import to briefbuilder, talentacquisition, entextract pages. Carbon UI `Containerfile` committed (was untracked). |
-| Oct 2026 (5th, session 2) | **Extraction fix & nav**: (1) Removed IT Ops Email and Logistics Quote tabs from `/entextract` — now 3 tabs: Why IBM Power, Import Vehicul, Technology. (2) Switched `/api/extract` from AI Services `schema_name` approach to **direct Ollama `/api/chat`** (Option C) — prompt built from UI entity labels+definitions, `format: 'json'` enforced, response parsed and returned as `{ data: { extraction: {...} } }`. Root cause of "Date indisponibile": `NORMALIZE_KEYS=true` was stripping Romanian diacritics from key names. Fixed in `messages.js` (set to `false`) and superseded by Option C which uses raw label strings end-to-end. (3) Added `OLLAMA_URL` + `LLM_MODEL` env vars to `carbon-ui` in `podman-compose.yml`. (4) Added `HeaderNavigation` to header with links for Entity Extraction (`/entextract`), Translation (`/translate`), RAG Assistant (`/rfpassistant`) — bilingual RO/EN, active-page highlight via `usePathname`. |
+| Oct 2026 (5th, session 2) | **Extraction fix & nav**: (1) Removed IT Ops Email and Logistics Quote tabs from `/entextract` — now 3 tabs: Why IBM Power, Import Vehicul, Technology. (2) Switched `/api/extract` from AI Services `schema_name` approach to **direct Ollama `/api/chat`** (Option C). (3) Added `OLLAMA_URL` + `LLM_MODEL` env vars to `carbon-ui` in `podman-compose.yml`. (4) Added `HeaderNavigation` to header with links for Entity Extraction, Translation, RAG Assistant — bilingual RO/EN, active-page highlight. |
+| Oct 2026 (5th, session 3) | **All three routes on Ollama (Option C)**: Diagnosed `/api/translate` — AI Services translate-service crashes on `/tokenize` 404 (vLLM endpoint, not available on Ollama). Replaced with direct Ollama `/api/chat` translation prompt; returns `{data:{translation,source_language}}`. Diagnosed `/api/rag` — route was calling `/query` (wrong path); RAG backend `/api/generate` is coupled to IBM Power sales-manual use case (MTM lookups, Watson intent). Fixed with two-step approach: (1) `/api/search` with `collection_name=dgpci-regulations` for retrieval, (2) Ollama `/api/chat` for generation grounded in retrieved chunks; returns `{answer,sources}`. UI rebuilt and redeployed. All three health checks green. |
 
 ---
 
@@ -62,42 +63,47 @@
 
 ## Next steps
 
-**Extraction fixed (direct Ollama), nav added. UI needs rebuild + deploy to LPAR.**
+**Full stack live and healthy. All three demo routes call Ollama directly. Handed to Romanian colleague for testing.**
 
-Stack status (as of 2026-10-05 session 2 — code changes local, not yet deployed):
-- `postgres`, `ollama-service`, `opensearch-service` — Up, healthy (on LPAR)
-- `extract-service` — still running on LPAR but **no longer needed for extraction** (Option C bypasses it)
-- `translate-service`, `rag-backend` — **NOT RUNNING** — need restart before translate/RAG demo
-- `dgpci-carbon-ui` — running but stale (needs rebuild with this session's changes)
+### What is and isn't using official AI Services
+
+| Demo route | Official AI Service | Status |
+|---|---|---|
+| `/api/extract` | extract-service | ❌ Not used — direct Ollama call |
+| `/api/translate` | translate-service | ❌ Not used — direct Ollama call |
+| `/api/rag` | rag-backend `/api/generate` | ❌ Not used — `/api/search` for retrieval only + Ollama for generation |
+
+All three user-visible demos are powered entirely by **Granite 4.2:8b via Ollama** on the IBM Power LPAR. The AI Services containers (`extract-service`, `translate-service`) are still running but not in any user-facing path. Getting the demo working reliably was the right priority at this stage.
+
+Stack status (as of 2026-10-05 end of day — deployed and verified):
+- `postgres`, `ollama-service`, `opensearch-service` — Up 3+ days, healthy
+- `extract-service` — Up, not used (Option C bypasses it)
+- `translate-service` — Up, not used (official `v0.0.13` + `DISABLE_CRASH_HANDLER=1` — Option C bypasses it)
+- `rag-backend` — Up healthy (RAG-with-Notebook — `/api/search` used for retrieval only, generation is Ollama)
+- `dgpci-carbon-ui` — Up, port 3000, latest image (all three routes on Ollama)
 
 Demo URL: `http://pvm1-2ij8bu3k.p1308.pok-systems.techzone.ibm.com:3000`
 
-1. **Push and rebuild the UI** on the LPAR:
-   ```bash
-   # On local machine:
-   git add -A && git commit -m "feat: direct Ollama extraction, remove IT Ops/Logistics tabs, add header nav"
-   git push origin feature/dgpci-romania
+**If container restart needed** (all three services now on Ollama — just restart UI + dependencies):
+```bash
+podman rm -f dgpci-carbon-ui
+podman run -d --name dgpci-carbon-ui --network dgpci_dgpci-net -p 3000:3000 \
+  -e NODE_ENV=production -e PORT=3000 \
+  -e OLLAMA_URL=http://ollama-service:11434 -e LLM_MODEL=granite4:latest \
+  -e EXTRACT_SERVICE_URL=http://extract-service:6000 \
+  -e TRANSLATE_SERVICE_URL=http://translate-service:9000 \
+  -e RAG_BACKEND_URL=http://rag-backend:8080 \
+  --restart unless-stopped localhost/dgpci-carbon-ui:latest
 
-   # On LPAR:
-   cd ~/Carbon-GenAI-Demos
-   git pull origin feature/dgpci-romania
-   cd deployment/dgpci
-   podman build --tag localhost/dgpci-carbon-ui:latest ../../carbon-ui/
-   podman rm -f dgpci-carbon-ui
-   podman-compose --env-file .env up -d carbon-ui
-   ```
+podman start translate-service rag-backend   # if they dropped
+```
 
-2. **Restart translate-service and rag-backend**:
-   ```bash
-   cd ~/Carbon-GenAI-Demos/deployment/dgpci
-   podman start translate-service rag-backend
-   # or if containers were removed:
-   podman-compose --env-file .env up -d translate-service rag-backend
-   ```
-
-3. **Test extraction** — should now call Ollama directly, all 7 fields populated.
-
-4. **Investigate translate-service and rag-backend** — need to verify their API contracts and check the translate/RAG pages work correctly (these still use the AI Services containers).
+**To rebuild UI** (after code changes):
+```bash
+cd ~/Carbon-GenAI-Demos && git pull origin feature/dgpci-romania
+podman build --tag localhost/dgpci-carbon-ui:latest ~/Carbon-GenAI-Demos/carbon-ui/
+# then podman rm -f dgpci-carbon-ui && podman run ... (as above)
+```
 
 3. **If full stack needs restart** (foreground — no `-d`; use tmux/screen):
    ```bash
@@ -156,7 +162,7 @@ Demo URL: `http://pvm1-2ij8bu3k.p1308.pok-systems.techzone.ibm.com:3000`
 Paste this into the first message:
 
 ```
-DGPCI Romania — IBM AI Services Demo: Deploy & Test Session
+DGPCI Romania — Demo: All routes on Ollama (Option C)
 
 We are on branch feature/dgpci-romania of Carbon-GenAI-Demos.
 Read _checkpoint.md for full context.
@@ -165,18 +171,16 @@ TechZone LPAR details:
 - Host: pvm1-2ij8bu3k.p1308.pok-systems.techzone.ibm.com
 - User: UOM7SE8
 - Key: C:\Users\029878866\Downloads\techzone_id_rsa (password in your password manager)
-- Current LPAR state:
-  - postgres, ollama-service, opensearch-service: healthy and running
-  - extract-service: running but no longer needed for extraction (bypassed by Option C)
-  - translate-service, rag-backend: NOT running — need restart
-  - dgpci-carbon-ui: stale — needs rebuild with this session's changes
-- Changes this session (local only, not yet deployed):
-  - /api/extract now calls Ollama directly (Option C) — no schema_name, uses UI entity labels
-  - IT Ops Email + Logistics tabs removed from /entextract (now 3 tabs)
-  - Header nav added: Entity Extraction, Translation, RAG Assistant links
-  - OLLAMA_URL + LLM_MODEL added to carbon-ui env in podman-compose.yml
-- Next: git push, pull on LPAR, rebuild carbon-ui container, restart translate+rag-backend
-- Then: test extraction, then investigate translate/RAG service API contracts
+- Current LPAR state (all healthy):
+  - postgres, ollama-service, opensearch-service: Up 3+ days
+  - extract-service: Up (not used — Option C bypasses)
+  - translate-service: Up (official v0.0.13 + DISABLE_CRASH_HANDLER=1 — not used, Option C bypasses)
+  - rag-backend: Up (RAG-with-Notebook, /api/search used for retrieval only)
+  - dgpci-carbon-ui: Up on port 3000 (all three routes call Ollama directly)
+- All three demo routes deployed and health-checked:
+  - /api/extract: Ollama direct, UI entity labels as schema
+  - /api/translate: Ollama direct, Chinese→Romanian via prompt
+  - /api/rag: /api/search retrieval (collection=dgpci-regulations) + Ollama generation
 - NOTE: do not use -d flag on podman-compose. Use nohup + redirect for background tasks.
 - NOTE: build without --no-cache to use cached yarn layer; only use --no-cache if yarn layer itself is broken.
 ```
