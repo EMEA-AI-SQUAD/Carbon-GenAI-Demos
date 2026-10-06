@@ -15,79 +15,45 @@ ok()   { echo -e "${GREEN}OK${NC} $*"; }
 warn() { echo -e "${YELLOW}WARN${NC} $*"; }
 
 START=$(date +%s)
-WORK_DIR="$HOME"
 REPO_DIR="Carbon-GenAI-Demos"
 APP_DIR="carbon-ui"
-MODEL_DIR="${HOME}/models"
 MODEL_FILE="granite-4.0-micro-Q4_K_M.gguf"
 MODEL_URL="https://huggingface.co/ibm-granite/granite-4.0-micro-GGUF/resolve/main/granite-4.0-micro-Q4_K_M.gguf"
-LOG_FILE="${HOME}/deployment/techxchange-deploy-$(date +%Y%m%d-%H%M%S).log"
-mkdir -p "${HOME}/deployment"
-exec > >(tee -a "$LOG_FILE") 2>&1
-echo "Log: $LOG_FILE | Branch: $BRANCH | Spyre: $SPYRE_URL"
 
-# [0] Expand filesystem if < 20 GB free
-step "[0/12] Check and expand disk if needed"
-FREE=$(df -BG "$WORK_DIR" | awk 'NR==2 {print $4}' | sed 's/G//')
-ok "Current free space on $WORK_DIR: ${FREE}GB"
+# [0] Pick a working directory with enough space
+step "[0/12] Select working directory"
 
-if [ "${FREE}" -lt 20 ]; then
-    warn "Less than 20GB free -- attempting LVM expansion"
-
-    echo "--- disk layout ---"
-    lsblk
-    echo "--- VGs ---"
-    vgdisplay 2>/dev/null || echo "(no LVM or vgdisplay not available)"
-    echo "--- PVs ---"
-    pvdisplay 2>/dev/null || true
-
-    # Find the VG backing the home/root filesystem
-    HOME_FS=$(df "$WORK_DIR" | awk 'NR==2 {print $1}')
-    ok "Filesystem for $WORK_DIR: $HOME_FS"
-
-    # Detect VG name from the LV path (e.g. /dev/almalinux/home -> almalinux)
-    VG_NAME=$(lvdisplay "$HOME_FS" 2>/dev/null | awk '/VG Name/{print $3}' || true)
-    if [ -z "$VG_NAME" ]; then
-        # Try parsing from device path e.g. /dev/mapper/almalinux-home or /dev/almalinux/home
-        VG_NAME=$(echo "$HOME_FS" | sed 's|/dev/mapper/||;s|-.*||;s|/dev/||;s|/.*||')
-    fi
-    ok "VG name: $VG_NAME"
-
-    # Check for free extents in the VG
-    VG_FREE=$(vgdisplay "$VG_NAME" 2>/dev/null | awk '/Free.*PE/{print $5}' || echo "0")
-    ok "Free PEs in VG: ${VG_FREE}"
-
-    if [ "${VG_FREE:-0}" -gt 0 ]; then
-        ok "Free space available in VG -- extending LV by all free extents"
-        lvextend -l +100%FREE "$HOME_FS"
-        # Grow the filesystem
-        FS_TYPE=$(blkid -o value -s TYPE "$HOME_FS" 2>/dev/null || df -T "$WORK_DIR" | awk 'NR==2{print $2}')
-        ok "Filesystem type: $FS_TYPE"
-        case "$FS_TYPE" in
-            xfs)  xfs_growfs "$WORK_DIR" ;;
-            ext4) resize2fs "$HOME_FS" ;;
-            *)    warn "Unknown FS type $FS_TYPE -- try: xfs_growfs $WORK_DIR or resize2fs $HOME_FS" ;;
-        esac
-        FREE=$(df -BG "$WORK_DIR" | awk 'NR==2 {print $4}' | sed 's/G//')
-        ok "Free space after expansion: ${FREE}GB"
-    else
-        warn "No free extents in VG $VG_NAME"
-        echo ""
-        echo "Options to free space manually before re-running:"
-        echo "  1. Remove old kernels:  dnf remove --oldinstallonly --setopt installonly_limit=2 kernel"
-        echo "  2. Clean dnf cache:     dnf clean all"
-        echo "  3. Remove large files:  du -sh ~/* | sort -rh"
-        echo "  4. Ask your LPAR admin to extend the virtual disk (then: pvresize /dev/<disk>; lvextend -l +100%FREE <lv>; xfs_growfs /)"
-        echo ""
-        if [ "${FREE}" -lt 5 ]; then
-            echo "ERROR: only ${FREE}GB free -- cannot proceed. Free space and re-run."
-            exit 1
+pick_workdir() {
+    # Returns the first mount point that has >= 20 GB free
+    for candidate in /data /opt /var /tmp "$HOME"; do
+        if [ -d "$candidate" ]; then
+            FREE_GB=$(df -BG "$candidate" | awk 'NR==2{print $4}' | sed 's/G//')
+            echo "  $candidate : ${FREE_GB}GB free" >&2
+            if [ "${FREE_GB}" -ge 20 ]; then
+                echo "$candidate"
+                return
+            fi
         fi
-        warn "Continuing with ${FREE}GB -- may fail at model download"
-    fi
-else
-    ok "Sufficient free space (${FREE}GB) -- no expansion needed"
+    done
+    echo ""
+}
+
+echo "Scanning mount points for free space:"
+WORK_DIR=$(pick_workdir)
+
+if [ -z "$WORK_DIR" ]; then
+    echo "ERROR: no mount point with >=20GB free found."
+    echo "Current disk usage:"
+    df -h
+    exit 1
 fi
+
+ok "Using working directory: $WORK_DIR"
+MODEL_DIR="${WORK_DIR}/models"
+LOG_FILE="${HOME}/deployment/techxchange-deploy-$(date +%Y%m%d-%H%M%S).log"
+mkdir -p "${HOME}/deployment" "$MODEL_DIR"
+exec > >(tee -a "$LOG_FILE") 2>&1
+echo "Log: $LOG_FILE | WORK_DIR: $WORK_DIR | Branch: $BRANCH | Spyre: $SPYRE_URL"
 
 # [1] Pre-flight
 step "[1/12] Pre-flight checks"
@@ -95,11 +61,7 @@ step "[1/12] Pre-flight checks"
 ok "OS: $(cat /etc/redhat-release)"
 ok "Arch: $(uname -m)"
 FREE=$(df -BG "$WORK_DIR" | awk 'NR==2 {print $4}' | sed 's/G//')
-if [ "${FREE}" -lt 5 ]; then
-    echo "ERROR: only ${FREE}GB free -- need at least 5GB"
-    exit 1
-fi
-ok "Disk: ${FREE}GB free"
+ok "Free space in $WORK_DIR: ${FREE}GB"
 
 # [2] Install packages -- disable unreachable IBM repos
 step "[2/12] Install required packages"
@@ -157,11 +119,10 @@ else
     git clone --branch "$BRANCH" "$REPO_URL"
 fi
 chmod +x "${REPO_DIR}/deployment/"*.sh 2>/dev/null || true
-ok "Repo ready on $BRANCH"
+ok "Repo ready at ${WORK_DIR}/${REPO_DIR} on $BRANCH"
 
 # [4] yarn + pm2
 step "[4/12] Install yarn + pm2"
-# Re-source nvm in case we installed it above
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh" || true
 npm install --global yarn pm2
@@ -288,6 +249,7 @@ ELAPSED=$(( $(date +%s) - START ))
 echo ""
 echo "========================================================"
 echo "  DONE in $(( ELAPSED/60 ))m $(( ELAPSED%60 ))s"
+echo "  WORK_DIR: $WORK_DIR"
 echo "  Demo:  http://9.8.70.150:3000"
 echo "  Spyre: ${SPYRE_URL}"
 echo "  Toggle MMA <-> Spyre in the header bar"
