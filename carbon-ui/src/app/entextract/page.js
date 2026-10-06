@@ -48,11 +48,11 @@ import { getExpectedKeys, parseModelJson, reconcileOutput, buildKeyLabelMap } fr
 import { runExtractionWithStreaming } from "./extraction";
 import { IT_OPS_SCENARIOS } from "./it-ops-emails";
 import { LOGISTICS_QUOTE_SCENARIO } from "./logistics-quote";
-import { useSpyre as useSpyreCtx } from '../spyre-context';
 
 export default function EntityExtractionPage() {
-  // ── Spyre toggle — reads from SpyreContext (set via header toggle) ──────
-  const { useSpyre } = useSpyreCtx();
+  // Spyre toggle — hardcoded false for initial CPU deploy.
+  // Re-enable SpyreContext here once the toggle UI is wired back in.
+  const spyreActive = false;
 
   const [values, setValues] = useState(() => DEFAULTS);
   const [streamedText, setStreamedText] = useState("");
