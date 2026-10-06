@@ -134,10 +134,10 @@ export default function EntityExtractionPage() {
     setExtractedRows([]);
 
     // ── Backend selection ──────────────────────────────────────────────────
-    // useSpyre is read from SpyreContext (toggled in the header).
+    // spyreActive is read from SpyreContext (toggled in the header).
     // We POST to /api/chat (Next.js route on port 3000) which proxies to
-    // either local llama.cpp or IBM Spyre based on the useSpyre flag.
-    const backendLabel = useSpyre ? '⚡ IBM Spyre' : 'IBM Power MMA';
+    // either local llama.cpp or IBM Spyre based on the spyreActive flag.
+    const backendLabel = spyreActive ? '⚡ IBM Spyre' : 'IBM Power MMA';
     console.log(`Calling LLM via ${backendLabel}...`);
 
     try {
@@ -151,7 +151,7 @@ export default function EntityExtractionPage() {
           messages: msgs,
           stream: false,
           temperature: 0,
-          useSpyre,              // consumed by /api/chat, stripped before forwarding
+          spyreActive,              // consumed by /api/chat, stripped before forwarding
         }),
       });
 
@@ -161,7 +161,7 @@ export default function EntityExtractionPage() {
       }
 
       const text = result?.choices?.[0]?.message?.content ?? "";
-      const backend = response.headers.get('X-LLM-Backend') || (useSpyre ? 'spyre' : 'llama');
+      const backend = response.headers.get('X-LLM-Backend') || (spyreActive ? 'spyre' : 'llama');
       console.log(`Raw model response [${backend}]:`, text);
 
       // Parse + reconcile with your expected keys
@@ -517,8 +517,8 @@ export default function EntityExtractionPage() {
                     <Button className="send-to-llm-class" onClick={()=>completion()} disabled={isLoading}>
                       {isLoading ? 'Sending…' : 'Send Prompt to LLM'}
                     </Button>
-                    <Tag type={useSpyre ? 'green' : 'blue'} size="md">
-                      {useSpyre ? '⚡ IBM Spyre' : '🔵 IBM Power MMA'}
+                    <Tag type={spyreActive ? 'green' : 'blue'} size="md">
+                      {spyreActive ? '⚡ IBM Spyre' : '🔵 IBM Power MMA'}
                     </Tag>
                   </div>
                 </Column>
@@ -851,8 +851,8 @@ export default function EntityExtractionPage() {
                     <Button className="send-to-llm-class" onClick={()=>completion()} disabled={isLoading}>
                       {isLoading ? 'Sending…' : 'Send Prompt to LLM'}
                     </Button>
-                    <Tag type={useSpyre ? 'green' : 'blue'} size="md">
-                      {useSpyre ? '⚡ IBM Spyre' : '🔵 IBM Power MMA'}
+                    <Tag type={spyreActive ? 'green' : 'blue'} size="md">
+                      {spyreActive ? '⚡ IBM Spyre' : '🔵 IBM Power MMA'}
                     </Tag>
                   </div>
                 </Column>
@@ -1093,8 +1093,8 @@ export default function EntityExtractionPage() {
                     <Button className="send-to-llm-class" onClick={()=>completion()} disabled={isLoading}>
                       {isLoading ? 'Sending…' : 'Send Prompt to LLM'}
                     </Button>
-                    <Tag type={useSpyre ? 'green' : 'blue'} size="md">
-                      {useSpyre ? '⚡ IBM Spyre' : '🔵 IBM Power MMA'}
+                    <Tag type={spyreActive ? 'green' : 'blue'} size="md">
+                      {spyreActive ? '⚡ IBM Spyre' : '🔵 IBM Power MMA'}
                     </Tag>
                   </div>
                 </Column>
