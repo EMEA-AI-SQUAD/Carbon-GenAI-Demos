@@ -43,9 +43,9 @@ module.exports = {
     // -------------------------------------------------------------------------
     {
       name: 'genai-llama',
-      script: `${process.env.HOME}/llama.cpp/build/bin/llama-server`,
+      script: '/data/llama.cpp/build/bin/llama-server',
       args: `-m ${llamaModel} --host 0.0.0.0 --port ${llamaPort}`,
-      cwd: `${process.env.HOME}/llama.cpp`,   // llama.cpp stays in $HOME
+      cwd: '/data/llama.cpp',
       interpreter: 'none',
 
       // Restart policy
