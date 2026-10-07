@@ -34,7 +34,7 @@ const llamaModel = process.env.LLAMA_MODEL
 // The Spyre cards are on 9.8.70.146; they expose the same llama.cpp
 // OpenAI-compatible API so no format changes are needed.
 // Override with SPYRE_URL env var if the address changes.
-const spyreUrl = process.env.SPYRE_URL || 'http://9.8.70.146:8080';
+const spyreUrl = process.env.SPYRE_URL || 'http://9.8.70.146:8001';
 
 module.exports = {
   apps: [
