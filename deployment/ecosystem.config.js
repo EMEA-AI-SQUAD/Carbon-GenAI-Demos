@@ -27,48 +27,48 @@ const llamaPort = process.env.LLAMA_PORT || '8080';
 const proxyPort = process.env.PROXY_PORT || '3001';
 const appPort   = process.env.APP_PORT   || '3000';
 
-const llamaModel = process.env.LLAMA_MODEL
-  || '/data/models/granite-4.0-micro-Q4_K_M.gguf';
+// WORK_DIR: root of deployment — set by remote-deploy.sh, defaults to /data.
+// All other paths are derived from this so the ecosystem file works on any
+// machine regardless of where the repo was cloned.
+const workDir  = process.env.WORK_DIR  || '/data';
+const repoDir  = process.env.REPO_DIR  || 'Carbon-GenAI-Demos';
+const appPath  = `${workDir}/${repoDir}/carbon-ui`;
 
-// TechXChange Lab 1127 — IBM Spyre endpoint.
-// The Spyre cards are on 9.8.70.146; they expose the same llama.cpp
-// OpenAI-compatible API so no format changes are needed.
+const llamaModel = process.env.LLAMA_MODEL
+  || `${workDir}/models/granite-4.0-micro-Q4_K_M.gguf`;
+
+// TechXChange Lab 1127 — IBM Spyre endpoint (ncat forwarder on 9.8.70.146:8001
+// → vLLM container running granite-4.1-8b-fp8 on the internal pod network).
 // Override with SPYRE_URL env var if the address changes.
 const spyreUrl = process.env.SPYRE_URL || 'http://9.8.70.146:8001';
 
 module.exports = {
   apps: [
     // -------------------------------------------------------------------------
-    // LLM Server (llama.cpp)
+    // LLM Server (llama.cpp) — CPU path
     // -------------------------------------------------------------------------
     {
       name: 'genai-llama',
-      script: '/data/llama.cpp/build/bin/llama-server',
+      script: `${workDir}/llama.cpp/build/bin/llama-server`,
       args: `-m ${llamaModel} --host 0.0.0.0 --port ${llamaPort}`,
-      cwd: '/data/llama.cpp',
+      cwd: `${workDir}/llama.cpp`,
       interpreter: 'none',
 
-      // Restart policy
       max_restarts: 10,
       restart_delay: 3000,
       exp_backoff_restart_delay: 200,
-
-      // Nightly restart at 03:00 (server local time)
       cron_restart: '0 3 * * *',
-
-      // Safety net — llama-server can grow large under sustained load
       max_memory_restart: '4G',
-
       log_date_format: 'YYYY-MM-DD HH:mm:ss',
     },
 
     // -------------------------------------------------------------------------
-    // Proxy Server (Node / Express)
+    // Proxy Server (Node / Express) — bridges browser pages to llama.cpp
     // -------------------------------------------------------------------------
     {
       name: 'genai-proxy',
       script: 'server_final.js',
-      cwd: '/data/Carbon-GenAI-Demos/carbon-ui/src/llama-proxy',
+      cwd: `${appPath}/src/llama-proxy`,
       interpreter: 'node',
 
       env: {
@@ -78,64 +78,50 @@ module.exports = {
         NODE_ENV: 'production',
       },
 
-      // Restart policy
       max_restarts: 20,
       restart_delay: 2000,
       exp_backoff_restart_delay: 100,
-
       cron_restart: '5 3 * * *',
-
       log_date_format: 'YYYY-MM-DD HH:mm:ss',
     },
 
     // -------------------------------------------------------------------------
-    // Next.js UI
-    // Uses server.js (custom wrapper) instead of `yarn start` so that
-    // ECONNRESET / EPIPE errors are caught and do not kill the process.
+    // Next.js UI — Spyre toggle routes /api/chat to CPU or Spyre backend
     // -------------------------------------------------------------------------
     {
       name: 'genai-nextjs',
       script: 'server.js',
-      cwd: '/data/Carbon-GenAI-Demos/carbon-ui',
+      cwd: appPath,
       interpreter: 'node',
 
       env: {
         PORT: appPort,
         NODE_ENV: 'production',
-        // Spyre backend URL — read by /api/chat Next.js route
         LLAMA_URL: `http://localhost:${llamaPort}`,
         SPYRE_URL: spyreUrl,
       },
 
-      // Restart policy — more restarts allowed since ECONNRESET should no
-      // longer cause crashes, but keep a limit as a safety net
       max_restarts: 20,
       restart_delay: 2000,
       exp_backoff_restart_delay: 100,
-
-      // Nightly restart slightly after proxy (10 3 vs 5 3) to avoid race
       cron_restart: '10 3 * * *',
-
       max_memory_restart: '512M',
-
       log_date_format: 'YYYY-MM-DD HH:mm:ss',
     },
 
     // -------------------------------------------------------------------------
-    // PassportEye OCR Service (Python / Flask)
+    // PassportEye OCR Service (Python / Flask) — optional, PII Extract tab
     // -------------------------------------------------------------------------
     {
       name: 'passporteye',
       script: 'deployment/passport_service.py',
-      cwd: '/data/Carbon-GenAI-Demos',
+      cwd: `${workDir}/${repoDir}`,
       interpreter: `${process.env.HOME}/.passporteye-venv/bin/python3`,
 
       max_restarts: 10,
       restart_delay: 3000,
       exp_backoff_restart_delay: 200,
-
       cron_restart: '15 3 * * *',
-
       log_date_format: 'YYYY-MM-DD HH:mm:ss',
     },
   ],
