@@ -1,12 +1,12 @@
 # Checkpoint — Carbon GenAI IBM Power Recipe
 
-> Last updated: 2026-09-10
+> Last updated: 2026-10-07
 
 ---
 
 ## Status
 
-**CE Marketplace PR submitted. Both demos live on TechZone. Ready for tomorrow's call.**
+**TechXChange Lab 1127 Spyre toggle working end-to-end. Both CPU and Spyre backends live on mma-bench (150). Deployment script (`remote-deploy.sh`) updated and pushed.**
 
 ---
 
@@ -20,6 +20,7 @@
 | Sep 2026 | v2 TechZone platform (`6a7aba1916c56f06e4b1e910`) validated. RHEL 10.2 full deployment confirmed (38m 2s clean). All 4 services running. Granite 4.0 Micro LLM verified. Username handling fixed (`cecuser` → per-reservation). Barry doc updated. TechZone bug report drafted. Everything committed (`d639457`). |
 | Sep 2026 (10th) | MCP reservation tested — confirmed `userVariables` bug (empty array → `TZ-FS5200_` image not found). Manual reservation works. Bug report updated with full API comparison evidence. `.carbonvenv` purged from all git history (175 commits, both remotes). `.gitattributes` added to prevent CRLF on shell scripts. New Farnell dual-deploy scripts added (`deploy-farnell-ui.sh`, `remote-launch-farnell.sh`). Both demos deployed and verified on `pvm1-sqqsd52k.p1210.pok-systems.techzone.ibm.com` (U3KAJZD, RHEL 10.2, reservation `6aa286be`, expires 2026-09-14). All 5 ports confirmed live. |
 | Sep 2026 (10th, cont.) | All use case counts corrected to 18 across all docs. CE Marketplace PR opened: `github.ibm.com/ClientEngineering/bob/pull/231` — `Recipes/IBM-Power-GenAI/` with `README.md` and `01-IBM-Power-GenAI.md`. |
+| Oct 2026 (7th) | TechXChange Lab 1127 Spyre toggle implemented. All 6 demo pages migrated from hardcoded port 3001 (OpenAI SDK) to `/api/chat` route. `SpyreContext` + `Toggle` added to Header. Model set to `ibm-granite/granite-4.1-8b-fp8`. ncat forwarder on 146:8001 → container 10.89.0.55:8000. `ecosystem.config.js` paths made dynamic via `WORK_DIR` env var. `remote-deploy.sh` rewritten: Node PATH fix (checks `/usr/local/node/bin` first), uses ecosystem.config.js for pm2 start, correct SPYRE_URL. All committed to `feature/lab1127-techxchange` (`ca77683`). Demo live and verified at `http://9.8.70.150:3000`. |
 
 ---
 
@@ -55,29 +56,39 @@
 
 ---
 
+## Lab 1127 server reference
+
+| Server | Hostname | IP | Role |
+|---|---|---|---|
+| mma-bench | p11-mma-rhel (150) | `9.8.70.150` | Next.js demo + llama.cpp CPU LLM |
+| p11-mma-rhel (146) | p11-mma-rhel | `9.8.70.146` | Spyre cards + vLLM containers |
+
+**Spyre container:** `llm-aa67fe1b75-llm` — `granite-4.1-8b-fp8` at `10.89.0.55:8000` (internal pod network)
+**ncat forwarder** (must be running on 146): `nohup ncat -l 0.0.0.0 8001 --keep-open --sh-exec "ncat 10.89.0.55 8000" > /tmp/ncat-spyre.log 2>&1 &`
+**Demo URL:** `http://9.8.70.150:3000`
+**App location on 150:** `/data/Carbon-GenAI-Demos/carbon-ui`
+
+---
+
 ## Next steps
 
-1. **Before Thursday** — deploy is running on the Denmark VM. Once complete (~38 min from start),
-   push the Danish-tailored files and rebuild. You are currently on the `denmark-2026` local branch.
-   Run these scp commands from the repo root:
+1. **Make ncat forwarder permanent on 146** (before lab day — survives reboots):
+   ```bash
+   cat > /etc/systemd/system/spyre-proxy.service << 'EOF'
+   [Unit]
+   Description=ncat proxy: host:8001 → granite-4.1-8b-fp8 container
+   After=network.target
+   [Service]
+   ExecStart=/usr/bin/ncat -l 0.0.0.0 8001 --keep-open --sh-exec "ncat 10.89.0.55 8000"
+   Restart=always
+   RestartSec=3
+   [Install]
+   WantedBy=multi-user.target
+   EOF
+   systemctl daemon-reload && systemctl enable --now spyre-proxy
    ```
-   KEY="C:\Users\029878866\Downloads\techzone-power-key-denmark.pem"
-   HOST="UY32QEF@pvm1-fso8l13k.p651.pok-systems.techzone.ibm.com"
-   BASE="carbon-ui/src/app"
-   scp -i "$KEY" $BASE/entextract/defaults.js         "$HOST:~/Carbon-GenAI-Demos/$BASE/entextract/defaults.js"
-   scp -i "$KEY" $BASE/entextract/it-ops-emails.js    "$HOST:~/Carbon-GenAI-Demos/$BASE/entextract/it-ops-emails.js"
-   scp -i "$KEY" $BASE/entextract/logistics-quote.js  "$HOST:~/Carbon-GenAI-Demos/$BASE/entextract/logistics-quote.js"
-   scp -i "$KEY" $BASE/convintel/defaults.js           "$HOST:~/Carbon-GenAI-Demos/$BASE/convintel/defaults.js"
-   scp -i "$KEY" $BASE/home/page.js                    "$HOST:~/Carbon-GenAI-Demos/$BASE/home/page.js"
-   ssh -i "$KEY" "$HOST" "cd ~/Carbon-GenAI-Demos/carbon-ui && yarn build && pm2 restart nextjs-app"
-   ```
-   Demo at: `http://pvm1-fso8l13k.p651.pok-systems.techzone.ibm.com:3000` (IBM VPN required)
 
-2. **After Thursday** — return local working copy to the generic demo:
-   ```
-   git checkout main
-   ```
-   The `denmark-2026` branch is preserved locally. See [`TAILORING.md`](TAILORING.md) for the full pattern.
+2. **Run `pm2 save` on 150** after confirming all three processes are healthy, so they survive a reboot.
 
 3. **CE Marketplace PR** — awaiting review: `github.ibm.com/ClientEngineering/bob/pull/231`
 
@@ -101,11 +112,13 @@
 Paste this into the first message:
 
 ```
-We are working on the Carbon GenAI IBM Power recipe for the CE Marketplace.
+We are working on the Carbon GenAI IBM Power demo / TechXChange Lab 1127.
 Read _checkpoint.md for full context.
 
-Current status: Denmark VM deploying — pvm1-fso8l13k.p651.pok-systems.techzone.ibm.com (UY32QEF, RHEL 10.2,
-key at C:\Users\029878866\Downloads\techzone-power-key-denmark.pem). Danish tailoring on local branch
-denmark-2026 (not pushed). After Thursday run: git checkout main. CE Marketplace PR open at
-github.ibm.com/ClientEngineering/bob/pull/231. IBM VPN required.
+Current status: Spyre toggle working end-to-end on mma-bench (9.8.70.150).
+Branch: feature/lab1127-techxchange (latest commit ca77683).
+App lives at /data/Carbon-GenAI-Demos/carbon-ui on 150.
+Spyre vLLM (granite-4.1-8b-fp8) on 146, reachable via ncat forwarder on 9.8.70.146:8001.
+Still to do: make ncat forwarder a systemd unit on 146; run pm2 save on 150.
+CE Marketplace PR open at github.ibm.com/ClientEngineering/bob/pull/231.
 ```
