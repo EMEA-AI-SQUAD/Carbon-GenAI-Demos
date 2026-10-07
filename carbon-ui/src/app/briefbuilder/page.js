@@ -47,19 +47,10 @@ import {
   reconcileOutput,
   buildKeyLabelMap,
 } from './postprocess';
-import OpenAI from 'openai';
-
-const API_URL = typeof window !== 'undefined'
-  ? `http://${window.location.hostname}:3001/v1`
-  : 'http://localhost:3001/v1';
-
-const openai_client = new OpenAI({
-  baseURL: API_URL,
-  apiKey: 'sk-no-key-required',
-  dangerouslyAllowBrowser: true,
-});
+import { useSpyre } from '../spyre-context';
 
 export default function BriefBuilderPage() {
+  const { useSpyre: spyreActive } = useSpyre();
   const [values, setValues] = useState(() => DEFAULTS);
   const messages = useMemo(() => buildMessages(values), [values]);
 
@@ -91,15 +82,22 @@ export default function BriefBuilderPage() {
 
     console.log('Calling LLM for Brief Builder generation...');
     try {
-      const result = await openai_client.chat.completions.create({
-        model: 'gpt-3.5-turbo',
-        messages,
-        stream: false,
-        temperature: 0.4,
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'ibm-granite/granite-4.1-8b-fp8',
+          messages,
+          stream: false,
+          temperature: 0.4,
+          useSpyre: spyreActive,
+        }),
       });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result?.error || `HTTP ${response.status}`);
 
       const text = result?.choices?.[0]?.message?.content ?? '';
-      console.log('Raw model response:', text);
+      console.log(`Raw model response [${response.headers.get('X-LLM-Backend')}]:`, text);
 
       const modelObj = parseModelJson(text);
       const expected = getExpectedKeys(values);

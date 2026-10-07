@@ -20,7 +20,7 @@ import https from 'https';
  */
 
 const LLAMA_URL = process.env.LLAMA_URL || 'http://localhost:8080';
-const SPYRE_URL = process.env.SPYRE_URL || 'http://9.8.70.146:8080';
+const SPYRE_URL = process.env.SPYRE_URL || 'http://9.8.70.146:8001';
 
 function nodeRequest(baseUrl, path, body) {
   return new Promise((resolve, reject) => {

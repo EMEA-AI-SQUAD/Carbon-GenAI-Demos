@@ -27,7 +27,7 @@ LPAR_HOST="9.8.70.150"
 LPAR_USER="root"
 BRANCH="feature/lab1127-techxchange"
 REPO_URL="https://github.com/ibm-power-demos-with-bob/Carbon-GenAI-Demos"
-SPYRE_URL="http://9.8.70.146:8080"
+SPYRE_URL="http://9.8.70.146:8001"
 
 # Colours
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'

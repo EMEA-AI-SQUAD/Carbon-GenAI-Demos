@@ -48,11 +48,11 @@ import { getExpectedKeys, parseModelJson, reconcileOutput, buildKeyLabelMap } fr
 import { runExtractionWithStreaming } from "./extraction";
 import { IT_OPS_SCENARIOS } from "./it-ops-emails";
 import { LOGISTICS_QUOTE_SCENARIO } from "./logistics-quote";
+import { useSpyre } from '../spyre-context';
 
 export default function EntityExtractionPage() {
-  // Spyre toggle — hardcoded false for initial CPU deploy.
-  // Re-enable SpyreContext here once the toggle UI is wired back in.
-  const spyreActive = false;
+  // Spyre toggle — reads from SpyreContext (set via the header toggle).
+  const { useSpyre: spyreActive } = useSpyre();
 
   const [values, setValues] = useState(() => DEFAULTS);
   const [streamedText, setStreamedText] = useState("");
@@ -147,11 +147,11 @@ export default function EntityExtractionPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gpt-3.5-turbo', // llama.cpp ignores but field required
+          model: 'ibm-granite/granite-4.1-8b-fp8', // llama.cpp ignores; vLLM requires this to match --served-model-name
           messages: msgs,
           stream: false,
           temperature: 0,
-          spyreActive,              // consumed by /api/chat, stripped before forwarding
+          useSpyre: spyreActive,    // consumed by /api/chat, stripped before forwarding
         }),
       });
 

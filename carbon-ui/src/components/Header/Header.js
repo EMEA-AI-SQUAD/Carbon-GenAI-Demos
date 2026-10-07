@@ -14,10 +14,14 @@ import {
   SideNav,
   SideNavItems,
   HeaderSideNavItems,
+  Toggle,
 } from '@carbon/react';
 import Link from 'next/link';
+import { useSpyre } from '../../app/spyre-context';
 
-const TutorialHeader = () => (
+const TutorialHeader = () => {
+  const { useSpyre: spyreActive, setUseSpyre } = useSpyre();
+  return (
   <HeaderContainer
     render={({ isSideNavExpanded, onClickSideNavExpand }) => (
       <Header aria-label="Carbon Tutorial">
@@ -84,6 +88,17 @@ const TutorialHeader = () => (
           </SideNavItems>
         </SideNav>
         <HeaderGlobalBar>
+          <div style={{ display: 'flex', alignItems: 'center', padding: '0 1rem' }}>
+            <Toggle
+              id="spyre-toggle"
+              size="sm"
+              labelA="CPU"
+              labelB="⚡ Spyre"
+              toggled={spyreActive}
+              onToggle={(checked) => setUseSpyre(checked)}
+              aria-label="Switch LLM backend"
+            />
+          </div>
           <HeaderGlobalAction
             aria-label="Notifications"
             tooltipAlignment="center"
@@ -103,6 +118,7 @@ const TutorialHeader = () => (
       </Header>
     )}
   />
-);
+  );
+};
 
 export default TutorialHeader;

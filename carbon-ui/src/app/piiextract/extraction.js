@@ -4,7 +4,7 @@ export async function runExtractionWithStreaming(values, openai_client) {
 
   // 2) Create streaming completion
   const stream = await openai_client.chat.completions.create({
-    model: "gpt-3.5-turbo", // llama.cpp ignores but field required
+    model: "ibm-granite/granite-4.1-8b-fp8", // llama.cpp ignores; vLLM requires this to match --served-model-name
     messages,
     stream: true,
     temperature: 0
