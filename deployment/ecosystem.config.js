@@ -45,7 +45,7 @@ module.exports = {
       name: 'genai-llama',
       script: `${process.env.HOME}/llama.cpp/build/bin/llama-server`,
       args: `-m ${llamaModel} --host 0.0.0.0 --port ${llamaPort}`,
-      cwd: `${process.env.HOME}/llama.cpp`,
+      cwd: `${process.env.HOME}/llama.cpp`,   // llama.cpp stays in $HOME
       interpreter: 'none',
 
       // Restart policy
@@ -68,7 +68,7 @@ module.exports = {
     {
       name: 'genai-proxy',
       script: 'server_final.js',
-      cwd: `${process.env.HOME}/Carbon-GenAI-Demos/carbon-ui/src/llama-proxy`,
+      cwd: '/data/Carbon-GenAI-Demos/carbon-ui/src/llama-proxy',
       interpreter: 'node',
 
       env: {
@@ -96,7 +96,7 @@ module.exports = {
     {
       name: 'genai-nextjs',
       script: 'server.js',
-      cwd: `${process.env.HOME}/Carbon-GenAI-Demos/carbon-ui`,
+      cwd: '/data/Carbon-GenAI-Demos/carbon-ui',
       interpreter: 'node',
 
       env: {
@@ -127,7 +127,7 @@ module.exports = {
     {
       name: 'passporteye',
       script: 'deployment/passport_service.py',
-      cwd: `${process.env.HOME}/Carbon-GenAI-Demos`,
+      cwd: '/data/Carbon-GenAI-Demos',
       interpreter: `${process.env.HOME}/.passporteye-venv/bin/python3`,
 
       max_restarts: 10,
