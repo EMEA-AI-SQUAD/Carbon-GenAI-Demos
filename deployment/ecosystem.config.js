@@ -28,7 +28,7 @@ const proxyPort = process.env.PROXY_PORT || '3001';
 const appPort   = process.env.APP_PORT   || '3000';
 
 const llamaModel = process.env.LLAMA_MODEL
-  || `${process.env.HOME}/models/granite-4.0-micro-Q4_K_M.gguf`;
+  || '/data/models/granite-4.0-micro-Q4_K_M.gguf';
 
 // TechXChange Lab 1127 — IBM Spyre endpoint.
 // The Spyre cards are on 9.8.70.146; they expose the same llama.cpp
