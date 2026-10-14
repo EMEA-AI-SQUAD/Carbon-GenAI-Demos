@@ -65,11 +65,11 @@ Email: alex.dubois@globalbank.eu`,
       },
       {
         label: "Sender Emotional State",
-        definition: "The emotional tone of the sender (calm/analytical/panicked)"
+        definition: "The emotional tone of the sender (e.g., Analytical, Stressed, Panicked)"
       },
       {
         label: "True Priority",
-        definition: "Objective assessment of priority: Low, Medium, High, or Critical. (Since quorum is maintained and data is intact, latency on non-critical analytics is Medium/High, not a catastrophic Critical outage)."
+        definition: "Must be exactly one of: Low, Medium, High, Critical. Evaluate objectively based on enterprise impact: since quorum is maintained and core payments continue, analytics batch latency is Medium/High, not a Critical outage."
       },
       {
         label: "Suggested Solution Area",
@@ -108,7 +108,7 @@ P.S. - HO DAVVERO BISOGNO DI AIUTO URGENTE!!!`,
     entities: [
       {
         label: "English Summary",
-        definition: "A concise summary of the email content in English (2-3 sentences covering the main issue, impact, and request)"
+        definition: "A concise summary of the email content in English (2-3 sentences covering the main issue and technical error)"
       },
       {
         label: "Sender Name",
@@ -144,15 +144,15 @@ P.S. - HO DAVVERO BISOGNO DI AIUTO URGENTE!!!`,
       },
       {
         label: "Business Impact",
-        definition: "The actual impact on business operations (what can't be done)"
+        definition: "Organizational operational impact only: describe what business task is delayed (e.g. 'Monthly sales report unavailable for VP meeting; core company sales operations continue unaffected'). Ignore personal employment fears."
       },
       {
         label: "Emotional State",
-        definition: "The emotional tone of the sender (calm/stressed/panicked)"
+        definition: "The emotional tone of the sender (e.g., Panicked, Stressed, Calm)"
       },
       {
         label: "True Priority",
-        definition: "Objective assessment of business priority based solely on organisational impact — ignore the sender's emotional state entirely. Use: Low (no business impact, cosmetic or personal inconvenience only), Medium (a business task is delayed or inconvenienced but the organisation continues to operate normally — e.g. a report cannot be generated for a meeting), High (a business process is disrupted — revenue, compliance, or a key delivery is at risk), Critical (immediate risk to human safety, or a failure that threatens significant financial loss or regulatory breach at organisational scale). A reporting tool being unavailable for a VP meeting is Medium, not Critical."
+        definition: "Must be exactly one of: Low, Medium, High, Critical. An unavailable internal reporting tool for a meeting is strictly Medium. Critical is only for complete system-wide outages or safety hazards."
       },
       {
         label: "Suggested Solution Area",
@@ -249,7 +249,7 @@ Classification: URGENT - SÉCURITÉ`,
       },
       {
         label: "Business Impact",
-        definition: "The actual impact on business operations (what can't be done)"
+        definition: "Organizational operational impact only: describe what facility or business workflow is affected. Ignore personal anxiety."
       },
       {
         label: "Safety Risk",
@@ -261,7 +261,7 @@ Classification: URGENT - SÉCURITÉ`,
       },
       {
         label: "True Priority",
-        definition: "Objective assessment of priority: Low (no immediate business impact), Medium (business inconvenience), High (business disruption), Critical (safety/major financial risk)"
+        definition: "Must be exactly one of: Low, Medium, High, Critical. Guidance: Critical is strictly for immediate safety hazards, risk of explosion/injury, or complete facility shutdown."
       },
       {
         label: "Suggested Solution Area",
