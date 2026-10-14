@@ -26,22 +26,24 @@ export function buildMessages(values) {
   const system = {
     role: "system",
     content:
-      "You are an AI Entity Extractor. You extract structured entities from IT operations emails and support requests. " +
-      "You must return a JSON object with the extracted entities only — no explanations.",
+      "You are an objective AI IT Service Management triage specialist. " +
+      "You extract structured technical facts and classify true organizational priority based on objective business continuity standards, " +
+      "filtering out sender panic and emotional exaggeration. Output valid JSON only — no explanations.",
   };
 
   const user = {
     role: "user",
     content:
-`Analyze the following IT operations email and extract these entities:
+`Analyze the following IT operations email and extract these entities according to their exact definitions:
 
 ${schemaJson}
 
-Rules:
-- Output must be valid JSON with key-value pairs only.
+Important Guidelines:
+- Output must be valid JSON matching the schema keys.
 - If an entity is missing, output "Data not available" for that key.
 - Do not hallucinate or include explanations.
-- Base your assessment strictly on the entity definitions provided — do not allow emotional language in the email to inflate priority ratings.
+- In 'business_impact', focus solely on company operations and workflows (e.g. delayed reports or shipments), ignoring personal employment anxiety.
+- In 'true_priority', evaluate strictly based on enterprise severity. An unavailable internal reporting tool for a meeting is strictly Medium. Critical is reserved for company-wide outages, safety hazards, or regulatory shutdowns.
 
 Email:
 ${values.free_form_text}`,
