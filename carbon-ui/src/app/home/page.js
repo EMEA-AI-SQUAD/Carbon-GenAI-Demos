@@ -22,28 +22,28 @@ export default function LandingPage() {
             <a href="/">Getting started</a>
           </BreadcrumbItem>
         </Breadcrumb>
-        <h1 className="landing-page__heading">Demonstrate GenAI adding value with IBM Power</h1>
+        <h1 className="landing-page__heading">Resilient Distributed Data Meets Sovereign AI on IBM Power</h1>
       </Column>
       <Column lg={16} md={8} sm={4} className="landing-page__r2">
         <Tabs defaultSelectedIndex={0}>
           <TabList className="tabs-group" aria-label="Tab navigation">
             <Tab>About</Tab>
-            <Tab>Secure</Tab>
-            <Tab>Flexible</Tab>
+            <Tab>Resilience</Tab>
+            <Tab>Data Sovereignty</Tab>
+            <Tab>Agentic Intelligence</Tab>
           </TabList>
           <TabPanels>
             <TabPanel>
               <Grid className="tabs-group-content">
                 <Column md={4} lg={7} sm={4} className="landing-page__tab-content">
-                  <h3 className="landing-page__subheading">GenAI on IBM Power</h3>
+                  <h3 className="landing-page__subheading">GenAI on IBM Power + CockroachDB</h3>
                   <p className="landing-page__p">
-                    GenAI, running in IBM Power, can deliver business benefit without
-                    needing to use expensive and energy hungry GPUs. You can derive
-                    business benefit by using Open Source GenAI that are augmented
-                    by the Matrix Maths Accelerator that is designed into every IBM Power
-                    server.
+                    Enterprise GenAI delivers maximum value when executed directly where mission-critical
+                    data lives. By combining CockroachDB's distributed, zero-downtime transactional database
+                    architecture with IBM Power's on-chip Matrix Math Accelerators (MMA), enterprises achieve
+                    high-throughput AI inference without expensive GPU clusters, cloud egress fees, or data exposure.
                   </p>
-                  <Button>Learn more</Button>
+                  <Button href="/entextract">Explore Demos</Button>
                 </Column>
                 <Column md={4} lg={{ span: 8, offset: 7 }} sm={4}>
                   <Image
@@ -59,12 +59,12 @@ export default function LandingPage() {
             <TabPanel>
               <Grid className="tabs-group-content">
                 <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
+                  <h3 className="landing-page__subheading">Zero-Downtime Resilience</h3>
                   <p className="landing-page__p">
-                    Your data can remain safe and secure inside IBM Power, without needing
-                    to leave your control. IBM Power also has orders of magnitude fewer
-                    security vulnerabilities in the virtualisation that is in the heart of
-                    every IBM Power server, lowering the surface area that can be attacked
-                    by bad actors.
+                    Just as CockroachDB survives node and regional outages without data loss or downtime,
+                    IBM Power delivers 99.999+% availability with hardware-enforced virtualization isolation.
+                    Together, they form an uncompromised foundation for always-on transaction processing
+                    and real-time operational AI.
                   </p>
                 </Column>
               </Grid>
@@ -72,13 +72,24 @@ export default function LandingPage() {
             <TabPanel>
               <Grid className="tabs-group-content">
                 <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
+                  <h3 className="landing-page__subheading">Total Data Locality & Compliance</h3>
                   <p className="landing-page__p">
-                    These demos use the Granite 4.0 model, running in this IBM Power virtual
-                    server, which was downloaded from Huggingface. You can easily swap this
-                    model for others, such as Mystral or the Llama models from Meta. You can 
-                    therefore be free to pick which every model best suits your use case, and
-                    use different models in different virtual servers. You are not restricted
-                    to the resources in GPUs, or to the model served by a given provider.
+                    Sensitive client, financial, and personal data never leaves your security perimeter.
+                    Models like IBM Granite 4.0 run natively in memory on Power servers, analyzing live
+                    CockroachDB records for entity extraction, PII redaction, and semantic retrieval with
+                    complete compliance under EU AI Act, GDPR, and DORA regulations.
+                  </p>
+                </Column>
+              </Grid>
+            </TabPanel>
+            <TabPanel>
+              <Grid className="tabs-group-content">
+                <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
+                  <h3 className="landing-page__subheading">The Agentic Database Era (Cockroach Continuum)</h3>
+                  <p className="landing-page__p">
+                    With Cockroach Continuum and Aegis, database operations shift from manual cluster firefighting
+                    to autonomous estate governance. Local AI models assist SREs and DBAs by triaging telemetry,
+                    optimizing slow queries, preventing deadlocks, and recommending dynamic storage placement.
                   </p>
                 </Column>
               </Grid>
@@ -89,7 +100,7 @@ export default function LandingPage() {
       <Column lg={16} md={8} sm={4} className="landing-page__r3">
         <Grid>
           <Column lg={4} md={2} sm={4}>
-            <h3 className="landing-page__label">The Principles</h3>
+            <h3 className="landing-page__label">Core Pillars</h3>
           </Column>
           <Column
             lg={{ start: 5, span: 3 }}
@@ -98,7 +109,7 @@ export default function LandingPage() {
             className="landing-page__title"
             style={{ textAlign: 'center' }}>
             <h4>💾 Data Locality</h4>
-            <div>Run GenAI Models where your data lives</div>
+            <div>Run Granite AI directly where distributed data lives</div>
           </Column>
           <Column
             lg={{ start: 9, span: 3 }}
@@ -106,8 +117,8 @@ export default function LandingPage() {
             sm={4}
             className="landing-page__title"
             style={{ textAlign: 'center' }}>
-            <h4>🔒 Security</h4>
-            <div>Ensure data sovereignty</div>
+            <h4>🛡️ Zero Downtime</h4>
+            <div>CockroachDB resilience on Power reliability</div>
           </Column>
           <Column
             lg={{ start: 13, span: 3 }}
@@ -115,8 +126,8 @@ export default function LandingPage() {
             sm={4}
             className="landing-page__title"
             style={{ textAlign: 'center' }}>
-            <h4>⚡ Reliability</h4>
-            <div>Legendary reliability</div>
+            <h4>⚡ Energy & TCO</h4>
+            <div>On-chip MMA inference without GPU power overhead</div>
           </Column>
         </Grid>
       </Column>

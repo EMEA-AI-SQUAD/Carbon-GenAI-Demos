@@ -1,6 +1,83 @@
 // IT Ops Email Scenarios for Entity Extraction Demo
 
 export const IT_OPS_SCENARIOS = {
+  cockroach_telemetry: {
+    title: "CockroachDB Multi-Region Cluster Telemetry & SRE Triage",
+    description: "Demonstrates technical root-cause triage and objective priority rating for distributed database estates",
+    language: "English",
+    email: `Subject: P1 ALERT (ESCALATED): Multi-Region CockroachDB Cluster Telemetry — Range Leases & WAN Jitter
+
+Hi SRE Team,
+
+I am writing regarding automated alerts firing on our European production CockroachDB cluster (cluster-id: crdb-prod-eu-central).
+
+TELEMETRY & LOG FINDINGS:
+- Cluster Topology: 9 nodes across Frankfurt (eu-central-1), Dublin (eu-west-1), and Stockholm (eu-north-1)
+- Affected Table: 'payments_ledger_v2' (approx. 42M rows, active-active multi-region)
+- Alert: Elevated p99 latency (>450ms, baseline <8ms) observed on node-5 and node-6 (Stockholm)
+- Aegis Agent Observation: Temporary WAN packet drop (approx. 3.2%) between Stockholm and Frankfurt triggered automatic Raft leaseholder transfers back to Frankfurt nodes. No data lost; quorum maintained at 100%.
+
+OPERATIONAL IMPACT:
+- Core banking payment processing has NOT stopped; transactions remain consistent (Serializable isolation preserved).
+- Batch settlement report jobs connecting directly to the Stockholm gateway are experiencing elevated latency timeouts.
+- Panic on the application channel: The payments ops team believes the database is corrupted because their local query timed out.
+
+DIAGNOSIS & REQUIRED ACTIONS:
+1. Reassure the business: Database integrity is 100% intact with zero split-brain or data loss.
+2. Route local analytics queries via proxy to Frankfurt leaseholders until Stockholm WAN jitter resolves.
+3. Aegis recommends applying a temporary range lease preference to 'eu-central-1' for the next 2 hours.
+
+Deadline for lease rebalance confirmation: 16:30 CET today.
+
+Regards,
+Alexandre Dubois, Lead Site Reliability Engineer
+CockroachDB Estate Operations | EMEA Banking Core
+Tel: +33 1 70 89 22 10
+Email: alex.dubois@globalbank.eu`,
+    entities: [
+      {
+        label: "English Summary",
+        definition: "A concise summary of the email content in English (2-3 sentences covering the main issue, impact, and request)"
+      },
+      {
+        label: "Sender Name",
+        definition: "Who sent this email (full name)"
+      },
+      {
+        label: "Sender Role",
+        definition: "The job title or role of the sender"
+      },
+      {
+        label: "Cluster / System ID",
+        definition: "The cluster name or identifier affected"
+      },
+      {
+        label: "Issue Type",
+        definition: "The technical problem being reported (e.g., WAN jitter, Raft leaseholder rebalancing, latency)"
+      },
+      {
+        label: "Affected Regions / Nodes",
+        definition: "Regions, datacenters, or nodes mentioned"
+      },
+      {
+        label: "Data Loss / Integrity Status",
+        definition: "Status of data consistency and whether any data was lost"
+      },
+      {
+        label: "Sender Emotional State",
+        definition: "The emotional tone of the sender (calm/analytical/panicked)"
+      },
+      {
+        label: "True Priority",
+        definition: "Objective assessment of priority: Low, Medium, High, or Critical. (Since quorum is maintained and data is intact, latency on non-critical analytics is Medium/High, not a catastrophic Critical outage)."
+      },
+      {
+        label: "Suggested Solution Area",
+        definition: "Recommended resolution action (e.g. adjust range lease preference, reroute gateway queries)"
+      }
+    ]
+  },
+
   italian_emotional: {
     title: "Emotional Italian Report Issue",
     description: "Demonstrates handling emotional language and priority assessment",
@@ -195,7 +272,7 @@ Classification: URGENT - SÉCURITÉ`,
 };
 
 export const getScenario = (scenarioKey) => {
-  return IT_OPS_SCENARIOS[scenarioKey] || IT_OPS_SCENARIOS.italian_emotional;
+  return IT_OPS_SCENARIOS[scenarioKey] || IT_OPS_SCENARIOS.cockroach_telemetry;
 };
 
 export const getAllScenarios = () => {
