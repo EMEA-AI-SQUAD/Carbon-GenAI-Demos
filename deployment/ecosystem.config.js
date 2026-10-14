@@ -27,19 +27,25 @@ const llamaPort = process.env.LLAMA_PORT || '8080';
 const proxyPort = process.env.PROXY_PORT || '3001';
 const appPort   = process.env.APP_PORT   || '3000';
 
+const workDir  = process.env.WORK_DIR  || process.env.HOME || '/data';
+const repoDir  = process.env.REPO_DIR  || 'Carbon-GenAI-Demos';
+const appPath  = `${workDir}/${repoDir}/carbon-ui`;
+
 const llamaModel = process.env.LLAMA_MODEL
-  || `${process.env.HOME}/models/granite-4.0-micro-Q4_K_M.gguf`;
+  || `${workDir}/models/granite-4.0-micro-Q4_K_M.gguf`;
+
+const spyreUrl = process.env.SPYRE_URL || 'http://9.8.70.146:8001';
 
 module.exports = {
   apps: [
     // -------------------------------------------------------------------------
-    // LLM Server (llama.cpp)
+    // LLM Server (llama.cpp) — CPU path (Matrix Math Accelerator)
     // -------------------------------------------------------------------------
     {
       name: 'genai-llama',
-      script: `${process.env.HOME}/llama.cpp/build/bin/llama-server`,
+      script: `${workDir}/llama.cpp/build/bin/llama-server`,
       args: `-m ${llamaModel} --host 0.0.0.0 --port ${llamaPort}`,
-      cwd: `${process.env.HOME}/llama.cpp`,
+      cwd: `${workDir}/llama.cpp`,
       interpreter: 'none',
 
       // Restart policy
@@ -57,12 +63,12 @@ module.exports = {
     },
 
     // -------------------------------------------------------------------------
-    // Proxy Server (Node / Express)
+    // Proxy Server (Node / Express) — bridges browser requests to llama.cpp
     // -------------------------------------------------------------------------
     {
       name: 'genai-proxy',
       script: 'server_final.js',
-      cwd: `${process.env.HOME}/Carbon-GenAI-Demos/carbon-ui/src/llama-proxy`,
+      cwd: `${appPath}/src/llama-proxy`,
       interpreter: 'node',
 
       env: {
@@ -90,12 +96,14 @@ module.exports = {
     {
       name: 'genai-nextjs',
       script: 'server.js',
-      cwd: `${process.env.HOME}/Carbon-GenAI-Demos/carbon-ui`,
+      cwd: appPath,
       interpreter: 'node',
 
       env: {
         PORT: appPort,
         NODE_ENV: 'production',
+        LLAMA_URL: `http://localhost:${llamaPort}`,
+        SPYRE_URL: spyreUrl,
       },
 
       // Restart policy — more restarts allowed since ECONNRESET should no
@@ -118,8 +126,8 @@ module.exports = {
     {
       name: 'passporteye',
       script: 'deployment/passport_service.py',
-      cwd: `${process.env.HOME}/Carbon-GenAI-Demos`,
-      interpreter: `${process.env.HOME}/.passporteye-venv/bin/python3`,
+      cwd: `${workDir}/${repoDir}`,
+      interpreter: `${process.env.HOME || workDir}/.passporteye-venv/bin/python3`,
 
       max_restarts: 10,
       restart_delay: 3000,
