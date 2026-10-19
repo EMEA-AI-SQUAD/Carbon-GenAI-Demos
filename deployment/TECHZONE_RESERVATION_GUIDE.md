@@ -246,7 +246,7 @@ See [Deployment README](README.md) for complete deployment instructions.
 Environment: AI-Ready RHEL on IBM Power On-Premises
 Collection: On-Premises Power Systems – AIX, IBM i and Linux Base Images (RHEL journey)
 Collection URL: https://techzone.ibm.com/collection/on-premises-power-systems-aix-ibm-i-and-linux-base-images/journey-rhel
-Platform ID: _________________ (obtain from Reserve button URL)
+Platform ID:    6a7aba1916c56f06e4b1e910
 Your FQDN: _________________ (fill in after reservation)
 SSH Username: _________________ (fill in after reservation)
 Reservation ID: _________________ (fill in after reservation)
