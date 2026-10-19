@@ -38,10 +38,10 @@ chmod +x deploy-carbon-genai.sh
 
 #### Quick TechZone Reservation
 
-1. **Environment**: RHEL 9 ready for AI on IBM Power10 (IaaS)
-2. **Collection**: [Generative AI demos on IBM Power](https://techzone.ibm.com/collection/generative-ai-demos-on-ibm-power)
+1. **Environment**: AI-Ready RHEL on IBM Power On-Premises
+2. **Collection**: [On-Premises Power Systems – AIX, IBM i and Linux Base Images (RHEL journey)](https://techzone.ibm.com/collection/on-premises-power-systems-aix-ibm-i-and-linux-base-images/journey-rhel)
 3. **Reservation**:
-   - Go to TechZone → Search for collection → Reserve environment
+   - Go to the collection URL above → Find "AI-Ready RHEL on IBM Power On-Premises" → Reserve
    - **⚠️ IMPORTANT**: Fill the form slowly (wait 2-3 seconds between fields)
    - Enter your ISC Opportunity Number (if Demo/Pilot purpose)
 4. **Wait**: Provisioning takes ~15-30 minutes

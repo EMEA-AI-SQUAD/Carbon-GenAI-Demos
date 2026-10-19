@@ -1,4 +1,4 @@
-﻿# TechZone Environment Reservation Guide
+# TechZone Environment Reservation Guide
 
 ## Overview
 
@@ -6,11 +6,11 @@ This guide explains how to reserve the required IBM Power environment from TechZ
 
 ## Required Environment
 
-**Environment Name**: RHEL 9 ready for AI on IBM Power10 (IaaS)
+**Environment Name**: AI-Ready RHEL on IBM Power On-Premises
 
-**TechZone Collection**: [Generative AI demos on IBM Power](https://techzone.ibm.com/collection/generative-ai-demos-on-ibm-power)
+**TechZone Collection**: [On-Premises Power Systems – AIX, IBM i and Linux Base Images (RHEL journey)](https://techzone.ibm.com/collection/on-premises-power-systems-aix-ibm-i-and-linux-base-images/journey-rhel)
 
-**Platform ID**: `66479c385e3bbb001e089937`
+**Platform ID**: *(obtain from the Reserve button URL on the TechZone page above — format: 24-char hex string)*
 
 ## Prerequisites
 
@@ -26,16 +26,15 @@ Before reserving, ensure you have:
 #### Step 1: Navigate to TechZone Collection
 
 1. Go to [TechZone](https://techzone.ibm.com)
-2. Search for "Generative AI demos on IBM Power" or navigate directly to:
+2. Navigate directly to the RHEL journey of the On-Premises Power base images collection:
    ```
-   https://techzone.ibm.com/collection/generative-ai-demos-on-ibm-power
+   https://techzone.ibm.com/collection/on-premises-power-systems-aix-ibm-i-and-linux-base-images/journey-rhel
    ```
 
 #### Step 2: Select Environment
 
-1. Click on the **"Environments"** tab
-2. Find **"RHEL 9 ready for AI on IBM Power10 (IaaS)"**
-3. Click **"Reserve"** button
+1. Find **"AI-Ready RHEL on IBM Power On-Premises"**
+2. Click **"Reserve"** button
 
 #### Step 3: Fill Reservation Form
 
@@ -225,7 +224,7 @@ See [Deployment README](README.md) for complete deployment instructions.
 
 ### TechZone Resources
 - **TechZone Home**: https://techzone.ibm.com
-- **Collection**: https://techzone.ibm.com/collection/generative-ai-demos-on-ibm-power
+- **Collection**: https://techzone.ibm.com/collection/on-premises-power-systems-aix-ibm-i-and-linux-base-images/journey-rhel
 - **TechZone Support**: Use the support link in TechZone UI
 
 ### Project Resources
@@ -244,9 +243,10 @@ See [Deployment README](README.md) for complete deployment instructions.
 
 ### Key Information to Note
 ```
-Environment: RHEL 9 ready for AI on IBM Power10 (IaaS)
-Collection: Generative AI demos on IBM Power
-Platform ID: 66479c385e3bbb001e089937
+Environment: AI-Ready RHEL on IBM Power On-Premises
+Collection: On-Premises Power Systems – AIX, IBM i and Linux Base Images (RHEL journey)
+Collection URL: https://techzone.ibm.com/collection/on-premises-power-systems-aix-ibm-i-and-linux-base-images/journey-rhel
+Platform ID: _________________ (obtain from Reserve button URL)
 Your FQDN: _________________ (fill in after reservation)
 SSH Username: _________________ (fill in after reservation)
 Reservation ID: _________________ (fill in after reservation)
@@ -256,8 +256,8 @@ End Date: _________________ (fill in when reserving)
 
 ### Reservation Checklist
 - [ ] Have valid ISC Opportunity Number (if Demo/Pilot)
-- [ ] Navigated to TechZone collection
-- [ ] Selected RHEL 9 AI environment
+- [ ] Navigated to TechZone collection (RHEL journey)
+- [ ] Selected "AI-Ready RHEL on IBM Power On-Premises" environment
 - [ ] Filled form carefully (2-3 seconds between fields)
 - [ ] Submitted reservation
 - [ ] Received confirmation email
@@ -268,6 +268,6 @@ End Date: _________________ (fill in when reserving)
 
 ---
 
-**Last Updated**: May 2026  
+**Last Updated**: October 2026
 **Maintained by**: EMEA AI on IBM Power Squad  
 **For**: Carbon GenAI Demos Project
