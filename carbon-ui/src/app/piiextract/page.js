@@ -27,7 +27,6 @@ import {
   Loading,
   Tile,
   Tag,
-  FileUploader,
 } from '@carbon/react';
 import {
   Application,
@@ -41,16 +40,10 @@ import {
 } from '@carbon/pictograms-react';
 import Image from 'next/image';
 import React, { useMemo, useState } from 'react';
-import { DEFAULTS, PASSPORT_VERIFICATION, DOCUMENT_SCAN } from "./defaults";
+import { DEFAULTS, DOCUMENT_SCAN } from "./defaults";
 import { buildMessages } from "./messages";
 import { getExpectedKeys, parseModelJson, reconcileOutput, buildKeyLabelMap } from "./postprocess";
-import { extractPassportWithPassportEye, fileToBase64, checkPassportEyeAvailability } from "./passporteye-extraction";
 import { useSpyre } from '../spyre-context';
-
-// PassportEye still runs locally on port 3001 — this is the Python OCR service, not the LLM
-const PROXY_URL = typeof window !== 'undefined'
-  ? `http://${window.location.hostname}:3001`
-  : 'http://localhost:3001';
 
 export default function PIIExtractionPage() {
   const { useSpyre: spyreActive } = useSpyre();
@@ -61,15 +54,9 @@ export default function PIIExtractionPage() {
   const [errorMsg, setErrorMsg] = useState('');
   const [extractedRows, setExtractedRows] = useState([]); // [{ id, label, value }]
   const [redactedText, setRedactedText] = useState('');
-  const [verificationStatus, setVerificationStatus] = useState(null); // For passport verification
   const [activeTab, setActiveTab] = useState(0);
   const [processingTab, setProcessingTab] = useState(null); // Track which demo tab is processing
   const [isComplete, setIsComplete] = useState(false); // Track if LLM processing is complete
-  
-  // PassportEye state
-  const [passportEyeAvailable, setPassportEyeAvailable] = useState(false);
-  const [uploadedFile, setUploadedFile] = useState(null);
-  const [passportEyeProcessing, setPassportEyeProcessing] = useState(false);
 
   const onFreeFormChange = (e) =>
     setValues((prev) => ({ ...prev, free_form_text: e.target.value }));
@@ -88,154 +75,6 @@ export default function PIIExtractionPage() {
 
   const removeEntity = (index) =>
     setValues((prev) => ({ ...prev, entities: prev.entities.filter((_, i) => i !== index) }));
-
-  // Check PassportEye availability on mount
-  React.useEffect(() => {
-    checkPassportEyeAvailability(PROXY_URL).then(setPassportEyeAvailable);
-  }, []);
-
-  // Handle file upload for PassportEye - automatically extract and populate text
-  const handleFileUpload = async (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    setUploadedFile(file);
-    setErrorMsg('');
-
-    // If PassportEye is available, try automatic extraction
-    if (passportEyeAvailable) {
-      setPassportEyeProcessing(true);
-
-      try {
-        console.log('🔍 Processing passport with PassportEye...');
-        console.log('PROXY_URL:', PROXY_URL);
-        const base64Image = await fileToBase64(file);
-        console.log('Base64 image length:', base64Image.length);
-        const result = await extractPassportWithPassportEye(base64Image, PROXY_URL);
-        console.log('PassportEye result:', result);
-
-        if (!result.success) {
-          console.error('PassportEye extraction failed:', result.error);
-          setErrorMsg(result.error || 'PassportEye extraction failed. You can manually enter the passport details below.');
-          setPassportEyeProcessing(false);
-          return;
-        }
-
-        // Format ONLY the MRZ data that PassportEye actually extracts
-        const mrzData = result.mrzData;
-        const formattedText = `PASSPORT MRZ DATA (Extracted by PassportEye OCR from Machine Readable Zone)
-
-Document Type: ${mrzData.type || 'P'}
-Passport Number: ${mrzData.number || 'Not found'}
-Surname: ${mrzData.surname || 'Not found'}
-Given Names: ${mrzData.names || 'Not found'}
-Nationality Code: ${mrzData.nationality || 'Not found'}
-Date of Birth: ${mrzData.date_of_birth || 'Not found'}
-Sex: ${mrzData.sex || 'Not found'}
-Expiry Date: ${mrzData.expiration_date || 'Not found'}
-Country Code: ${mrzData.country || 'Not found'}
-${mrzData.personal_number ? `Personal Number: ${mrzData.personal_number}` : ''}
-
-Note: PassportEye extracts data from the MRZ (Machine Readable Zone) only.
-Other details like place of birth, issue date, and issuing authority must be added manually if needed.
-
-Extraction completed in ${result.duration}s.`;
-
-        // Update the text area with extracted data
-        setValues((prev) => ({ ...prev, free_form_text: formattedText }));
-        
-        console.log(`✅ PassportEye extraction completed in ${result.duration}s`);
-        
-      } catch (err) {
-        console.error('PassportEye error:', err);
-        setErrorMsg(err?.message || 'PassportEye extraction failed. You can manually enter the passport details below.');
-      } finally {
-        setPassportEyeProcessing(false);
-      }
-    } else {
-      // Service offline - allow manual entry
-      setErrorMsg('PassportEye service is offline. Please manually enter the passport details in the text area below.');
-    }
-  };
-
-  // Verify passport data and return status
-  function verifyPassport(extractedData) {
-    const issues = [];
-    const warnings = [];
-    
-    // Check for required fields
-    const requiredFields = ['expiry_date', 'passport_number', 'surname', 'given_names'];
-    const missingFields = requiredFields.filter(field =>
-      !extractedData[field] || extractedData[field] === 'Data not available'
-    );
-    
-    if (missingFields.length > 0) {
-      issues.push(`Missing required fields: ${missingFields.join(', ')}`);
-    }
-    
-    // Check expiry date
-    if (extractedData.expiry_date && extractedData.expiry_date !== 'Data not available') {
-      try {
-        // Parse date in format YYMMDD or YYYY-MM-DD
-        let expiryDate;
-        const dateStr = extractedData.expiry_date.replace(/[^0-9]/g, '');
-        
-        if (dateStr.length === 6) {
-          // YYMMDD format
-          const year = parseInt('20' + dateStr.substring(0, 2));
-          const month = parseInt(dateStr.substring(2, 4)) - 1;
-          const day = parseInt(dateStr.substring(4, 6));
-          expiryDate = new Date(year, month, day);
-        } else if (dateStr.length === 8) {
-          // YYYYMMDD format
-          const year = parseInt(dateStr.substring(0, 4));
-          const month = parseInt(dateStr.substring(4, 6)) - 1;
-          const day = parseInt(dateStr.substring(6, 8));
-          expiryDate = new Date(year, month, day);
-        }
-        
-        if (expiryDate) {
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
-          
-          if (expiryDate < today) {
-            issues.push('Passport has expired');
-          } else {
-            const daysUntilExpiry = Math.floor((expiryDate - today) / (1000 * 60 * 60 * 24));
-            if (daysUntilExpiry <= 180) {
-              warnings.push(`Passport expires in ${daysUntilExpiry} days`);
-            }
-          }
-        }
-      } catch (err) {
-        warnings.push('Could not validate expiry date format');
-      }
-    }
-    
-    // Determine overall status
-    let status = 'ALLOWED';
-    let statusColor = 'green';
-    let statusIcon = '✓';
-    
-    if (issues.length > 0) {
-      status = 'DENIED';
-      statusColor = 'red';
-      statusIcon = '✗';
-    } else if (warnings.length > 0) {
-      status = 'WARNING';
-      statusColor = 'orange';
-      statusIcon = '⚠';
-    }
-    
-    return {
-      status,
-      statusColor,
-      statusIcon,
-      issues,
-      warnings,
-      timestamp: new Date().toISOString()
-    };
-  }
 
   async function completion() {
     setIsLoading(true);
@@ -282,28 +121,20 @@ Extraction completed in ${result.duration}s.`;
 
       setExtractedRows(rows);
 
-      // For passport tab (activeTab === 2), generate verification status instead of redacted text
-      if (activeTab === 2) {
-        const verification = verifyPassport(finalObj);
-        setVerificationStatus(verification);
-        setRedactedText(''); // Clear redacted text for passport tab
-      } else {
-        // For other tabs, create redacted version of the text
-        let redacted = values.free_form_text;
-        rows.forEach(row => {
-          if (row.value && row.value !== "Data not available") {
-            // Split comma-separated values and redact each individually
-            const values = row.value.split(',').map(v => v.trim()).filter(v => v);
-            values.forEach(val => {
-              // Replace each PII value with [REDACTED]
-              const regex = new RegExp(val.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-              redacted = redacted.replace(regex, '[REDACTED]');
-            });
-          }
-        });
-        setRedactedText(redacted);
-        setVerificationStatus(null); // Clear verification for non-passport tabs
-      }
+      // Create redacted version of the text
+      let redacted = values.free_form_text;
+      rows.forEach(row => {
+        if (row.value && row.value !== "Data not available") {
+          // Split comma-separated values and redact each individually
+          const values = row.value.split(',').map(v => v.trim()).filter(v => v);
+          values.forEach(val => {
+            // Replace each PII value with [REDACTED]
+            const regex = new RegExp(val.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+            redacted = redacted.replace(regex, '[REDACTED]');
+          });
+        }
+      });
+      setRedactedText(redacted);
       setIsComplete(true);
 
     } catch (err) {
@@ -323,7 +154,7 @@ Extraction completed in ${result.duration}s.`;
 
   // Get demo tab name for display
   const getDemoTabName = (tabIndex) => {
-    const names = ['Why IBM Power', 'Fraud Complaint', 'Passport Verification', 'Document Discovery', 'What We\'re Using'];
+    const names = ['Why IBM Power', 'Fraud Complaint', 'Document Discovery', 'What We\'re Using'];
     return names[tabIndex] || 'Demo';
   };
 
@@ -353,15 +184,12 @@ Extraction completed in ${result.duration}s.`;
           if (selectedIndex === 1) {
             setValues(DEFAULTS);
           } else if (selectedIndex === 2) {
-            setValues(PASSPORT_VERIFICATION);
-          } else if (selectedIndex === 3) {
             setValues(DOCUMENT_SCAN);
           }
         }}>
           <TabList className="tabs-group" aria-label="Tab navigation">
             <Tab>Why IBM Power</Tab>
             <Tab>Fraud Complaint</Tab>
-            <Tab>Passport Verification</Tab>
             <Tab>Document Discovery</Tab>
             <Tab>What We're Using</Tab>
           </TabList>
@@ -830,440 +658,6 @@ Extraction completed in ${result.duration}s.`;
               )}
             </>
           )}
-              </Grid>
-            </TabPanel>
-            <TabPanel>
-              <Grid className="tabs-group-content">
-                <Column md={4} lg={7} sm={4} className="entity__tab-content">
-                  <h3 className="landing-page__subheading">ID Document Verification with PassportEye OCR</h3>
-                  <p className="landing-page__p">
-                    This demo shows automated extraction of personal information from identity documents
-                    for visitor registration, KYC compliance, and pre-meeting verification. Upload a passport
-                    image and PassportEye will quickly extract the MRZ data, which Granite 4.0 then structures
-                    into the required fields.
-                  </p>
-                </Column>
-                <Column md={4} lg={{ span: 8, offset: 7 }} sm={4}>
-                  <Image
-                    className="landing-page__illo"
-                    src="/images/mr-bean-passport.jpg"
-                    alt="Mr. Bean UK Passport - Sample ID Document"
-                    width={600}
-                    height={400}
-                    style={{ border: '2px solid var(--cds-border-subtle)', borderRadius: '4px' }}
-                  />
-                  <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-                    <p style={{ fontSize: '0.875rem', color: 'var(--cds-text-secondary)' }}>
-                      Sample passport for demonstration purposes
-                    </p>
-                  </div>
-                </Column>
-
-                {/* Use Case Scenario Box */}
-                <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
-                  <div style={{
-                    background: 'var(--cds-layer-02)',
-                    padding: '1.5rem',
-                    borderLeft: '4px solid var(--cds-border-interactive)',
-                    marginTop: '1rem',
-                    marginBottom: '1rem'
-                  }}>
-                    <h4 style={{ marginTop: 0, marginBottom: '1rem', fontSize: '1.125rem' }}>
-                      📋 Use Case Scenario: Pre-Meeting Identity Verification
-                    </h4>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                      <div style={{ display: 'flex', gap: '0.5rem' }}>
-                        <span style={{ fontWeight: 600, minWidth: '40px' }}>1.</span>
-                        <span>Visitors must submit passport/ID scans before facility access or customer meetings.</span>
-                      </div>
-                      <div style={{ display: 'flex', gap: '0.5rem' }}>
-                        <span style={{ fontWeight: 600, minWidth: '40px' }}>2.</span>
-                        <span>Manual data entry is <strong>time-consuming and error-prone</strong>, especially with international documents.</span>
-                      </div>
-                      <div style={{ display: 'flex', gap: '0.5rem' }}>
-                        <span style={{ fontWeight: 600, minWidth: '40px' }}>3.</span>
-                        <span>Security teams need <strong>structured data</strong> for visitor logs, access control, and compliance records.</span>
-                      </div>
-                      <div style={{
-                        marginTop: '0.5rem',
-                        paddingTop: '0.75rem',
-                        borderTop: '1px solid var(--cds-border-subtle)',
-                        fontStyle: 'italic',
-                        color: 'var(--cds-text-secondary)'
-                      }}>
-                        <strong>Solution:</strong> PassportEye OCR quickly extracts MRZ data from passport images (typically 15-20 seconds), then Granite 4.0 structures the information for visitor registration and KYC verification.
-                      </div>
-                    </div>
-                  </div>
-                </Column>
-
-                {/* Passport Image Upload Section */}
-                <Column lg={16} md={8} sm={4} className="landing-page__tab-content" style={{ marginTop: '2rem' }}>
-                  <div style={{
-                    background: 'var(--cds-layer-01)',
-                    padding: '1.5rem',
-                    borderRadius: '4px',
-                    border: '1px solid var(--cds-border-subtle)'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-                      <h4 style={{ margin: 0, fontSize: '1.125rem' }}>📤 Upload Passport Image</h4>
-                      {passportEyeAvailable && (
-                        <Tag type="green" size="sm">PassportEye Ready</Tag>
-                      )}
-                    </div>
-                    
-                    <p style={{
-                      marginBottom: '1rem',
-                      color: 'var(--cds-text-secondary)',
-                      fontSize: '0.875rem'
-                    }}>
-                      Upload a passport image. If PassportEye is available, it will automatically extract the MRZ (Machine Readable Zone) data.
-                      Otherwise, you can manually enter the passport details in the text area below.
-                    </p>
-
-                    <FileUploader
-                      labelTitle="Choose passport image"
-                      labelDescription="Supported formats: JPG, PNG (max 5MB)"
-                      buttonLabel="Select file"
-                      filenameStatus="edit"
-                      accept={['.jpg', '.jpeg', '.png']}
-                      multiple={false}
-                      disabled={passportEyeProcessing}
-                      onChange={handleFileUpload}
-                    />
-
-                    {passportEyeProcessing && (
-                      <InlineNotification
-                        kind="info"
-                        title="Extracting passport data"
-                        subtitle="PassportEye is reading the MRZ from your image..."
-                        hideCloseButton
-                        lowContrast
-                        style={{ marginTop: '1rem' }}
-                      />
-                    )}
-                  </div>
-                </Column>
-
-                <Column lg={16} md={8} sm={4} className="landing-page__tab-content" style={{ marginTop: '1rem' }}>
-                  <Button
-                    kind="primary"
-                    size="lg"
-                    onClick={()=>completion()}
-                    disabled={isLoading}
-                    style={{ marginBottom: '1rem' }}
-                  >
-                    {isLoading ? 'Processing...' : '🚀 Pre-load Demo Results'}
-                  </Button>
-                  {isLoading && (
-                    <InlineNotification
-                      kind="info"
-                      title="Processing in background"
-                      subtitle="Results will appear below when ready. Continue explaining the demo!"
-                      hideCloseButton
-                      lowContrast
-                      style={{ marginTop: '0.5rem' }}
-                    />
-                  )}
-                </Column>
-
-                <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
-                  <p className="landing-page__p">
-                    Below is the OCR-extracted text from the passport image. The AI will parse this unstructured
-                    text and extract structured identity information for verification and record-keeping.
-                  </p>
-                  <TextArea
-                    className="text-area-class"
-                    id="free-form-text"
-                    value={values.free_form_text ?? ""}
-                    onChange={onFreeFormChange}
-                    size="lg"
-                    rows={12}
-                  />
-                </Column>
-                <Column lg={16} md={8} sm={4} className="landing-page__tab-content">
-                  <p className="landing-page__p">
-                    Define the identity fields to extract from the passport OCR text. These will be used
-                    for visitor registration, security clearance, and compliance documentation.
-                  </p>
-                </Column>
-              </Grid>
-
-              {/* Entities - use single Grid with all entity pairs */}
-              <Grid className="entity-grid">
-                {(values.entities ?? []).map((f, i) => (
-                  <React.Fragment key={i}>
-                    {/* Label column */}
-                    <Column sm={4} md={4} lg={4} className="entity-label-col">
-                      <TextArea
-                        id={`label-${i}`}
-                        labelText={`Label ${i + 1}`}
-                        value={f.label ?? ''}
-                        onChange={onEntityChange(i, 'label')}
-                        size="sm"
-                        rows={Math.max(1, Math.ceil((f.label?.length || 0) / 30))}
-                      />
-                    </Column>
-
-                    {/* Definition column */}
-                    <Column sm={4} md={4} lg={12} className="entity-def-col">
-                      <TextArea
-                        id={`definition-${i}`}
-                        labelText={`Definition ${i + 1}`}
-                        value={f.definition ?? ''}
-                        onChange={onEntityChange(i, 'definition')}
-                        size="sm"
-                        rows={Math.max(1, Math.ceil((f.definition?.length || 0) / 80))}
-                      />
-                    </Column>
-                  </React.Fragment>
-                ))}
-              </Grid>
-
-              <Grid className="tabs-group-content">
-                <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
-                  <Button className="send-to-llm-class" onClick={()=>completion()} disabled={isLoading}>
-                    {isLoading ? 'Extracting Identity Data…' : 'Extract Passport Information'}
-                  </Button>
-                </Column>
-
-                {/* Error Display */}
-                {errorMsg && (
-                  <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
-                    <InlineNotification
-                      kind="error"
-                      title="Error"
-                      subtitle={errorMsg}
-                      onCloseButtonClick={() => setErrorMsg('')}
-                      lowContrast
-                    />
-                  </Column>
-                )}
-
-                {/* Results */}
-                {isLoading ? (
-                  <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
-                    <div style={{
-                      textAlign: 'center',
-                      padding: '2rem',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: '1rem'
-                    }}>
-                      <Loading description="Processing" withOverlay={false} />
-                      <InlineNotification
-                        kind="info"
-                        title="Processing Passport"
-                        subtitle="Granite 4.0 is extracting identity information from OCR text..."
-                        hideCloseButton
-                        lowContrast
-                      />
-                    </div>
-                    <DataTableSkeleton
-                      headers={[
-                        { key: 'label', header: 'Field' },
-                        { key: 'value', header: 'Extracted Value' },
-                      ]}
-                      showHeader
-                      showToolbar
-                      rowCount={Math.max(3, values.entities.filter(e => (e.label || '').trim()).length)}
-                      columnCount={2}
-                    />
-                  </Column>
-                ) : extractedRows.length === 0 ? (
-                  <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
-                    <div style={{
-                      textAlign: 'center',
-                      padding: '3rem 1rem',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: '1rem'
-                    }}>
-                      <h4 style={{ margin: 0 }}>No data extracted yet</h4>
-                      <p style={{
-                        color: 'var(--cds-text-secondary)',
-                        maxWidth: '400px',
-                        margin: 0
-                      }}>
-                        Review the OCR text above, then click
-                        <strong> Extract Passport Information</strong> to parse identity data.
-                      </p>
-                    </div>
-                  </Column>
-                ) : (
-                  <>
-                    {/* Identity Data Table - Left side */}
-                    <Column sm={4} md={3} lg={6} className="landing-page__tab-content">
-                      <DataTable
-                        rows={extractedRows}
-                        headers={[
-                          { key: 'label', header: 'Field' },
-                          { key: 'value', header: 'Extracted Value' },
-                        ]}
-                        isSortable
-                        size="sm"
-                        useStaticWidth
-                      >
-                        {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
-                          <TableContainer
-                            title={
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                <span>Extracted Identity Data</span>
-                                <AILabel size="sm">
-                                  <AILabelContent>
-                                    <div>
-                                      <p className="secondary">AI Generated</p>
-                                      <p className="secondary">Parsed by Granite 4.0</p>
-                                    </div>
-                                  </AILabelContent>
-                                </AILabel>
-                              </div>
-                            }
-                            description="Structured data for visitor registration"
-                          >
-                            <Table stickyHeader {...getTableProps()}>
-                              <TableHead>
-                                <TableRow>
-                                  {headers.map((header) => (
-                                    <TableHeader
-                                      key={header.key}
-                                      {...getHeaderProps({ header })}
-                                    >
-                                      {header.header}
-                                    </TableHeader>
-                                  ))}
-                                </TableRow>
-                              </TableHead>
-                              <TableBody>
-                                {rows.map((row) => (
-                                  <TableRow key={row.id} {...getRowProps({ row })}>
-                                    {row.cells.map((cell) => (
-                                      <TableCell key={cell.id} style={{ whiteSpace: 'pre-wrap' }}>
-                                        {cell.value}
-                                      </TableCell>
-                                    ))}
-                                  </TableRow>
-                                ))}
-                              </TableBody>
-                            </Table>
-                          </TableContainer>
-                        )}
-                      </DataTable>
-                    </Column>
-
-                    {/* Verification Status - Right side */}
-                    {verificationStatus && (
-                      <Column sm={4} md={5} lg={10} className="landing-page__tab-content">
-                        <Tile style={{ padding: '1.5rem', height: '100%' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-                            <h4 style={{ margin: 0, fontSize: '1rem' }}>Verification Status</h4>
-                            <AILabel size="sm">
-                              <AILabelContent>
-                                <div>
-                                  <p className="secondary">AI Generated</p>
-                                  <p className="secondary">Verified by Granite 4.0</p>
-                                </div>
-                              </AILabelContent>
-                            </AILabel>
-                          </div>
-                          <p style={{
-                            fontSize: '0.75rem',
-                            color: 'var(--cds-text-secondary)',
-                            marginBottom: '1.5rem'
-                          }}>
-                            Privacy-preserving verification result
-                          </p>
-                          
-                          {/* Status Badge */}
-                          <div style={{
-                            background: verificationStatus.statusColor === 'green' ? '#24a148' :
-                                       verificationStatus.statusColor === 'orange' ? '#f1c21b' : '#da1e28',
-                            color: 'white',
-                            padding: '1rem 1.5rem',
-                            borderRadius: '4px',
-                            fontSize: '1.5rem',
-                            fontWeight: 'bold',
-                            textAlign: 'center',
-                            marginBottom: '1.5rem'
-                          }}>
-                            {verificationStatus.statusIcon} {verificationStatus.status}
-                          </div>
-                          
-                          {/* Issues */}
-                          {verificationStatus.issues.length > 0 && (
-                            <div style={{ marginBottom: '1rem' }}>
-                              <h5 style={{
-                                color: '#da1e28',
-                                fontSize: '0.875rem',
-                                marginBottom: '0.5rem',
-                                fontWeight: 600
-                              }}>
-                                Issues:
-                              </h5>
-                              <ul style={{
-                                margin: 0,
-                                paddingLeft: '1.5rem',
-                                fontSize: '0.875rem'
-                              }}>
-                                {verificationStatus.issues.map((issue, idx) => (
-                                  <li key={idx} style={{ marginBottom: '0.25rem' }}>{issue}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-                          
-                          {/* Warnings */}
-                          {verificationStatus.warnings.length > 0 && (
-                            <div style={{ marginBottom: '1rem' }}>
-                              <h5 style={{
-                                color: '#f1c21b',
-                                fontSize: '0.875rem',
-                                marginBottom: '0.5rem',
-                                fontWeight: 600
-                              }}>
-                                Warnings:
-                              </h5>
-                              <ul style={{
-                                margin: 0,
-                                paddingLeft: '1.5rem',
-                                fontSize: '0.875rem'
-                              }}>
-                                {verificationStatus.warnings.map((warning, idx) => (
-                                  <li key={idx} style={{ marginBottom: '0.25rem' }}>{warning}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-                          
-                          {/* Success message */}
-                          {verificationStatus.status === 'ALLOWED' && (
-                            <div style={{
-                              background: 'var(--cds-layer-01)',
-                              padding: '1rem',
-                              borderRadius: '4px',
-                              fontSize: '0.875rem',
-                              color: 'var(--cds-text-secondary)'
-                            }}>
-                              ✓ All verification checks passed. Passport details remain private while providing verification result.
-                            </div>
-                          )}
-                          
-                          {/* Timestamp */}
-                          <p style={{
-                            fontSize: '0.75rem',
-                            color: 'var(--cds-text-secondary)',
-                            marginTop: '1rem',
-                            marginBottom: 0
-                          }}>
-                            Verified at: {new Date(verificationStatus.timestamp).toLocaleString()}
-                          </p>
-                        </Tile>
-                      </Column>
-                    )}
-                  </>
-                )}
               </Grid>
             </TabPanel>
             <TabPanel>
