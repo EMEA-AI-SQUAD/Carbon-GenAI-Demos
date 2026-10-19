@@ -20,6 +20,13 @@ import https from 'https';
  */
 
 const LLAMA_URL = process.env.LLAMA_URL || 'http://localhost:8080';
+
+// Optional per-backend model names. Each backend names its model differently
+// (vLLM: the --served-model-name; Ollama: e.g. "granite4.1:3b"). The pages send
+// one fixed name, so if these are set the route swaps in the right one for the
+// backend that is about to receive the request. Unset = forward unchanged.
+const LLAMA_MODEL = process.env.LLAMA_MODEL || '';
+const SPYRE_MODEL = process.env.SPYRE_MODEL || '';
 const SPYRE_URL = process.env.SPYRE_URL || 'http://9.8.70.146:8001';
 
 function nodeRequest(baseUrl, path, body) {
@@ -60,6 +67,9 @@ export async function POST(request) {
 
     const targetBase = useSpyre ? SPYRE_URL : LLAMA_URL;
     const backendLabel = useSpyre ? 'spyre' : 'llama';
+
+    const modelOverride = useSpyre ? SPYRE_MODEL : LLAMA_MODEL;
+    if (modelOverride) llmBody.model = modelOverride;
 
     // Forward to /v1/chat/completions (OpenAI-compatible endpoint)
     const { status, body: raw, headers } = await nodeRequest(
