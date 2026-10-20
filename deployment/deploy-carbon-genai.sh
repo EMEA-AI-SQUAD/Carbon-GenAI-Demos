@@ -340,12 +340,6 @@ EOF
         @carbon/icons-react@latest \
         @carbon/pictograms-react@latest >> "$LOG_FILE" 2>&1
 
-    npm install \
-        openai@^4.104.0 \
-        cors \
-        express@^4.21.2 \
-        http-proxy-middleware@^2.0.7 >> "$LOG_FILE" 2>&1
-
     # Proxy server dependencies
     if [ -d "src/llama-proxy" ]; then
         print_info "Installing proxy dependencies..."
@@ -358,6 +352,12 @@ EOF
         node_modules/.bin/next build >> "$LOG_FILE" 2>&1
     else
         yarn --ignore-engines build >> "$LOG_FILE" 2>&1
+    fi
+
+    # Verify .next was produced — fail fast rather than letting pm2 crash-loop
+    if [ ! -f ".next/BUILD_ID" ]; then
+        print_error "Next.js build did not produce .next/BUILD_ID — aborting"
+        exit 1
     fi
     print_success "Next.js application built successfully"
 }
