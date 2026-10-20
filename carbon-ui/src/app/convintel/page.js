@@ -41,17 +41,9 @@ import React, { useMemo, useState } from 'react';
 import { DEFAULTS, SALES_CALL, SUPPORT_TICKET } from "./defaults";
 import { buildMessages } from "./messages";
 import { getExpectedKeys, parseModelJson, reconcileOutput, buildKeyLabelMap } from "./postprocess";
-import OpenAI from 'openai';
+import { createLlmClient } from '../llmClient';
 
-const API_URL = typeof window !== 'undefined'
-  ? `http://${window.location.hostname}:3001/v1`
-  : 'http://localhost:3001/v1';
-
-const openai_client = new OpenAI({
-  baseURL: API_URL,
-  apiKey: 'sk-no-key-required',
-  dangerouslyAllowBrowser: true,
-});
+const openai_client = createLlmClient();
 
 export default function ConversationIntelligencePage() {
   const [values, setValues] = useState(() => DEFAULTS);
