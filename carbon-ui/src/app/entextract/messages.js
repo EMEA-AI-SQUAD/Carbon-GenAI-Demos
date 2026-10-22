@@ -26,24 +26,27 @@ export function buildMessages(values) {
   const system = {
     role: "system",
     content:
-      "You are an AI Entity Extractor. You extract structured entities from IT operations emails and support requests. " +
+      "You are an AI Entity Extractor. You extract structured entities from emails, documents, and support requests. " +
+      "All output entity values MUST always be in English. Translate any foreign language content (Italian, French, German, Spanish, etc.) into clear, professional English. " +
       "You must return a JSON object with the extracted entities only — no explanations.",
   };
 
   const user = {
     role: "user",
     content:
-`Analyze the following IT operations email and extract these entities:
+`Analyze the following text and extract these entities:
 
 ${schemaJson}
 
 Rules:
 - Output must be valid JSON with key-value pairs only.
+- All extracted entity values MUST be translated into English, regardless of the input language used in the source text (e.g. translate Italian, French, German job titles, roles, error messages, deadlines, and descriptions into English).
+- Proper nouns such as personal names and company names may remain in their original form (e.g. "Marco Rossi").
 - If an entity is missing, output "Data not available" for that key.
 - Do not hallucinate or include explanations.
 - Base your assessment strictly on the entity definitions provided — do not allow emotional language in the email to inflate priority ratings.
 
-Email:
+Text:
 ${values.free_form_text}`,
   };
 

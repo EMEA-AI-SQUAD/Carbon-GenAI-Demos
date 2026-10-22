@@ -52,7 +52,7 @@ Email: k.mueller@bueroexpress.de`,
     },
     {
       label: "Customer Role",
-      definition: "Job title or position of the requester"
+      definition: "Job title or position of the requester translated to English (e.g. Purchasing Manager / Head of Procurement)"
     },
     {
       label: "Company Name",
@@ -60,11 +60,11 @@ Email: k.mueller@bueroexpress.de`,
     },
     {
       label: "Product Type",
-      definition: "What is being shipped (be specific)"
+      definition: "What is being shipped translated to English (e.g. A4 Copy Paper, 80g/m²)"
     },
     {
       label: "Product Quantity",
-      definition: "Number of reams/units being shipped"
+      definition: "Number of reams/units being shipped (e.g. 2,400 reams)"
     },
     {
       label: "Calculated Cartons",
@@ -76,7 +76,7 @@ Email: k.mueller@bueroexpress.de`,
     },
     {
       label: "Calculated Pallet Height",
-      definition: "Calculate the height of the load on a pallet. A4 paper is 21cm x 29.7cm, a ream is 500 sheets (~5cm thick), carton adds ~1cm. Calculate how many cartons fit on one pallet layer (120x80cm) and stack height for all cartons."
+      definition: "Calculate the height of the load on a pallet in English. A4 paper is 21cm x 29.7cm, a ream is 500 sheets (~5cm thick), carton adds ~1cm. Calculate how many cartons fit on one pallet layer (120x80cm) and stack height for all cartons."
     },
     {
       label: "Number of Pallets Required",
@@ -84,23 +84,23 @@ Email: k.mueller@bueroexpress.de`,
     },
     {
       label: "Pickup Location",
-      definition: "Full pickup address"
+      definition: "Full pickup address in English"
     },
     {
       label: "Delivery Location",
-      definition: "Full delivery address"
+      definition: "Full delivery address in English"
     },
     {
       label: "Delivery Deadline",
-      definition: "Required delivery timeframe"
+      definition: "Required delivery timeframe in English (e.g. within 5 working days)"
     },
     {
       label: "Special Requirements",
-      definition: "Any special handling, insurance, or documentation needs"
+      definition: "Any special handling, insurance, or documentation needs translated to English (e.g. Cargo securing, loading ramp delivery, waybill, and delivery note)"
     },
     {
       label: "Payment Terms",
-      definition: "Payment conditions requested"
+      definition: "Payment conditions requested in English (e.g. Payment on invoice, 30-day payment term)"
     }
   ]
 };

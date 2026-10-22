@@ -39,39 +39,39 @@ P.S. - HO DAVVERO BISOGNO DI AIUTO URGENTE!!!`,
       },
       {
         label: "Sender Role",
-        definition: "The job title or role of the sender"
+        definition: "The job title or role of the sender (translated to English, e.g. Sales Analyst)"
       },
       {
         label: "Business Area",
-        definition: "Which business department or function is affected (e.g., Sales, Logistics, Finance)"
+        definition: "Which business department or function is affected in English (e.g., Sales, Logistics, Finance)"
       },
       {
         label: "Issue Type",
-        definition: "The technical problem being reported"
+        definition: "The technical problem being reported in English"
       },
       {
         label: "Affected System",
-        definition: "Which system or application is having problems"
+        definition: "Which system or application is having problems (in English)"
       },
       {
         label: "Error Message",
-        definition: "Any specific error messages mentioned"
+        definition: "Any specific error messages mentioned, translated into English (e.g. Database connection error - timeout after 30 seconds)"
       },
       {
         label: "Time First Encountered",
-        definition: "When did the problem first occur or was first noticed"
+        definition: "When did the problem first occur or was first noticed (in English)"
       },
       {
         label: "Deadline",
-        definition: "When does this need to be resolved"
+        definition: "When does this need to be resolved (in English, e.g. Tomorrow morning at 9:00)"
       },
       {
         label: "Business Impact",
-        definition: "The actual impact on business operations (what can't be done)"
+        definition: "The actual impact on business operations (what can't be done, in English)"
       },
       {
         label: "Emotional State",
-        definition: "The emotional tone of the sender (calm/stressed/panicked)"
+        definition: "The emotional tone of the sender in English (calm/stressed/panicked)"
       },
       {
         label: "True Priority",
@@ -79,7 +79,7 @@ P.S. - HO DAVVERO BISOGNO DI AIUTO URGENTE!!!`,
       },
       {
         label: "Suggested Solution Area",
-        definition: "Based on the error and symptoms, what technical area should be investigated first (e.g., database connectivity, network, application server, user permissions)"
+        definition: "Based on the error and symptoms, what technical area should be investigated first in English (e.g., database connectivity, network, application server, user permissions)"
       }
     ]
   },
@@ -144,19 +144,19 @@ Classification: URGENT - SÉCURITÉ`,
       },
       {
         label: "Sender Role",
-        definition: "The job title or role of the sender"
+        definition: "The job title or role of the sender translated to English (e.g. Logistics Manager - Warehouse B)"
       },
       {
         label: "Business Area",
-        definition: "Which business department or function is affected (e.g., Sales, Logistics, Finance)"
+        definition: "Which business department or function is affected in English (e.g., Logistics, Operations)"
       },
       {
         label: "Issue Type",
-        definition: "The technical problem being reported"
+        definition: "The technical problem being reported in English"
       },
       {
         label: "Affected System",
-        definition: "Which system or application is having problems"
+        definition: "Which system or application is having problems (in English)"
       },
       {
         label: "Error Code",
@@ -164,23 +164,23 @@ Classification: URGENT - SÉCURITÉ`,
       },
       {
         label: "Time First Encountered",
-        definition: "When did the problem first occur or was first noticed"
+        definition: "When did the problem first occur or was first noticed (in English)"
       },
       {
         label: "Response Deadline",
-        definition: "Required response time"
+        definition: "Required response time (in English)"
       },
       {
         label: "Business Impact",
-        definition: "The actual impact on business operations (what can't be done)"
+        definition: "The actual impact on business operations in English (what can't be done)"
       },
       {
         label: "Safety Risk",
-        definition: "Any safety or health risks mentioned (explosion, fire, injury, etc.)"
+        definition: "Any safety or health risks mentioned in English (explosion, fire, injury, etc.)"
       },
       {
         label: "Financial Impact",
-        definition: "Monetary value of affected operations or potential losses"
+        definition: "Monetary value of affected operations or potential losses in English"
       },
       {
         label: "True Priority",
@@ -188,7 +188,7 @@ Classification: URGENT - SÉCURITÉ`,
       },
       {
         label: "Suggested Solution Area",
-        definition: "Based on the error and symptoms, what technical area should be investigated first (e.g., sensor hardware, climate control system, database, network)"
+        definition: "Based on the error and symptoms, what technical area should be investigated first in English (e.g., sensor hardware, climate control system, database, network)"
       }
     ]
   }
