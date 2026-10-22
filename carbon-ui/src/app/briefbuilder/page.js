@@ -25,6 +25,7 @@ import {
   AILabelContent,
   Loading,
   Tile,
+  Tag,
 } from '@carbon/react';
 import {
   Application,
@@ -60,6 +61,24 @@ export default function BriefBuilderPage() {
   const [activeTab, setActiveTab] = useState(0);
   const [processingTab, setProcessingTab] = useState(null);
   const [isComplete, setIsComplete] = useState(false);
+  const [liveElapsed, setLiveElapsed] = useState('0.0');
+  const [timingInfo, setTimingInfo] = useState({ durationSec: null, backend: null });
+  const [lastCpuDuration, setLastCpuDuration] = useState(null);
+  const [lastSpyreDuration, setLastSpyreDuration] = useState(null);
+
+  React.useEffect(() => {
+    let interval = null;
+    if (isLoading) {
+      const start = performance.now();
+      setLiveElapsed('0.0');
+      interval = setInterval(() => {
+        setLiveElapsed(((performance.now() - start) / 1000).toFixed(1));
+      }, 100);
+    } else {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [isLoading]);
 
   const onFreeFormChange = (e) =>
     setValues((prev) => ({ ...prev, free_form_text: e.target.value }));
@@ -81,6 +100,7 @@ export default function BriefBuilderPage() {
     setExtractedRows([]);
 
     console.log('Calling LLM for Brief Builder generation...');
+    const startTime = performance.now();
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -97,7 +117,15 @@ export default function BriefBuilderPage() {
       if (!response.ok) throw new Error(result?.error || `HTTP ${response.status}`);
 
       const text = result?.choices?.[0]?.message?.content ?? '';
-      console.log(`Raw model response [${response.headers.get('X-LLM-Backend')}]:`, text);
+      const backend = response.headers.get('X-LLM-Backend') || (spyreActive ? 'spyre' : 'llama');
+      const elapsed = ((performance.now() - startTime) / 1000).toFixed(2);
+      setTimingInfo({ durationSec: elapsed, backend });
+      if (spyreActive) {
+        setLastSpyreDuration(elapsed);
+      } else {
+        setLastCpuDuration(elapsed);
+      }
+      console.log(`Raw model response [${backend}] in ${elapsed}s:`, text);
 
       const modelObj = parseModelJson(text);
       const expected = getExpectedKeys(values);
@@ -630,9 +658,29 @@ export default function BriefBuilderPage() {
 
         <Grid className="tabs-group-content">
           <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
-            <Button className="send-to-llm-class" onClick={() => completion()} disabled={isLoading}>
-              {isLoading ? loadingText : primaryButton}
-            </Button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
+              <Button className="send-to-llm-class" onClick={() => completion()} disabled={isLoading}>
+                {isLoading ? loadingText : primaryButton}
+              </Button>
+              <Tag type={spyreActive ? 'green' : 'blue'} size="md">
+                {spyreActive ? '⚡ IBM Spyre' : '🔵 IBM Power MMA'}
+              </Tag>
+              {isLoading && (
+                <Tag type="warm-gray" size="md">
+                  ⏱️ {liveElapsed}s...
+                </Tag>
+              )}
+              {!isLoading && timingInfo.durationSec && (
+                <Tag type={timingInfo.backend === 'spyre' ? 'green' : 'blue'} size="md">
+                  ⏱️ {timingInfo.durationSec}s ({timingInfo.backend === 'spyre' ? '⚡ Spyre' : '🔵 CPU'})
+                </Tag>
+              )}
+              {!isLoading && lastCpuDuration && lastSpyreDuration && (
+                <Tag type="purple" size="md">
+                  🚀 Spyre is {(parseFloat(lastCpuDuration) / parseFloat(lastSpyreDuration)).toFixed(1)}x faster ({lastSpyreDuration}s vs {lastCpuDuration}s)
+                </Tag>
+              )}
+            </div>
           </Column>
 
           {errorMsg && (

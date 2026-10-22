@@ -59,6 +59,7 @@ function nodeRequest(baseUrl, path, body) {
 }
 
 export async function POST(request) {
+  const startTime = Date.now();
   try {
     const payload = await request.json();
 
@@ -78,12 +79,15 @@ export async function POST(request) {
       llmBody
     );
 
-    // Attach a header so the client can confirm which backend answered
+    const durationMs = Date.now() - startTime;
+
+    // Attach headers so the client can confirm backend and response duration
     const resp = NextResponse.json(
       status === 200 ? JSON.parse(raw) : { error: `Backend returned HTTP ${status}`, raw },
       { status: status === 200 ? 200 : 502 }
     );
     resp.headers.set('X-LLM-Backend', backendLabel);
+    resp.headers.set('X-Response-Time-Ms', String(durationMs));
     return resp;
 
   } catch (err) {

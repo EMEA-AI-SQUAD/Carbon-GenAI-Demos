@@ -64,6 +64,24 @@ export default function EntityExtractionPage() {
   const [activeTab, setActiveTab] = useState(0);
   const [processingTab, setProcessingTab] = useState(null); // Track which demo tab is processing
   const [isComplete, setIsComplete] = useState(false); // Track if LLM processing is complete
+  const [liveElapsed, setLiveElapsed] = useState('0.0');
+  const [timingInfo, setTimingInfo] = useState({ durationSec: null, backend: null });
+  const [lastCpuDuration, setLastCpuDuration] = useState(null);
+  const [lastSpyreDuration, setLastSpyreDuration] = useState(null);
+
+  useEffect(() => {
+    let interval = null;
+    if (isLoading) {
+      const start = performance.now();
+      setLiveElapsed('0.0');
+      interval = setInterval(() => {
+        setLiveElapsed(((performance.now() - start) / 1000).toFixed(1));
+      }, 100);
+    } else {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [isLoading]);
   
   // IT Ops email selection state
   const [selectedScenario, setSelectedScenario] = useState('italian_emotional'); // 'italian_emotional' or 'french_professional'
@@ -140,6 +158,7 @@ export default function EntityExtractionPage() {
     const backendLabel = spyreActive ? '⚡ IBM Spyre' : 'IBM Power MMA';
     console.log(`Calling LLM via ${backendLabel}...`);
 
+    const startTime = performance.now();
     try {
       const msgs = buildMessages(values); // uses your free_form_text + entities
 
@@ -162,7 +181,14 @@ export default function EntityExtractionPage() {
 
       const text = result?.choices?.[0]?.message?.content ?? "";
       const backend = response.headers.get('X-LLM-Backend') || (spyreActive ? 'spyre' : 'llama');
-      console.log(`Raw model response [${backend}]:`, text);
+      const elapsed = ((performance.now() - startTime) / 1000).toFixed(2);
+      setTimingInfo({ durationSec: elapsed, backend });
+      if (spyreActive) {
+        setLastSpyreDuration(elapsed);
+      } else {
+        setLastCpuDuration(elapsed);
+      }
+      console.log(`Raw model response [${backend}] in ${elapsed}s:`, text);
 
       // Parse + reconcile with your expected keys
       const modelObj = parseModelJson(text);
@@ -189,6 +215,26 @@ export default function EntityExtractionPage() {
       setIsLoading(false);
     }
   }
+
+  const renderTimingTags = () => (
+    <>
+      {isLoading && (
+        <Tag type="warm-gray" size="md">
+          ⏱️ {liveElapsed}s...
+        </Tag>
+      )}
+      {!isLoading && timingInfo.durationSec && (
+        <Tag type={timingInfo.backend === 'spyre' ? 'green' : 'blue'} size="md">
+          ⏱️ {timingInfo.durationSec}s ({timingInfo.backend === 'spyre' ? '⚡ Spyre' : '🔵 CPU'})
+        </Tag>
+      )}
+      {!isLoading && lastCpuDuration && lastSpyreDuration && (
+        <Tag type="purple" size="md">
+          🚀 Spyre is {(parseFloat(lastCpuDuration) / parseFloat(lastSpyreDuration)).toFixed(1)}x faster ({lastSpyreDuration}s vs {lastCpuDuration}s)
+        </Tag>
+      )}
+    </>
+  );
 
   // Function to handle clicking the sticky notification to return to results
   const handleReturnToResults = () => {
@@ -513,13 +559,14 @@ export default function EntityExtractionPage() {
 
               <Grid className="tabs-group-content">
                 <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
                     <Button className="send-to-llm-class" onClick={()=>completion()} disabled={isLoading}>
                       {isLoading ? 'Sending…' : 'Send Prompt to LLM'}
                     </Button>
                     <Tag type={spyreActive ? 'green' : 'blue'} size="md">
                       {spyreActive ? '⚡ IBM Spyre' : '🔵 IBM Power MMA'}
                     </Tag>
+                    {renderTimingTags()}
                   </div>
                 </Column>
 
@@ -847,13 +894,14 @@ export default function EntityExtractionPage() {
               {/* Submit button and results - reuse the same pattern from Book Review tab */}
               <Grid className="tabs-group-content">
                 <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
                     <Button className="send-to-llm-class" onClick={()=>completion()} disabled={isLoading}>
                       {isLoading ? 'Sending…' : 'Send Prompt to LLM'}
                     </Button>
                     <Tag type={spyreActive ? 'green' : 'blue'} size="md">
                       {spyreActive ? '⚡ IBM Spyre' : '🔵 IBM Power MMA'}
                     </Tag>
+                    {renderTimingTags()}
                   </div>
                 </Column>
 
@@ -1089,13 +1137,14 @@ export default function EntityExtractionPage() {
 
               <Grid className="tabs-group-content">
                 <Column sm={4} md={8} lg={16} className="landing-page__tab-content">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
                     <Button className="send-to-llm-class" onClick={()=>completion()} disabled={isLoading}>
                       {isLoading ? 'Sending…' : 'Send Prompt to LLM'}
                     </Button>
                     <Tag type={spyreActive ? 'green' : 'blue'} size="md">
                       {spyreActive ? '⚡ IBM Spyre' : '🔵 IBM Power MMA'}
                     </Tag>
+                    {renderTimingTags()}
                   </div>
                 </Column>
 
